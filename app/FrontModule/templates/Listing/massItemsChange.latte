@@ -1,0 +1,21 @@
+{block head}
+<link rel="stylesheet" type="text/css" href="{$basePath}/css/jquery-ui.css">
+{/block}
+
+{block scripts}
+{include parent}
+<script src="{$basePath}/js/jquery-ui.js"></script>
+<script src="{$basePath}/js/jquery.ui.touch-punch.min.js"></script>
+<script src="{$basePath}/js/timeConverter.js"></script>
+<script src="{$basePath}/js/sliders.js"></script>
+{/block}
+
+{block content}
+
+{control listingActionsMenu}
+
+<h2 n:block="title">Hromadná změna položek výčetky</h2>
+
+{control massItemChangeTable}
+
+{/block}

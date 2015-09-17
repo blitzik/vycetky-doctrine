@@ -1,0 +1,15 @@
+{block title}Systém pro správu výčetek{/block}
+
+{block content}
+
+<!--<h2>Hlavní stránka - přehled</h2>-->
+
+{*if $numberOfMessages}
+	<a href="{link MailBox:receivedUnread}" class="box box-new-messages">Ve schránce máte nové zprávy</a>
+{/if*}
+
+{control filter}
+
+{control listingsOverview}
+
+{/block}

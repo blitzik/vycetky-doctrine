@@ -1,0 +1,68 @@
+{block content}
+
+<h2 n:block="title">Správa napovídání pracovišť</h2>
+
+{form localitiesTableForm}
+
+{snippet localitiesList}
+{if $numberOfLocalities > 0}
+<table class="table t-classic t-overview">
+    <caption>Celkový počet položek: ({$numberOfLocalities}) | Zobrazeno položek: ({count($localities)})</caption>
+    <tr><td colspan="2">{input search} {input filter}</td><td>{input hide}</td></tr>
+    <tr><th class="w20"><input type="checkbox" id="checkAll"></th>
+        <th class="w200">Pracoviště</th>
+        <th></th>
+    </tr>
+    {snippet container}
+    {if count($localities) > 0}
+        {foreach $localities as $locality}
+            <tr n:snippet="locality-$locality->localityID">
+                <td><input type="checkbox" name="lcls[]" value="{$locality->localityID}" class="itemToCheck"></td>
+                <td>{$locality->name}</td>
+                <td><a href="{plink doNotShowLocality!, 'localityID' => $locality->localityID}"
+                       class="ajax">Odebrat z nápovědy</a></td></tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="3">Zadanému kritériu neodpovídají žádné záznamy</td>
+        </tr>
+    {/if}
+    <script>
+    $(function () {
+        var SearchInput = $('#search');
+        var strlen = SearchInput.val().length * 2;
+        SearchInput.focus();
+        SearchInput[0].setSelectionRange(strlen, strlen);
+
+        checkAllFunc();
+    });
+    </script>
+    {/snippet}
+</table>
+{else}
+<div class="box box-classic">
+    Nemáte žádná pracoviště zobrazitelná v nápovědě.
+</div>
+{/if}
+{/snippet}
+{/form}
+
+<div class="box box-hint">
+<h3>Správa pracovišť</h3>
+<p>Každé pracoviště nebo jiný text, který uvedete do pole <b>Pracoviště</b>
+    při vytváření nebo upravování položky výčetky se ukládá, aby později
+    uživatel nemusel znovu psát celý název pracoviště. Při zadání prvních znaků
+    se zobrazí seznam odpovídajících pracovišť.</p>
+
+<h3>Proč spravovat pracoviště?</h3>
+<p>Občas se stane, že se uživatel přepíše. Aby se uživateli nezobrazovala
+takto špatně zadaná pracoviště v nápovědě, může je vyloučit kliknutím na
+odkaz nezobrazovat.</p>
+
+<p class="box box-red">
+Pracoviště jako takové se bude stále zobrazovat v položkách výčetek.
+Jedná se pouze o vyloučení z nápovědy.
+</p>
+</div>
+
+{/block}

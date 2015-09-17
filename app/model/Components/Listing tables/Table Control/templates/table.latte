@@ -1,0 +1,83 @@
+
+{snippet actions}
+{if isset($showActions)}
+    {includeblock $showActions}
+{/if}
+{/snippet}
+
+
+{snippet itemsCollection}
+<table class="detail-table">
+    {if $isTableCaptionVisible}
+	<caption>
+    	{control description}
+    	<span class="right">Celkem odpracováno: [ <b n:snippet="workedDays">{$workedDays|dayWordForm}</b> ] a
+    	[ <b n:snippet="workedHours">{$totalWorkedHours|toTimeWithComma:true} hodin</b> ]</span>
+    </caption>
+    {/if}
+
+    <tr>
+        {if $showCheckBoxes}
+        <th class="w45"><input type="checkbox" id="checkAll"></th>
+        {/if}
+
+        <th class="w45">Datum</th>
+        <th class="w45">Den</th>
+        <th>Popis práce - místo</th>
+        <th class="w90">Prac. doba</th>
+        <th class="w45">Oběd</th>
+        <th class="w45">Odpr. hod.</th>
+        <th class="w45">Ost. hod.</th>
+
+        {if isset($showActions)}
+            {include #items-table-actionsLabel}
+        {/if}
+    </tr>
+    {foreach $itemsCollection as $day => $item}
+        <tr n:class="$item->isCurrentDay() ? currentDay, $item->isWeekDay() ? weekDay"
+            n:snippet="itemDay-$day">
+            {if $showCheckBoxes}
+                {if !$item->isFilling()}<td><input type="checkbox" class="itemToCheck" name="items[]" value="{$item->listingItemID}"></td>
+                {else}<td></td>{/if}
+            {/if}
+           <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$day}</td>
+           <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$item->day|dayShortcut}</td>
+
+        {if !$item->isFilling()}
+
+            {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}
+            {var $localityDesc = $item->locality . $description}
+
+            <td><a name="{$item->getDay()->format('j')}">{$localityDesc|truncate:40}</a></td>
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->workStart|date:'H:i'} - {$item->workEnd|date:'H:i'}{/if}</td>
+
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->lunch|toTimeWithComma:true}{/if}</td>
+
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->hours|toTimeWithComma}{/if}</td>
+
+            <td{if !is_null($item->descOtherHours)} title="{$item->descOtherHours}"
+                                          class="desc-other-hours"{/if}>
+                                          {$item->otherHours|toTimeWithComma}</td>
+
+        {else}
+            <td></td><td></td><td></td><td></td><td></td>
+        {/if}
+
+        {if isset($showActions)}
+            {include #items-table-actions, 'day' => $day,
+                                           'item' => $item,
+                                           'numberOfDaysInMonth' => $numberOfDaysInMonth,
+                                           'params' => $parameters}
+        {/if}
+        </tr>
+    {/foreach}
+</table>
+<script>
+$(function () {
+    checkAllFunc();
+});
+</script>
+{/snippet}

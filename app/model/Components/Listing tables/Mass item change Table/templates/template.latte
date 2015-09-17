@@ -1,0 +1,76 @@
+
+{form listingMassItemsChangeForm}
+
+{snippet flashMessage}
+<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+{/snippet}
+
+{snippet formErrors}
+<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+    {$error}
+</div>
+{/snippet}
+
+<div class="box-wrapper">
+    <table class="table t-classic">
+    <caption>{control listingDescription}</caption>
+    <tr><th>{label workStart /}</th><th>{label workEnd /}</th>
+        <th>{label lunch /}</th><th>Odpracovano</th></tr>
+
+    <tr><td>{input workStart}
+            <div class="time-control">
+                {input workStartAdd}
+                {input workStartSub}
+            </div></td>
+            <td>{input workEnd}
+            <div class="time-control">
+                {input workEndAdd}
+                {input workEndSub}
+            </div></td><td>{input lunch}
+            <div class="time-control">
+                {input lunchAdd}
+                {input lunchSub}
+            </div></td>
+            <td>
+                <span class="workedHours">-</span>
+            </td>
+    </tr>
+
+    <tr><td colspan="2"><div id="slider-range"></div></td>
+        <td><div id="slider-lunch"></div></td><td>{input save}</td></tr>
+    <tr><td colspan="4">{input newListing}</td></tr>
+    </table>
+
+    <table class="table t-classic clear-element">
+        <tr><th>{label otherHours /}</th></tr>
+        <tr><td>{input otherHours}<div class="time-control">
+            {input otherHoursAdd}
+            {input otherHoursSub}
+        </div></td></tr>
+        <tr><td><div id="slider-time-other"></div></td></tr>
+    </table>
+    <div class="box box-red w300">Pokud budete měnit hodnotu <strong>"ostatních hodin"</strong> na
+               hodnotu 0 u řádku, kde byl k těmto hodinám nastaven komentář,
+               bude tento komentář ztracen.</div>
+</div>
+
+<script>
+$(function () {
+    $('.workedHours').text({$defaultWorkedHours});
+});
+</script>
+
+<div class="box box-hint w250 right">
+    <h3>Hromadná změna položek</h3>
+    <p>U změněných položek bude zachován den, místo
+        a popis práce. Změní se pouze hodnoty týkající se času.</p>
+
+    <h4>Výsledek</h4>
+    <p>Lze provést změny přímo v aktuální výčetce a nebo provedené změny
+       promítnout do nové výčetky, vycházející z výčetky aktuální zaškrnutím
+       pole pro založení nové výčetky.</p>
+</div>
+
+{control itemsTable}
+
+{/form listingMassItemsChangeForm}

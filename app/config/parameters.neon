@@ -1,0 +1,7 @@
+parameters:
+	defaultItemTime:
+		workStart: '6:00'
+		workEnd: '16:00'
+		lunch: '1'
+		workedHours: '9'
+		otherHours: '0'

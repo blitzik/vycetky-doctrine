@@ -1,0 +1,45 @@
+<nav class="listing-sub-nav">
+<ul>
+<li>
+    <a href="{plink Listing:pdfGeneration, 'id' => $listing->id}"
+       class="createPdf"
+       title="Vygeneruje PDF dokument s výčetkou">Generovat PDF</a>
+</li>
+
+<li>
+    <a href="{plink Listing:edit,
+              'id'=>$listing->id,
+              'backlink'=>$presenter->storeRequest()}"
+              {ifCurrent Listing:edit}class="selected"{/ifCurrent}>Upravit výčetku</a>
+</li>
+
+<li>
+   <a href="{plink Listing:copy, 'id'=>$listing->id}"
+      title="Vytvoří totožnou kopii výčetky"
+      {ifCurrent Listing:copy}class="selected"{/ifCurrent}>Vytvořit kopii</a>
+</li>
+
+<li>
+    <a href="{plink Listing:massItemsChange,
+              'id'=>$listing->id}"
+              {ifCurrent Listing:massItemsChange}class="selected"{/ifCurrent}>Hromadně změnit čas</a>
+</li>
+
+<li>
+    <a href="{plink Listing:share, 'id' => $listing->id}"
+    {ifCurrent Listing:share}class="selected"{/ifCurrent}>Odeslat výčetku</a>
+</li>
+
+<li>
+    <a href="{plink Merge:search, 'id' => $listing->id}"
+    {ifCurrent Merge:search}class="selected"{/ifCurrent}>Spojit výčetku</a>
+</li>
+
+<li>
+    <a href="{plink Listing:remove,
+              'id'=>$listing->id,
+              'backlink' => $presenter->storeRequest()}"
+              {ifCurrent Listing:remove}class="selected"{/ifCurrent}>Odstranit výčetku</a>
+</li>
+</ul>
+</nav>

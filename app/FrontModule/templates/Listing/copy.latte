@@ -1,0 +1,25 @@
+{block content}
+
+{control listingActionsMenu}
+
+<h2 n:block="title">Kopie výčetky</h2>
+
+{form simpleCopyForm}
+    <table class="table t-classic">
+    <caption>{control listingDescription}</caption>
+        <tr><th>Období:</th><td>{input month} {input year}</td></tr>
+        <tr><th>Popis:</th><td>{input description}</td></tr>
+        <tr><td></td><td>{input save}</td></tr>
+    </table>
+{/form simpleCopyForm}
+
+<div class="box box-hint">
+    <h3>Kopie výčetky</h3>
+    <p>Vytvoří se kopie výčetky, která bude mít identické
+       parametry, jako výčetka, ze které se vychází. Tzn.
+       stejný měsíc a stejný popis. Vytvoří se taktéž kopie
+       jednotlivých položek, které bude možné poté upravovat
+       stejně jako parametry nově vytvořené výčetky.</p>
+</div>
+
+{/block}

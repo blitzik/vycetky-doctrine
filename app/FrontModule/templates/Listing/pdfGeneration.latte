@@ -1,0 +1,38 @@
+{block content}
+
+{control listingActionsMenu}
+
+<h2 n:block="title">Generování PDF výčetky</h2>
+
+<div class="left-side">
+{form listingResultSettings}
+<table class="table t-classic">
+<caption>{control listingDescription}</caption>
+    <tr><th>{label employer /}</th><td colspan="2">{input employer}</td></tr>
+    <tr><th>{label name /}</th><td colspan="2">{input name}</td></tr>
+    <tr><td>{input reset}</td><td>{input generatePdf}</td></tr>
+</table>
+
+<table class="table t-classic">
+    <tr><th>Zobrazení položek výčetky</th></tr>
+    <tr><td>{input wage}</td></tr>
+    <tr><th>Zobrazení celkových hodin ve spodní části výčetky</th></tr>
+    <tr><td>{input otherHours}</td></tr>
+    <tr><td>{input workedHours}</td></tr>
+    <tr><td>{input lunch}</td></tr>
+</table>
+{/form}
+</div>
+
+<div class="box box-hint">
+<h3>Nastavení výsledného zobrazení</h3>
+<p>Před samotným vygenerováním můžete nastavit zobrazení
+    celkového součtu různých hodin, které se poté budou zobrazovat
+    ve spodní části výčetky.</p>
+<p>Dále je možné zadat jméno vlastníka výčetky. Toto jméno nemusíte
+    zadávat pokaždé. <a href="{link Profile:detail}">Ve svém Profilu</a>
+    si můžete nastavit jméno, které se poté bude zobrazovat v poli
+    <b>jméno</b>.</p>
+</div>
+
+{/block}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>{ifset #title}{include title|striptags}{/ifset}</title>
+
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/screen.css">
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/user.css">
+	{block scripts}
+        <script src="{$basePath}/js/jquery.js"></script>
+        <script src="{$basePath}/js/netteForms.js"></script>
+        <script src="{$basePath}/js/nette.ajax.js"></script>
+        <script src="{$basePath}/js/main.js"></script>
+    {/block}
+	{block head}{/block}
+</head>
+
+<body>
+      <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{!$flash->message}</div>
+
+      <div id="content">
+          {include content}
+      </div>
+</body>
+</html>

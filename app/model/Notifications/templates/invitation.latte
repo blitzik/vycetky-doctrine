@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Registrační pozvánka</title>
+        <meta charset="utf-8">
+    </head>
+<body>
+    
+<h1>Registrační pozvánka</h1>
+<p class="link"><a href="http://vycetky.alestichava.cz">http://vycetky.alestichava.cz</a></p>
+
+<p>Dobrý den,<br>
+   uživatel <strong>{$username}</strong> Vám posílá registrační pozvánku do výčetkového systému.
+   Registrační pozvánka má platnost do <strong>{$invitation->validity->format('d.m.Y H:i:s')}</strong>.<br>
+   Svou registraci můžete započnout na adrese:</p>
+
+{var $registrationLink = $link->link('User:Account:registration', ['email' => $invitation->email, 'token' => $invitation->token])}
+<p style="padding: 8px; border: 1px solid #ccc"><a href="{$registrationLink}">{$registrationLink}</a></p>
+
+<p>S přáním pěkného dne,<br>
+   Aleš Tichava, Administrátor aplikace</p>
+    
+</body>
+</html>

@@ -1,0 +1,53 @@
+{block title}Profil uživatele{/block}
+{block content}
+
+<h2>Profil uživatele</h2>
+
+<table class="table t-profile">
+
+    <tr><th>Přezdívka:</th><td>{$user->identity->username}</td></tr>
+    <tr><th>Jméno:</th><td>{form userForm}
+    {input name} {input savename}
+    {/form}</td></tr>
+    <tr><th>Registrační E-Mail:</th><td>{$user->identity->email}</td></tr>
+	<tr><th>Odprac. dní:</th><td>{$totalWorkedDays}</td></tr>
+    <tr><th>Odprac. hodin:</th><td>{$totalWorkedHours|toTimeWithComma:true}</td></tr>
+
+    {if $user->identity->role === 'administrator'}
+    <tr>
+        <th>Zálohovat Databázi:</th>
+        <td>{form backupDatabaseForm}{input backup}{/form backupDatabaseForm}</td>
+    </tr>
+    {/if}
+
+</table>
+
+<div class="box box-hint">
+
+    <h3>Registrační pozvánka</h3>
+
+    {form sendKeyForm}
+
+        <div class="errors" n:if="$form->hasErrors()">
+            <ul>
+                <li n:foreach="$form->errors as $error">{$error}</li>
+            </ul>
+        </div>
+
+        <table class="invitationTable">
+            <tr><th>{label email /}</th></tr>
+            <tr><td>{input email}</td></tr>
+            <tr><td>{input send}</td></tr>
+        </table>
+    {/form sendKeyForm}
+
+    <h4>Princip pozvánek</h4>
+    <p>Registrace do tohoto systému jsou omezeny
+       registračními pozvánkami. Uživatel, který chce
+       využívat tuto službu a nemá zřízený účet,
+       musí požádat člena, který tuto službu využívá,
+       aby mu poslal na email pozvánku na registraci
+       do systému.</p>
+</div>
+
+{/block}

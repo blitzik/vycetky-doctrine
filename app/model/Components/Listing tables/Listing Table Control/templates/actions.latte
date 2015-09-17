@@ -1,0 +1,25 @@
+{define items-table-actionsLabel}
+<th colspan="3">Akce</th>
+{/define}
+
+{define items-table-actions}
+<td class="w30">
+{if !$item->isFilling()}
+    {if $day != $numberOfDaysInMonth}
+        <a href="{$control->parent->link('copyItem!', ['day'=>$day])}"
+           class="ajax btn btn-copy" title="Kopírovat řádek o stupeň níž">&#9662;</a>
+    {/if}
+{/if}
+</td>
+
+<td class="w30"><a href="{plink Item:edit, 'id'=>$params['listingID'], 'day'=>$day}"
+    class="btn btn-blue" title="Upravit řádek výčetky">Upravit</a>
+</td>
+
+<td class="w30">
+{if !$item->isFilling()}
+    <a href="{$control->parent->link('removeItem!', ['day'=>$day])}"
+       class="ajax btn btn-red" title="Nastavit řádek do defaultních hodnot">&Cross;</a>
+{/if}
+</td>
+{/define}

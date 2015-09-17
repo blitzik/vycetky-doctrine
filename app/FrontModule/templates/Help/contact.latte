@@ -1,0 +1,33 @@
+{block content}
+
+    <h2 n:block=title>Pomoc v nouzi</h2>
+
+    <h3>Kontaktní formulář</h3>
+
+    <div class="box box-classic">
+    {form helpForm}
+
+        <table>
+            <tr><th>{label subject /}</th></tr>
+            <tr><td>{input subject}</td></tr>
+            <tr><th>{label text /}</th></tr>
+            <tr><td>{input text}</td></tr>
+            <tr><td>{input send}</td></tr>
+        </table>
+
+    {/form helpForm}
+    </div>
+
+    <div class="box box-hint">
+        <h3>Pomoc v nouzi</h3>
+
+        <p>Nevíte-li si s něčím rady a nebo máte problém s nějakou
+          funkcí systému, tak neváhejte kontaktovat správce systému
+          přes tento kontaktní formulář.</p>
+
+        <p>Odpověď bude zaslána na registrační E-mail uvedený ve
+            <a href="{link Profile:default}">Vašem profilu</a>, pokud nebude
+            ve zprávě specifikován jiný kontaktní E-mail.</p>
+    </div>
+
+{/block}

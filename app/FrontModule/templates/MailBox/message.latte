@@ -1,0 +1,35 @@
+{block content}
+
+{include 'navigation.latte'}
+
+<h2 n:block=title>{$message->isReceived() ? 'Přijatá' : 'Odeslaná'} zpráva</h2>
+
+{if !$message->isReceived()}
+<table class='table t-recipients'>
+{var $recipients = $message->getRecipientsNames()}
+{dump $recipients}
+<tr><th>{count($recipients) > 1 ? 'Příjemci' : 'Příjemce'}</th></tr>
+{foreach $recipients as $recipientName}
+<tr><td>{if isset($recipientName)}{$recipientName}{else}
+        <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">{/if}</td></tr>
+{/foreach}
+</table>
+{/if}
+
+<table class="table t-message">
+{if $message->isReceived()}
+<tr><th>Odesílatel</th>
+    <td>{if isset($message->author)}{$message->author->username}{else}
+        <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">{/if}</td>
+</tr>
+{/if}
+
+<tr><th>{$message->isReceived() ? 'Přijato' : 'Odesláno'}</th>
+    <td>{$message->sent|date:'j.n.Y v H:i'}</td></tr>
+
+<tr><th>Předmět</th><td>{$message->subject}</td></tr>
+<tr><th>Text zprávy</th><td>{$message->message|noescape|texy}</td></tr>
+</table>
+
+
+{/block}

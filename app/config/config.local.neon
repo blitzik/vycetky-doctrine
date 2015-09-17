@@ -1,0 +1,46 @@
+parameters:
+	mainEmail: 'admin@email.em'
+
+	backup:
+		database:
+			password: 'password'
+
+	database:
+		host: 127.0.0.1
+		driver: mysql
+		username: root
+		password: asqw
+		dbname: listings
+
+	company:
+		name: 'Company name'
+
+	emails:
+		system: 'system@email.em'
+		admin: %mainEmail%
+
+
+doctrine:
+	host: %database.host%
+	database: %database.driver%
+	user: %database.username%
+	password: %database.password%
+	dbname: %database.dbname%
+	charset: utf8
+	defaultRepositoryClassName: Kdyby\Doctrine\EntityRepository
+
+	metadata:
+		App\Model\Domain\Entities: %appDir%/model/Domain
+
+	dql:
+		string:
+			'COLLATE': App\Doctrine\MySQL\Collate
+
+		datetime:
+			'TIME_TO_SEC': App\Doctrine\MySQL\TimeToSec
+			'SEC_TO_TIME': App\Doctrine\MySQL\SecToTime
+			'ADDTIME': App\Doctrine\MySQL\AddTime
+			'SUBTIME': App\Doctrine\MySQL\SubTime
+
+	types:
+		'invoicetime': App\Doctrine\Types\InvoiceTimeType

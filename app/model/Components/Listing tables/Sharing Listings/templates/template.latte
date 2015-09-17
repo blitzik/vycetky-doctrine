@@ -1,0 +1,27 @@
+
+{form form}
+<table class="table t-classic">
+<tr><th>{label description /}</th></tr>
+<tr><td>{input description}</td></tr>
+<tr><td>{input send}</td></tr>
+</table>
+
+<table class="table t-classic left">
+<tr><th>{label recipients /}</th></tr>
+<tr><td>{input recipients}</td></tr>
+</table>
+
+<div class="box-hint right">
+<h3>Sdílení výčetky</h3>
+<p>Popis výčetky se nastaví jako popis nové výčetky,
+    který se zobrazí příjemci. Příjemce tak neuvidí popis, který
+    má nastaven vlastník výčetky.
+    <strong>Příjemce taktéž neuvidí hodnotu základní mzdy, kterou
+    máte u výčetky nastavenu.</strong></p>
+
+<p class="box box-red"><strong>Označené řádky nebudou sdíleny.</strong></p>
+</div>
+
+{control itemsTable}
+
+{/form}

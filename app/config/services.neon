@@ -1,0 +1,176 @@
+services:
+
+	security.userStorage: App\Model\Authentication\UserStorage
+
+	# Authentication
+	userAuthenticator: App\Model\Authentication\UserAuthenticator
+
+
+	# Listeners
+	authenticationListener:
+		class: App\Model\Listeners\AuthenticationListener
+		tags: [kdyby.subscriber]
+
+	# Database Backup
+	databaseBackup:
+		class: DatabaseBackup(%database%)
+
+	localityProvider:
+		class: App\Model\Services\Providers\LocalityProvider
+
+	workedHoursProvider:
+		class: App\Model\Services\Providers\WorkedHoursProvider
+
+	# Writers
+	listingItemWriter:
+		class: App\Model\Services\Writers\ListingItemWriter
+
+	# Readers
+	listingItemReader:
+		class: App\Model\Services\Readers\ListingItemReader
+
+	# Managers
+	listingItemManager:
+		class: App\Model\Services\Managers\ListingItemManager
+
+
+	# Presenters
+	listingPresenter:
+		class: App\FrontModule\Presenters\ListingPresenter
+		setup:
+			- setCompanyParameters(%company%)
+
+	helpPresenter:
+		class: App\FrontModule\Presenters\HelpPresenter
+		setup:
+			- setemails(%emails%)
+
+	profilePresenter:
+		class: App\FrontModule\Presenters\ProfilePresenter
+		setup:
+			- setEmails(%emails%)
+
+	backupPresenter:
+		class: App\FrontModule\Presenters\BackupPresenter
+		setup:
+			- setEmails(%emails%)
+
+	passwordPresenter:
+		class: App\UserModule\Presenters\PasswordPresenter
+		setup:
+			- setSystemEmail(%emails.system%)
+
+	# -----------------
+
+	nette.latteFactory:
+		setup:
+			- addFilter(null, [Filters\FilterLoader(), 'loader'])
+
+	listingFormFactory: App\Model\Components\ListingFormFactory
+
+	# Factories
+	itemUpdateFormFactory:
+		class: App\Model\Components\ItemUpdateFormFactory(%defaultItemTime%)
+
+	filterControlFactory:
+		implement: App\Model\Components\IFilterControlFactory
+
+	listingActionMenuControlFactory:
+		implement: App\Model\Components\IListingActionsMenuControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	messagesTableControlFactory:
+		implement: App\Model\Components\IMessagesTableControlFactory
+		parameters: [MessagesLoaders\IMessagesLoader loader]
+		arguments: [%loader%]
+
+	itemsTableControlFactory:
+		implement: App\Model\Components\ItemsTable\IItemsTableControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingTableControlFactory:
+		implement: App\Model\Components\ListingTable\IListingTableControlFactory
+		parameters: [array listingData]
+		arguments: [%listingData%]
+
+	massItemChangeControlFactory:
+		implement: App\Model\Components\IMassItemsChangeControlFactory
+		parameters: [App\Model\Entities\Listing listing]
+		arguments: [%listing%]
+
+	sharingListingControlFactory:
+		implement: App\Model\Components\ISharingListingControlFactory
+		parameters: [App\Model\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingFormControlFactory:
+		implement: App\Model\Components\IListingFormControlFactory
+		parameters: [listing]
+		arguments: [%listing%]
+
+	listingDescriptionControlFactory:
+		implement: App\Model\Components\IListingDescriptionControlFactory
+		parameters: [\DateTime period, description]
+		arguments: [%period%, %description%]
+
+	listingsOverviewControlFactory:
+		implement: App\Model\Components\IListingsOverviewControlFactory
+
+	paginatorFactory: \Components\IPaginatorFactory
+
+	# LeanMapper
+	standardMapper: App\Model\Mapper\StandardMapper
+	entityFactory: EntityFactory
+
+	# Repositories
+	userMessageRepository: App\Model\Repositories\UserMessageRepository
+	listingItemRepository: App\Model\Repositories\ListingItemRepository
+	workedHoursRepository: App\Model\Repositories\WorkedHoursRepository # dont remove
+	invitationRepository: App\Model\Repositories\InvitationRepository
+	localityRepository: App\Model\Repositories\LocalityRepository # dont remove
+	listingRepository: App\Model\Repositories\ListingRepository
+	messageRepository: App\Model\Repositories\MessageRepository
+	userRepository: App\Model\Repositories\UserRepository
+
+	# Transaction class
+	transaction: Transaction
+
+	# Service layers
+	localityService: App\Model\Services\LocalityService
+	itemService: App\Model\Services\ItemService
+
+	# Facades
+	messagesFacade: App\Model\Facades\MessagesFacade
+	localityFacade: App\Model\Facades\LocalityFacade
+	listingFacade: App\Model\Facades\ListingFacade
+	userManager: App\Model\Facades\UserManager
+	itemFacade: App\Model\Facades\ItemFacade
+
+	# Messages Loaders
+	receivedUnreadMessagesLoader: MessagesLoaders\ReceivedUnreadMessagesLoader
+	receivedReadMessagesLoader: MessagesLoaders\ReceivedReadMessagesLoader
+	sentMessagesLoader: MessagesLoaders\SentMessagesLoader
+
+	# Authentication
+	#userAuthenticator: App\Model\Authenticators\UserAuthenticator
+
+	# Notifications
+
+		#Profile
+	emailNotifier: App\Model\Notifications\EmailNotifier
+
+	sharedListingNotification: App\Model\Notifications\SharedListingNotification
+
+	databaseBackupControlFactory:
+		implement: App\Model\Components\IDatabaseBackupControlFactory
+		parameters: [array emails]
+		arguments: [%emails%]
+		setup:
+			- setPasswordForBackup(%backup.database.password%)
+
+
+	# Router
+	- App\RouterFactory
+	router: @App\RouterFactory::createRouter

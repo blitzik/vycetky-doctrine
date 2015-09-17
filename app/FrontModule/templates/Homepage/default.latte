@@ -1,0 +1,28 @@
+{block title}Systém pro správu výčetek{/block}
+{block content}
+
+    <h2>Přehled</h2>
+
+    <p class="filter-title">Filtrace záznamů</p>
+    {form listingFilter}
+        <div class="filter">
+
+            {label month /} {input month}
+            {label year /} {input year}
+            {label filter /} {input filter}
+
+        </div>
+    {/form listingFilter}
+
+    {if $listings}
+        {foreach $listings as $entity}
+            {$entity->listingID}
+            {$entity->description}
+            {$entity->posted|date:'d.m.Y'}
+            <br>
+        {/foreach}
+    {else}
+        <p>Pro tento rok a měsíc nemáte žádné výčetky.</p>
+    {/if}
+
+{/block}

@@ -1,0 +1,37 @@
+.__paginator{
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.p-btn,
+.counter{
+  color: #FFF;
+  background-color: #428BCA;
+  border-color: #357EBD;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+}
+
+.p-btn{ &:hover{
+  color: #FFF;
+  background-color: #3071A9;
+  border-color:#285E8E;
+}}
+
+@counter-color: #D0D0D0;
+.counter{
+  background-color: @counter-color;
+  color: darken(@counter-color, 50%);
+}
+
+@btn-inactive-color: #858585;
+.inactive{
+  background-color: @btn-inactive-color;
+  &:hover{ background-color: @btn-inactive-color;}
+}

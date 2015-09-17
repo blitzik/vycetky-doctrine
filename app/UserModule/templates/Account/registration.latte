@@ -1,0 +1,37 @@
+{block scripts}
+    {include parent}
+    <script src="{$basePath}/js/placeholders.js"></script>
+    <script src="{$basePath}/js/passwordValidation.js"></script>
+{/block}
+
+{block content}
+<div class="wrapperBox">
+    <h1 n:block="title">Registrace uživatele</h1>
+
+        {form registrationForm}
+        <p class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+            {$error}
+        </p>
+        <div class="box">
+            <table>
+                <tr><td>{label username /} {input username}</td></tr>
+                <tr><td>{label password}<span id="pass-message">Uživatelské heslo:</span>{/label} {input password}</td></tr>
+                <tr><td>{label pass2}<span id="pass-control-message">Kontrola Hesla:</span>{/label} {input pass2}</td></tr>
+                <tr><td>{label email /} {input email}</td></tr>
+                <tr><td>{input reg}</td></tr>
+            </table>
+        </div>
+
+        <div class="hint">
+            <ul>
+                <li><strong>Z bezpečnostních důvodů si zvolte takové heslo, které nepoužíváte
+                    v jiných aplikacích</strong></li>
+                <li>Všechny položky je nutné vyplnit</li>
+                <li>Heslo musí mít nejméně 5 znaků</li>
+                <li>E-mail je potřeba při přihlašování, obnově hesla či předávání informací
+                    uživateli</li>
+            </ul>
+        </div>
+        {/form registrationForm}
+</div>
+{/block}

@@ -1,0 +1,9 @@
+{layout '@messageBoxLayout.latte'}
+
+{block userTypeLabel}<th>Odesílatel</th>{/block}
+{block messageTimeLabel}<th>Přijato</th>{/block}
+
+{block username}
+<td>{if isset($message->author)}{$message->author->username}{else}
+<img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">{/if}</td>
+{/block}

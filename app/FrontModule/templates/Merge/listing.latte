@@ -1,0 +1,120 @@
+{block content}
+
+{control listingActionsMenu}
+
+<h2 n:block="title">Spojené výčetky - výsledek</h2>
+<div class="left-side">
+    <h3>Barevné odlišení kolidujících záznamů</h3>
+    <table class="table t-classic">
+        <tr><th>Základní výčetka</th>
+            <td class="baseListing">{control listingDescription}</td></tr>
+        <tr><th>Spojovaná výčetka</th>
+            <td class="listingToMerge">
+                <a href="{plink Listing:detail, 'id' => $listingToMerge->listingID}">
+                [#{$listingToMerge->listingID}] {$listingToMerge->entireDescription()}</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="box-hint right">
+<h3>Spojení výčetek</h3>
+<p><a href="{link Help:doc#spojeni-vycetek}">Více viz dokumentace</a></p>
+
+<p class="box box-red">Spojením se vytvoří nová výčetka. Původní výčetky
+    zůstanou nedotčeny.</p>
+</div>
+
+{form listingsMergeForm}
+<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+    {$error}
+</div>
+
+{input merge}
+
+<table class="detail-table">
+
+<tr>
+    <th class="w45">Datum</th>
+    <th class="w45">Den</th>
+    <th>Popis práce - místo</th>
+    <th class="w90">Prac. doba</th>
+    <th class="w45">Oběd</th>
+    <th class="w45">Odpr. hod.</th>
+    <th class="w45">Ost. hod.</th>
+    <th class="w70">Výběr</th>
+</tr>
+
+{foreach $mergedListingsItems as $day => $listingItems}
+    {var $itemsCount = count($listingItems)}
+    {if $itemsCount > 1}
+        {foreach $listingItems as $item}
+            {var $IDs[] = $item->listingItemID} {* key 0 => baseListing | 1 => listing to merge *}
+        {/foreach}
+    {/if}
+    {foreach $listingItems as $item}
+    <tr n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDay : null))"
+        {if !$item->isFilling()}id="rowID-{$item->listingItemID}"{/if}>
+
+        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null))">{$day}</td>
+        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null))">{$item->day|dayShortcut}</td>
+
+        {if !$item->isFilling()}
+            {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}
+            {var $localityDesc = $item->locality . $description}
+
+            <td>{$localityDesc|truncate:40}</td>
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->workStart|date:'H:i'} - {$item->workEnd|date:'H:i'}{/if}</td>
+
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->lunch|toTimeWithComma:true}{/if}</td>
+
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->hours|toTimeWithComma}{/if}</td>
+
+            <td{if $item->descOtherHours} title="{$item->descOtherHours}"
+                                          class="desc-other-hours"{/if}>
+                                          {$item->otherHours|toTimeWithComma}</td>
+
+        {else}
+            <td></td><td></td><td></td><td></td><td></td>
+        {/if}
+
+        <td>
+            {if count($listingItems) > 1}
+                <input type="checkbox" name="itm[]" data-other="{$IDs[($item->getListingID() == $baseListing->listingID ? 1 : 0)]}" value="{$item->listingItemID}"> {* switched $IDs indexes *}
+            {/if}
+        </td>
+    </tr>
+    {/foreach}
+    {if isset($IDs)}
+        {? unset($IDs)}
+    {/if}
+{/foreach}
+
+</table>
+
+<script>
+$(function() {
+    $(':checkbox').prop('checked', false);
+
+    $(':checkbox').on('click', function() {
+        var otherItemID = $(this).data('other');
+        var otherItem = $('#rowID-' + otherItemID);
+
+        if (this.checked) {
+            otherItem.find('input[type="checkbox"]').prop('disabled', true);
+            otherItem.fadeOut(400);
+        } else {
+            otherItem.find('input[type="checkbox"]').prop('disabled', false);
+            otherItem.fadeIn(400);
+        }
+    });
+});
+</script>
+
+
+{/form}
+
+{/block}

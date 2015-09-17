@@ -1,0 +1,26 @@
+{if $paginator->pageCount > 1}
+	<p class="__paginator">
+	{if !$paginator->isFirst()}
+		{if $borderPages}
+			<a href="{link this, 'page' => $paginator->getFirstPage()}" class="p-btn" title="První stránka">«</a>
+		{/if}
+		<a href="{link this, 'page' => $paginator->page - 1}" class="p-btn">« Předchozí</a>
+	{else}
+		<span class="p-btn inactive">« Předchozí</span>
+	{/if}
+
+	{if $counter}
+		<span class="counter">[{$paginator->getPage()|number:0:',':' '} / {$paginator->getPageCount()|number:0:',':' '}]</span>
+	{/if}
+
+	{if !$paginator->isLast()}
+		<a href="{link this, 'page' => $paginator->page + 1}" class="p-btn">Další »</a>
+		{if $borderPages}
+			<a href="{link this, 'page' => $paginator->getLastPage()}" class="p-btn" title="Poslední stránka">»</a>
+		{/if}
+	{else}
+		<span class="p-btn inactive">Další »</span>
+	{/if}
+	</p>
+
+{/if}

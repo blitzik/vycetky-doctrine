@@ -1,0 +1,44 @@
+#
+# SECURITY WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+#
+# If you don't protect this directory from direct web access, anybody will be able to see your passwords.
+# http://nette.org/security-warning
+#
+
+php:
+	date.timezone: Europe/Prague
+
+
+nette:
+	application:
+		errorPresenter: Error
+		mapping:
+			*: App\*Module\Presenters\*Presenter
+
+	session:
+		expiration: 1 month
+		savePath: %appDir%/../temp/sessions
+		name: 'listings'
+
+	debugger:
+		email: ales.tichava@gmail.com
+		bar:
+			- Nette\Bridges\DITracy\ContainerPanel
+
+	latte:
+		macros:
+			- Nextras\Latte\Macros\RedefineMacro
+
+extensions:
+	leanMapper: LeanMapperExtension
+	console: Kdyby\Console\DI\ConsoleExtension
+	events: Kdyby\Events\DI\EventsExtension
+	annotations: Kdyby\Annotations\DI\AnnotationsExtension
+	doctrine: Kdyby\Doctrine\DI\OrmExtension
+
+leanMapper:
+	%database%
+
+includes:
+	- parameters.neon
+	- services.neon

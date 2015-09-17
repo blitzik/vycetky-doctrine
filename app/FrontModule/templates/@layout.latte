@@ -1,0 +1,66 @@
+{**
+ * @param string   $basePath web base path
+ * @param array    $flashes  flash numberOfMessages
+ *}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>{ifset #title}{include title|striptags}{/ifset}</title>
+
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/screen.css">
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/dashboard.css">
+	<link rel="stylesheet" href="{$basePath}/css/paginator.css">
+	{block head}{/block}
+</head>
+
+<body>
+<script> document.documentElement.className+=' js' </script>
+<script src="{$basePath}/js/jquery.js"></script>
+<script src="{$basePath}/js/netteForms.js"></script>
+<script src="{$basePath}/js/nette.ajax.js"></script>
+<script src="{$basePath}/js/main.js"></script>
+
+{block scripts}{/block}
+
+<div id="container">
+    <!--<h1><a href="{*link Listing:overview*}">Správa výčetek</a></h1>-->
+	<nav class="menu">
+		<ul>
+			<li><a href="{link Profile:detail}" class="user-box">{$username}</a></li>
+			<li><a href="{link Listing:overview, 'year' => $currentDate->format('Y'),
+												  'month' => $currentDate->format('n')}">Úvodní stránka</a></li>
+			<li><a class="parent">Výčetky</a>
+				<ul>
+					<li><a href="{link Listing:add}" class="add-listing">Vytvořit výčetku</a></li>
+					<li><a href="{link Locality:itemAutocomplete}" class="list-of-listing">Správa napovídání pracovišť</a></li>
+				</ul>
+			</li>
+			<li><a href="{link MailBox:receivedUnread}">Schránka</a></li>
+			<li><a class="parent">Pomoc</a>
+				<ul>
+					<li><a href="{link Help:doc}" class="system-doc">Dokumentace</a></li>
+					<li><a href="{link Help:contact}" class="admin-contact">Kontaktní formulář</a></li>
+				</ul>
+			</li>
+			<li class="logout"><a n:href="logout!">Odhlásit</a></li>
+		</ul>
+	</nav>
+
+    <div id="content">
+
+        {snippet flashMessages}
+         <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+        {/snippet}
+
+         {include content}
+    </div>
+
+    <footer id="footer">
+    &copy; 2013 - {date('Y')} Aleš Tichava
+    </footer>
+</div>
+
+</body>
+</html>

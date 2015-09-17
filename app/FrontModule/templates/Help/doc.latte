@@ -1,0 +1,211 @@
+{block content}
+
+<h2 n:block=title>Dokumentace k systému</h2>
+
+<a href="{link Help:contact}" class="box-important">V případě problému využijte kontaktní formulář</a>
+
+<ul class="help-documentation-content-list">
+    <li><h4>Uživatelé</h4>
+        <ul>
+            <li><a href="{link this}#registrace">Registrace</a></li>
+            <li><a href="{link this}#zapomenute-heslo">Zapomenuté heslo</a></li>
+            <li><a href="{link this}#profil-uzivatele">Profil uživatele</a></li>
+            <li><h5>Systém zpráv</h5>
+                <ul>
+                    <li><a href="{link this}#schranka">Schránka</a></li>
+                    <li><a href="{link this}#nova-zprava">Nová zpráva</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+
+    <li><h4>Výčetky</h4>
+        <ul>
+            <li><a href="{link this}#zalozeni-vycetky">Založení výčetky</a></li>
+            <li><a href="{link this}#uprava-vycetky">Úprava výčetky</a></li>
+            <li><a href="{link this}#odstraneni-vycetky">Odstranění výčetky</a></li>
+            <li><a href="{link this}#kopie-vycetky">Vytvoření kopie výčetky</a></li>
+            <li><a href="{link this}#detail-vycetky">Detail výčetky</a></li>
+            <li><a href="{link this}#generovani-vycetky">Vygenerování PDF výčetky</a></li>
+            <li><a href="{link this}#hromadna-zmena-casu">Hromadná změna času</a></li>
+            <li><a href="{link this}#odeslani-vycetky">Odeslání výčetky</a></li>
+            <li><a href="{link this}#spojeni-vycetek">Spojení výčetek</a></li>
+
+            <li><h5>Řádek výčetky</h5>
+                <ul>
+                    <li><a href="{link this}#uprava-radku">Úprava řádku</a></li>
+                    <li><a href="{link this}#kopie-radku">Kopie řádku</a></li>
+                    <li><a href="{link this}#smazani-radku">Smazání řádku</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<div class="box box-text">
+
+<p>V této dokumentaci naleznete základní informace o systému. Pokud zde nenaleznete informaci,
+    kterou hledáte, tak je možné kontaktovat správce pomocí
+    <a href="{link Help:contact}">kontaktního formuláře</a>. Odpověď Vám dorazí na Váš
+    registrační E-mail uvedený v profilu, pokud ve zprávě nespecifikujete jinak.</p>
+
+<h3>Uživatelé</h3>
+
+<h4><a name="registrace">Registrace</a></h4>
+<p>Systém funguje na principu pozvánek. To znamená, že se do systému nemůže zaregistrovat
+   kdokoliv. Stávající uživatelé mají ve svých rukou nástroj, díky kterému mohou
+   zaslat pozvánku člověku, který v systému není zaregistrován. Tento nástroj naleznete
+   <a href="{link Profile:detail}">ve svém profilu</a>.</p>
+
+<p>Po odeslání pozvánky obdrží člověk, jemuž byla pozvánka odeslána, E-mail, ve kterém
+    bude kromě samotné zprávy i odkaz na registrační stránku. Tento odkaz je platný
+    pouze po <strong>následujících 7 dní</strong>. Během této doby lze vytvořit
+    <strong>pouze 1 účet</strong>. Pokud platnost pozvánky vyprší, již nebude možné
+    pomocí této pozvánky vytvořit účet.</p>
+
+<h4><a name="zapomenute-heslo">Zapomenuté heslo</a></h4>
+<p>Pokud uživatel zapomene heslo, je možné si
+    <a href="{plink :User:Password:reset}">zapomenuté heslo obnovit</a>.
+    Uživateli stačí zadat E-mail, který uvedl při registraci svého účtu. Po odeslání formuláře
+    uživatel obdrží na svůj registrační E-mail zprávu, ve které bude odkaz na stránku, kde
+    bude možné si změnit zapomenuté heslo. <strong>Platnost tohoto odkazu je 1 den</strong> od
+    odeslání formuláře. Po změné hesla přestane být tento odkaz aktivní a heslo znovu nepůjde
+    změnit. Pokud uživatel nestihne změnit své heslo, odkaz na změnu hesla přestane být aktivní.</p>
+
+<h4><a name="profil-uzivatele">Profil uživatele</a></h4>
+<p><a href="{link Profile:detail}">V profilu uživatele</a> naleznete kromě systému odesílání pozvánek
+    i informace o uživateli a základní statistické údaje týkající se práce zanesené ve výčetkách. Jedná
+    se pouze o odpracované dny a hodiny. Veškeré hodnoty se vztahují pouze k aktuálně přihlášenému
+    uživateli.</p>
+
+<p>Uživatel si v profilu může taktéž nastavit jméno, které se bude poté defaultně zobrazovat v nastavení
+    před generováním výčetky, aby se toto jméno nemuselo u každé výčetky stále zadávat.</p>
+
+<h3>Systém zpráv</h3>
+
+<h4><a name="schranka">Schránka</a></h4>
+<p>Schránka je místo, kde uživatel vidí své přijaté a odeslané zprávy. Na hlavní stránce se
+    nachází box, který upozorní uživatele na nově příchozí zprávy. Ve schránce může uživatel spravovat
+    své příchozí a odchozí zprávy.</p>
+
+<h4><a name="nova-zprava">Nová zpráva</a></h4>
+<p>Uživatel může vytvořit zprávu, která bude mít uveden předmět, samotný text zprávy a příjemce.
+    Datum zprávy se doplní automaticky. Uživatel může jednu zprávu poslat více přijemcům tak, že s pomocí
+    tlačítka <strong>CTRL</strong> vybere více příjemců ze seznamu. Není proto nutné jednu zprávu vytvářet
+    několikrát.</p>
+
+<p>Zprávu je možné obohatit o tučné písmo, kurzívu či odkazy. Více je popsáno u
+    <a href="{link MailBox:newMessage}">samotného formuláře v nápovědě</a>.</p>
+
+<h3>Výčetky</h3>
+
+<h4><a name="zalozeni-vycetky">Založení výčetky</a></h4>
+<p>Při <a href="{link Listing:add}">zakládání výčetky</a> uživatel vyplní pouze měsíc a rok, ke
+    kterému se výčetka vztahuje. Nepovinnou položkou je položka "popis výčetky", ve které si
+    uživatel může blíže specifikovat výčetku. Pokud má uživatel vytvořeno více výčetek, díky popisu
+    rychle rozpozná o jaké výčetky se jedná. Tento popis je zobrazen při jakékoliv práci s výčetkou.</p>
+
+<p>Formulář pro založení výčetky taktéž umožňuje zadat <b>Základní mzdu</b>, která se poté
+    zobrazí ve spodní části výčetky.</p>
+
+<p>Uživatel může založit pro daný měsíc a rok <strong>neomezeně výčetek</strong>.</p>
+
+<h4><a name="uprava-vycetky">Úprava výčetky</a></h4>
+<p>Při úpravě výčetky se zobrazí stejný formulář jako při zakládání výčetky. Tento formulář však
+    již bude mít předvyplněná pole na základě upravované výčetky. Vše je jinak stejné jako při
+    zakládání výčetky, kromě položek měsíce a roku, které nelze měnit.</p>
+
+<h4><a name="odstraneni-vycetky">Odstranění výčetky</a></h4>
+<p>Při odstranění výčetky dojde k <strong>nenávratnému</strong> smazání výčetky a údajů, které tato výčetka
+    obsahovala.</p>
+
+<h4><a name="kopie-vycetky">Vytvoření kopie výčetky</a></h4>
+<p>Vytvořením kopie výčetky se uživateli vytvoří identická kopie výčetky, kterou uživatel
+    kopíruje. Stejné bude jak záhlaví výčetky tak i jednotlivé položky i s popisy.</p>
+
+<h4><a name="detail-vycetky">Detail výčetky</a></h4>
+<p>V detailu výčetky je vidět samotná výčetka. Nad výčetkou je menu, které obsahuje tlačítka pro
+    manipulaci s výčetkou. Nad tímto menu jsou vidět základní údaje o výčetce, jako jsou měsíc
+    a rok výčetky, popis, počet odpracovaných dní a celkový odpracovaný čas.
+    V samotné výčetce lze pracovat s jednotlivými řádky(viz níže).</p>
+
+<p>Pokud má řádek výčetky vyplněny "ostatní hodiny" a k nim komentář, pak se pole s ostatními hodinami
+    zbarví do oranžova. Pokud uživatel přejede myší na toto pole, pak se zobrazí komentář k těmto ostatním
+    hodinám v info bublině.</p>
+
+<h4><a name="generovani-vycetky">Vygenerování PDF výčetky</a></h4>
+<p>Z uložené výčetky lze generovat data do PDF souboru, který se zobrazí v prohlížeči a který si
+    může následně uživatel uložit do počítače. Generovat PDF může pouze uživatel vlastnící danou výčetku.</p>
+
+<p>Před samotným vygenerováním výčetky může uživatel mírně přizpůsobit výsledek.
+    Lze upravit jméno zaměstnavatele a jméno vlastníka výčetky. Dále může
+    uživatel nastavit, aby se ve výčetce zobrazoval celkový součet různých hodin.</p>
+
+<h4><a name="hromadna-zmena-casu">Hromadná změna času</a></h4>
+<p>Při hromadné změně výčetky budou změněny všechny řádky, které
+    uživatel označí. Provedené změny lze promítnout do nové výčetky po zaškrtnutí
+    daného prvku ve formuláři. Změny nebudou tedy provedeny v původní výčetce, ale
+    bude vytvořena výčetka nová s danými původními hodnotami a provedenými změnami.</p>
+
+<p>U výčetky zůstane zachován den a místo pracoviště. Změní se pouze hodnoty týkající se času,
+    tedy hodnoty, které lze přímo ovlivnit nastavením formuláře.</p>
+
+<p class="box box-red">Při nastavování <b>ostatních hodin</b> u položky výčetky lze zadat i komentář.
+    Tento komentář lze zadat pouze pokud jsou ostatní hodiny větší než 0. Kvůli tomuto omezení
+    dochází při hromadné změně položek, u kterých byli nastaveny ostatní hodiny a komentář <strong>ke
+    ztrátě komentáře u položek, kterým se nově nastaví hodnota ostatních hodin na 0.</strong></p>
+
+<h4><a name="odeslani-vycetky">Odeslání výčetky</a></h4>
+<p>Uživatel může odeslat kopii své výčetky jinému uživateli či více uživatelům naráz.
+    Povinnou položkou je popis výčetky, který se zobrazí přijemci nebo příjemcům výčetky.
+    Příjemcům se tak nezobrazí popis výčetky vlastníka.</p>
+
+<p>Příjemce odeslané výčetky taktéž <b>neuvidí</b> hodnotu <b>Základní mzdy</b>, pokud jí má
+    vlastník výčetky zadanou.</p>
+
+<p>Před odesláním lze zaškrtnout řádky, které <strong>se nemají odeslat</strong>.</p>
+
+<h4><a name="spojeni-vycetek">Spojení výčetek</a></h4>
+<p>Spojením výčetek je myšlena akce, kdy uživatel vybere dvě výčetky, které jsou
+    ze stejného období a vytvoří z nich jednu výčetku, která bude mít záznamy z
+    obou vybraných výčetek.</p>
+
+<p>Pokud se v obou výčetkách nachází záznamy ze stejného dne, bude v
+    přehledu výsledné výčetky tento den zobrazen 2x. Jeden záznam bude zobrazen ze
+    základní výčetky a druhý z druhé výčetky. Tyto záznamy jsou barevně odlišeny.</p>
+
+<p>Uživatel může z každého takového záznamu vybrat právě jeden, který se poté
+    promítne do výsledné výčetky. Pokud uživatel nevybere ani jeden záznam z
+    kolizního dne, bude na to upozorněn.</p>
+
+<p>Tato funkcionalita je vhodná, když Vám jiný uživatel nasdílí svou
+    výčetku a chcete zkombinovat údaje těchto dvou výčetek dohromady, abyste
+    nemuseli záznamy ze sdílené výčetky ručně zadávat.</p>
+
+<h3>Řádek výčetky</h3>
+
+<h4><a name="uprava-radku">Úprava řádku</a></h4>
+<p>Při úpravě řádku výčetky uživatel nastavuje pracovní dobu a místo výkonu práce.
+    Dále je možné dodatečně uvést popis práce, který se objeví za místem výkonu práce v kulatých
+    závorkách. Pokud má uživatel započítané nějaké dodatečné hodiny a nebo se jen jedná
+    např. o svátek, víkend apod. tak tyto hodiny lze uvést do ostatních hodin s případným komentářem.</p>
+
+<p>Při nastavování času směny a oběda nelze zadávat čas tak, že by odpracované hodiny byli záporné
+    a podle toho se také chovají posuvníky. Pokud byste se o to pokusili, tak se posuvník zastaví a
+    nepůjde s ním hýbat směrem, kterým by docházelo k tomuto jevu.</p>
+
+<p>Pokud chcete napsat komentář k ostatním hodinám, musíte mít nastaveny ostatní hodiny na hodnotu
+    větší než 0.</p>
+
+<h4><a name="kopie-radku">Kopie řádku</a></h4>
+<p>Kopírování řádku výčetky funguje obdobně jako kopírování celých výčetek. Pokud uživatel
+    vykonával stejnou práci, stejnou dobu na stejném místě, je takto možné zkopírovat řádek z
+    předešlého dne na den následující. Veškeré hodnoty zůstanou zachovány až na datum, které se změní
+    na den následující.</p>
+
+<h4><a name="smazani-radku">Smazání řádku</a></h4>
+<p>Smazáním řádku dojde k nastavení řádku do defaultních hodnot.</p>
+
+</div>
+
+{/block}

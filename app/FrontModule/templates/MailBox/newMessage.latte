@@ -1,0 +1,59 @@
+{block content}
+
+{include 'navigation.latte'}
+
+<div class="left-side">
+<h2 n:block=title>Nová zpráva</h2>
+
+{form newMessageForm}
+<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+    {$error}
+</div>
+
+<table class="table t-message">
+    <tr><td colspan="2">{if $user->isInRole('administrator')}{input isSystemMessage}{/if}</td><th>{label receivers /}</th></tr>
+    <tr><th>{label subject /}</th><td>{input subject}</td><td rowspan="3">{input receivers}</td></tr>
+    <tr><th>{label message /}</th><td>{input message}</td></tr>
+    <tr><td></td><td>{input send}</td></tr>
+</table>
+{/form newMessageForm}
+
+<div class="box box-classic box-text">
+
+    <h3>Možnosti zpráv</h3>
+
+    <p>Chcete-li poslat stejnou zprávu více lidem, nemusíte pokaždé psát novou zprávu
+        s jiným přijemcem. Ve výběrovém seznamu, kde vidíte jména uživatelů, můžete vybrat více jmen,
+        když při výběru podržíte klávesu <strong>CTRL</strong>.</p>
+
+    <p>Zprávu lze obohatit o <strong>tučné</strong> písmo, <em>kurzívu</em> a <a href="">odkazy</a>.</p>
+
+    <h4>Tučné písmo</h4>
+    <p>Pokud chcete ztučnit nějakou část textu, jednoduše tento text vložte
+        mezi dvě hvězdičky:</p>
+
+    <p>Př: Nějaký **text, který chcete** ztučnit.<br>
+        Výsledek: Nějaký <strong>text, který chcete</strong> ztučnit.</p>
+
+    <h4>Text s kurzívou</h4>
+    <p>Text s kurzívou lze zadat stejně jako při ztučnění písma. Rozdíl je v
+        tom, že místo dvou hvězdiček použijete hvězdičku pouze jednu:</p>
+
+    <p>Př: Nějaký *text, který chcete* kurzívou.<br>
+        Výsledek: Nějaký <em>text, který chcete</em> kurzívou.</p>
+
+    <h4>Vložení odkazu</h4>
+    <p>Odkaz do textu vložíte tak, že text odkazu uvedete do uvozovek, kde za uzavírací
+        uvozovkou následuje dvojtečka a samotný odkaz v hranatých závorkách.<br>
+        <span style="color: red">Nezapomeňte v odkazu na <strong>http://</strong> před www.</span>:</p>
+
+    <p>Př: Nějaký "odkaz":[<span style="color: red">http://</span>www.seznam.cz] v textu.<br>
+        Výsledek: Nějaký <a href="http://www.seznam.cz">odkaz</a> v textu.</p>
+
+    <h4>Další možnosti</h4>
+    <p>Alternativně lze využít HTML zápisu značek &lt;strong&gt;, &lt;em&gt; &lt;a&gt;.</p>
+
+</div>
+</div>
+
+{/block}

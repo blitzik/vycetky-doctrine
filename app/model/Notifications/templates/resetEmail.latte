@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Obnova hesla</title>
+        <style>
+            body{
+                  font-size: 0.90em;
+                  line-height: 1.6;
+                  color: #333;
+                  background: #FFF;
+                  font-family: Tahoma, "Geneva CE", lucida, sans-serif;
+            }
+            
+            h1{ margin: 0;}
+            a{ color: #006699; }
+            a:hover{ text-decoration: none;}
+            
+            #container{
+                        width: 500px;
+                        padding: 30px;
+                        background-color: #F1F1D4;
+                        border: 1px solid #d4d499;
+                        margin: 0 auto;
+            }
+            
+            .link{ margin: 0; }
+        </style>
+    </head>
+    <body>
+        
+    <div id="container">
+        <h1>Obnova zapomenutého hesla</h1>
+        <p class="link"><a href="http://vycetky.alestichava.cz">http://vycetky.alestichava.cz</a></p>
+
+        <p>Dobrý den,<br>
+           někdo se pokouší o <strong>změnu hesla</strong> na Vašem účtu v aplikaci
+           www.vycetky.alestichava.cz. Pokud jste si vědomi této žádosti o změnu hesla,
+           tak pokračujte kliknutím na následující odkaz:</p>
+
+        {var $linkToReset = $link->link('User:Password:change', ['email' => $email, 'token' => $token])}
+        <p style="padding: 8px; border: 1px solid #ccc"><a href="{$linkToReset}">{$linkToReset}</a></p>
+
+        <p>Pokud jste si tuto změnu nevyžádali Vy, tento E-mail prosím ignorujte.</p>
+        <p>S přáním pěkného dne,<br>
+           Aleš Tichava, Administrátor aplikace</p>
+
+    </div>
+        
+    </body>
+</html>

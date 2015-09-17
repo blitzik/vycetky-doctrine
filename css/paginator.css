@@ -1,0 +1,39 @@
+.paginator{
+            margin: 15px 0;
+            overflow: auto;
+}
+
+.p-btn,
+.counter{
+	text-decoration: none;
+     color: #FFF;
+     background-color: #428bca;
+     border-color: #357ebd;
+	display: inline-block;
+	text-align: center;
+	vertical-align: middle;
+	padding: 6px 12px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+
+}
+
+.counter{
+		background-color: #d0d0d0;
+		color: #353535;
+}
+
+.p-btn:hover{
+                 color: #FFF;
+                 background-color: #3071a9;
+                 border-color: #285e8e;
+}
+
+.inactive{
+		background-color: #858585;
+}
+
+.inactive:hover{
+		background-color: #858585;
+}

@@ -1,0 +1,18 @@
+{block content}
+
+{control listingActionsMenu}
+
+<h2 n:block="title">Vyhledání výčetky pro spojení</h2>
+
+{form listingsSelector}
+<table class="table t-classic">
+<tr><th>Základní výčetka</th><th colspan="2">Spojit s výčetkou:</th></tr>
+<tr>
+    <td>{control listingDescription}</td>
+    <td>{input listingsList}</td>
+    <td>{input send}</td>
+</tr>
+</table>
+{/form}
+
+{/block}

@@ -1,0 +1,33 @@
+{block content}
+
+<div class="wrapperBox">
+
+    <h1 n:block="title">Obnova zapomenutého hesla</h1>
+
+    {form passwordReset}
+    <p class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+        {$error}
+    </p>
+
+    <div class="box">
+        <table>
+
+            <tr><td>{label email /} {input email}</td></tr>
+            <tr><td>{input reset}</td></tr>
+
+        </table>
+    </div>
+
+    <div class="hint">
+        <ul>
+            <li>Zadejte svůj E-mail do textového pole vlevo</li>
+            <li>Po zadání E-mailu a odeslání formuláře Vám bude
+                na E-mail svázaný s Vašim účtem odeslán odkaz, na kterém
+                si budete moci změnit Vaše heslo</li>
+        </ul>
+    </div>
+    {/form passwordReset}
+
+</div>
+
+{/block}

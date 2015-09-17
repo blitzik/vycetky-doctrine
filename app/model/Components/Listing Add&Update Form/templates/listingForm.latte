@@ -1,0 +1,25 @@
+
+{form listingForm}
+<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
+    {$error}
+</div>
+
+<table class="table t-classic">
+{ifCurrent Listing:edit}<caption>{control listingDescription}</caption>{/ifCurrent}
+  <tr><th>Výčetka pro:</th><td colspan="2">{input month} {input year}</td></tr>
+  <tr><th>{label description /}</th><td colspan="2">{input description}</td></tr>
+  <tr><th>{label hourlyWage /}</th><td>{input hourlyWage}</td><td>Kč/h</td></tr>
+  <tr><td></td><td  colspan="2">{input save}</td></tr>
+
+</table>
+{/form listingForm}
+
+
+<div class="box box-hint">
+    <h3>Popis výčetky</h3>
+
+    <p>Popis výčetky slouží k bližší specifikaci výčetky.
+       Pokud má uživatel vytvořeno více výčetek, díky popisu
+       rychle rozpozná o jaké výčetky se jedná. Tento popis
+       je zobrazen při jakékoliv práci s výčetkou.</p>
+</div>
