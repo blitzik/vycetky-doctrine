@@ -59,7 +59,11 @@ namespace Exceptions\Runtime;
 
 		class InvalidTimeMemberTypeException extends RuntimeException {}
 
-        class DayExceedCurrentMonthException extends RuntimeException {}
+        class DayExceedException extends RuntimeException {}
+
+        class ShiftItemUpException extends RuntimeException {}
+
+        class ShiftItemDownException extends RuntimeException {}
 
         class ListingAlreadyContainsListingItemException extends RuntimeException {}
 

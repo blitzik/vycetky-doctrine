@@ -2,9 +2,7 @@
 
 namespace App\Model\Query;
 
-use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\ListingItem;
-use App\Model\Domain\Entities\Locality;
 use App\Model\Domain\Entities\Listing;
 use Kdyby\Doctrine\QueryBuilder;
 use Kdyby\Doctrine\QueryObject;

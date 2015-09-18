@@ -2,102 +2,49 @@
 
 namespace App\Model\Services\Writers;
 
-use App\Model\Domain\Entities\Listing;
-use App\Model\Domain\Entities\ListingItem;
-use App\Model\Domain\Entities\Locality;
-use App\Model\Domain\Entities\WorkedHours;
-use App\Model\Services\Providers\LocalityProvider;
-use App\Model\Services\Providers\WorkedHoursProvider;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Exceptions\Logic\InvalidArgumentException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
-use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\OtherHoursZeroTimeException;
-use Exceptions\Runtime\ShiftEndBeforeStartException;
+use Exceptions\Runtime\ListingItemNotFoundException;
+use App\Model\Services\Readers\ListingItemReader;
+use Exceptions\Logic\InvalidArgumentException;
+use Exceptions\Runtime\ShiftItemDownException;
+use Exceptions\Runtime\ShiftItemUpException;
+use App\Model\Domain\Entities\ListingItem;
 use Kdyby\Doctrine\EntityManager;
-use Nette\Object;
 use Tracy\Debugger;
+use Nette\Object;
 
 class ListingItemWriter extends Object
 {
+    const WRITE_DOWN = 1;
+    const WRITE_UP   = -1;
+
     /**
      * @var EntityManager
      */
     private $em;
 
     /**
-     * @var LocalityProvider
+     * @var ListingItemReader
      */
-    private $localityProvider;
-
-    /**
-     * @var WorkedHoursProvider
-     */
-    private $workedHoursProvider;
+    private $listingItemReader;
 
     public function __construct(
         EntityManager $entityManager,
-        LocalityProvider $localityProvider,
-        WorkedHoursProvider $workedHoursProvider
+        ListingItemReader $listingItemReader
     ) {
         $this->em = $entityManager;
-        $this->localityProvider = $localityProvider;
-        $this->workedHoursProvider = $workedHoursProvider;
+        $this->listingItemReader = $listingItemReader;
     }
 
     /**
-     * @param array $newValues
-     * @param ListingItem|null $listingItem
+     * @param ListingItem $listingItem
      * @return ListingItem
-     * @throws OtherHoursZeroTimeException
-     * @throws NegativeResultOfTimeCalcException
-     * @throws ShiftEndBeforeStartException
      * @throws ListingItemDayAlreadyExistsException
      * @throws \Exception
      */
-    public function saveListingItem(array $newValues, ListingItem $listingItem = null)
+    public function saveListingItem(ListingItem $listingItem)
     {
-        $workedHours = new WorkedHours(
-            $newValues['workStart'], $newValues['workEnd'],
-            $newValues['lunch'], $newValues['otherHours']
-        );
-
-        $locality = new Locality($newValues['locality']);
-
-        if (isset($listingItem)) {
-            if (!$listingItem->getWorkedHours()->hasSameValuesAs($workedHours)) {
-                $workedHours = $this->workedHoursProvider->setupWorkedHoursEntity($workedHours);
-                $listingItem->setWorkedTime($workedHours, $newValues['descOtherHours']);
-            }
-
-            if (!$listingItem->getLocality()->isSameAs($locality)) {
-                $locality = $this->localityProvider->setupLocalityEntity($locality);
-                $listingItem->setLocality($locality);
-            }
-
-            $listingItem->setDescription($newValues['description']);
-        } else {
-
-            $day = $newValues['day'];
-
-            if (!$newValues['listing'] instanceof Listing) {
-                throw new InvalidArgumentException('Argument $newValues must have member "listing " of type ' .Listing::class);
-            }
-            $listing = $newValues['listing'];
-
-            $locality = $this->localityProvider->setupLocalityEntity($locality);
-            $workedHours = $this->workedHoursProvider->setupWorkedHoursEntity($workedHours);
-
-            $listingItem = new ListingItem(
-                $day,
-                $listing,
-                $workedHours,
-                $locality,
-                $newValues['description'],
-                $newValues['descOtherHours']
-            );
-        }
-
         try {
             $this->em->persist($listingItem)->flush();
 
@@ -114,5 +61,88 @@ class ListingItemWriter extends Object
         }
 
         return $listingItem;
+    }
+
+    /**
+     * @param ListingItem $listingItem
+     * @param string $direction
+     * @return ListingItem New or Updated ListingItem
+     * @throws ShiftItemUpException
+     * @throws ShiftItemDownException
+     * @throws \Exception
+     */
+    public function shiftCopyOfListingItem(
+        ListingItem $listingItem,
+        $direction
+    ) {
+        $day = $listingItem->day;
+        try {
+            if ($direction === self::WRITE_UP) {
+                $day += self::WRITE_UP;
+                $item = $this->provideItemForUpShifting($listingItem);
+
+            } elseif ($direction === self::WRITE_DOWN) {
+                $day += self::WRITE_DOWN;
+                $item = $this->provideItemForDownShifting($listingItem);
+
+            } else {
+                throw new InvalidArgumentException('Wrong $direction argument. Use WRITE_* constants of ' .self::class);
+            }
+
+            $this->updateListingItemProperties($item, $listingItem);
+
+        } catch (ListingItemNotFoundException $e) {
+            $item = clone $listingItem;
+            $item->setDay($day);
+        }
+
+        return $this->saveListingItem($item);
+    }
+
+    /**
+     * @param ListingItem $new
+     * @param ListingItem $original
+     * @return void
+     */
+    private function updateListingItemProperties(
+        ListingItem $new,
+        ListingItem $original
+    ) {
+        $new->setLocality($original->getLocality());
+        $new->setWorkedTime(
+            $original->getWorkedHours(),
+            $original->descOtherHours
+        );
+        $new->setDescription($original->description);
+    }
+
+    /**
+     * @param ListingItem $listingItem
+     * @return ListingItem
+     * @throws ListingItemNotFoundException
+     */
+    private function provideItemForDownShifting(ListingItem $listingItem)
+    {
+        // we do NOT want to shift the last item
+        if ($listingItem->day >= $listingItem->getListing()->getNumberOfDaysInMonth()) {
+            throw new ShiftItemDownException;
+        }
+
+        return $this->listingItemReader->getNextItem($listingItem);
+    }
+
+    /**
+     * @param ListingItem $listingItem
+     * @return ListingItem
+     * @throws ListingItemNotFoundException
+     */
+    private function provideItemForUpShifting(ListingItem $listingItem)
+    {
+        // we do NOT want to shift the first item
+        if ($listingItem->day <= 1) {
+            throw new ShiftItemUpException;
+        }
+
+        return $this->listingItemReader->getPreviousItem($listingItem);
     }
 }

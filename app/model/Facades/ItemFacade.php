@@ -2,21 +2,23 @@
 
 namespace App\Model\Facades;
 
-use App\Model\Query\ListingItemsQuery;
+use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
+use Exceptions\Runtime\NegativeResultOfTimeCalcException;
+use Exceptions\Runtime\ListingItemNotFoundException;
+use Exceptions\Runtime\ShiftEndBeforeStartException;
+use Exceptions\Runtime\OtherHoursZeroTimeException;
 use App\Model\Services\Managers\ListingItemManager;
 use App\Model\Services\Readers\ListingItemReader;
-use Exceptions\Runtime\DayExceedCurrentMonthException;
-use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
-use Exceptions\Runtime\ListingItemNotFoundException;
+use App\Model\Services\Writers\ListingItemWriter;
+use Exceptions\Runtime\ShiftItemDownException;
+use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Listing;
-use App\Model\Services\ItemService;
-use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\OtherHoursZeroTimeException;
-use Exceptions\Runtime\ShiftEndBeforeStartException;
-use Kdyby\Doctrine\EntityManager;
+use App\Model\Query\ListingItemsQuery;
 use Kdyby\Doctrine\EntityRepository;
+use App\Model\Services\ItemService;
+use Kdyby\Doctrine\EntityManager;
 use Nette\Security\User;
 
 class ItemFacade extends BaseFacade
@@ -82,7 +84,9 @@ class ItemFacade extends BaseFacade
      */
     public function saveListingItem(array $newValues, ListingItem $listingItem = null)
     {
-        return $this->listingItemManager->saveListingItem($newValues, $listingItem);
+        $item = $this->listingItemManager->prepareListingItemByFormsData($newValues, $listingItem);
+
+        return $this->listingItemManager->saveListingItem($item);
     }
 
     /**
@@ -117,8 +121,7 @@ class ItemFacade extends BaseFacade
      * @param int $day
      * @param Listing $listing
      * @return mixed
-     * @throws DayExceedCurrentMonthException
-     * @throws ListingItemNotFoundException
+     * @throws ShiftItemDownException
      * @throws \Exception
      */
     public function shiftCopyOfListingItemDown(
@@ -126,7 +129,30 @@ class ItemFacade extends BaseFacade
         Listing $listing
     ) {
         return $this->listingItemManager
-                    ->shiftCopyOfListingItemDown($day, $listing);
+                    ->shiftCopyOfListingItem(
+                        $day,
+                        $listing,
+                        ListingItemWriter::WRITE_DOWN
+                    );
+    }
+
+    /**
+     * @param int $day
+     * @param Listing $listing
+     * @return mixed
+     * @throws ShiftItemUpException
+     * @throws \Exception
+     */
+    public function shiftCopyOfListingItemUp(
+        $day,
+        Listing $listing
+    ) {
+        return $this->listingItemManager
+                    ->shiftCopyOfListingItem(
+                        $day,
+                        $listing,
+                        ListingItemWriter::WRITE_UP
+                    );
     }
 
     /**

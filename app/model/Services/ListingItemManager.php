@@ -2,20 +2,26 @@
 
 namespace App\Model\Services\Managers;
 
-use App\Model\Domain\Entities\Listing;
-use App\Model\Domain\Entities\ListingItem;
-use App\Model\Query\ListingItemsQuery;
+use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
+use Exceptions\Runtime\NegativeResultOfTimeCalcException;
+use App\Model\Services\Providers\WorkedHoursProvider;
+use Exceptions\Runtime\ShiftEndBeforeStartException;
+use Exceptions\Runtime\OtherHoursZeroTimeException;
+use App\Model\Services\Providers\LocalityProvider;
 use App\Model\Services\Readers\ListingItemReader;
 use App\Model\Services\Writers\ListingItemWriter;
-use Doctrine\DBAL\LockMode;
-use Exceptions\Runtime\DayExceedCurrentMonthException;
-use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
-use Exceptions\Runtime\ListingItemNotFoundException;
-use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\OtherHoursZeroTimeException;
-use Exceptions\Runtime\ShiftEndBeforeStartException;
-use Kdyby\Doctrine\EntityManager;
+use Exceptions\Logic\InvalidArgumentException;
+use Exceptions\Runtime\ShiftItemDownException;
+use Exceptions\Runtime\ShiftItemUpException;
+use App\Model\Domain\Entities\WorkedHours;
+use App\Model\Domain\Entities\ListingItem;
+use App\Model\Domain\Entities\Locality;
+use App\Model\Query\ListingItemsQuery;
+use App\Model\Domain\Entities\Listing;
 use Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\EntityManager;
+use Doctrine\DBAL\LockMode;
+use Tracy\Debugger;
 use Nette\Object;
 
 class ListingItemManager extends Object
@@ -36,6 +42,16 @@ class ListingItemManager extends Object
     private $listingItemReader;
 
     /**
+     * @var WorkedHoursProvider
+     */
+    private $workedHoursProvider;
+
+    /**
+     * @var LocalityProvider
+     */
+    private $localityProvider;
+
+    /**
      * @var EntityManager
      */
     private $em;
@@ -43,13 +59,30 @@ class ListingItemManager extends Object
     public function __construct(
         ListingItemWriter $listingItemWriter,
         ListingItemReader $listingItemReader,
+        WorkedHoursProvider $workedHoursProvider,
+        LocalityProvider $localityProvider,
         EntityManager $entityManager
     ) {
         $this->listingItemWriter = $listingItemWriter;
         $this->listingItemReader = $listingItemReader;
+        $this->workedHoursProvider = $workedHoursProvider;
+        $this->localityProvider = $localityProvider;
         $this->em = $entityManager;
 
         $this->listingItemRepository = $this->em->getRepository(ListingItem::class);
+    }
+
+    /**
+     * @param ListingItem $listingItem
+     * @return ListingItem
+     * @throws ListingItemDayAlreadyExistsException
+     * @throws \Exception
+     */
+    public function saveListingItem(ListingItem $listingItem)
+    {
+        $this->listingItemWriter->saveListingItem($listingItem);
+
+        return $listingItem;
     }
 
     /**
@@ -59,12 +92,49 @@ class ListingItemManager extends Object
      * @throws OtherHoursZeroTimeException
      * @throws NegativeResultOfTimeCalcException
      * @throws ShiftEndBeforeStartException
-     * @throws ListingItemDayAlreadyExistsException
-     * @throws \Exception
      */
-    public function saveListingItem(array $newValues, ListingItem $listingItem = null)
+    public function prepareListingItemByFormsData(array $newValues, ListingItem $listingItem = null)
     {
-        $listingItem = $this->listingItemWriter->saveListingItem($newValues, $listingItem);
+        $workedHours = new WorkedHours(
+            $newValues['workStart'], $newValues['workEnd'],
+            $newValues['lunch'], $newValues['otherHours']
+        );
+
+        $locality = new Locality($newValues['locality']);
+
+        if (isset($listingItem)) {
+            if (!$listingItem->getWorkedHours()->hasSameValuesAs($workedHours)) {
+                $workedHours = $this->workedHoursProvider->setupWorkedHoursEntity($workedHours);
+                $listingItem->setWorkedTime($workedHours, $newValues['descOtherHours']);
+            }
+
+            if (!$listingItem->getLocality()->isSameAs($locality)) {
+                $locality = $this->localityProvider->setupLocalityEntity($locality);
+                $listingItem->setLocality($locality);
+            }
+
+            $listingItem->setDescription($newValues['description']);
+        } else {
+
+            $day = $newValues['day'];
+
+            if (!$newValues['listing'] instanceof Listing) {
+                throw new InvalidArgumentException('Argument $newValues must have member "listing " of type ' .Listing::class);
+            }
+            $listing = $newValues['listing'];
+
+            $locality = $this->localityProvider->setupLocalityEntity($locality);
+            $workedHours = $this->workedHoursProvider->setupWorkedHoursEntity($workedHours);
+
+            $listingItem = new ListingItem(
+                $day,
+                $listing,
+                $workedHours,
+                $locality,
+                $newValues['description'],
+                $newValues['descOtherHours']
+            );
+        }
 
         return $listingItem;
     }
@@ -84,61 +154,42 @@ class ListingItemManager extends Object
     /**
      * @param int $day
      * @param Listing $listing
-     * @return mixed
-     * @throws DayExceedCurrentMonthException
-     * @throws ListingItemNotFoundException
+     * @param int $direction
+     * @return ListingItem
+     * @throws ShiftItemDownException
+     * @throws ShiftItemUpException
      * @throws \Exception
      */
-    public function shiftCopyOfListingItemDown(
+    public function shiftCopyOfListingItem(
         $day,
-        Listing $listing
+        Listing $listing,
+        $direction
     ) {
-        // we do NOT want to shift the last item
-        if ($day >= $listing->getNumberOfDaysInMonth()) {
-            throw new DayExceedCurrentMonthException;
-        }
-
         $currentItemQuery = new ListingItemsQuery();
         $currentItemQuery->byListing($listing)
                          ->byDay($day);
-
-        $nextItemQuery = new ListingItemsQuery();
-        $nextItemQuery->byListing($listing)
-                      ->byDay($day + 1);
 
         try {
             $this->em->beginTransaction();
 
             /** @var ListingItem $listingItem */
-            $listingItem = $this->listingItemReader->fetchListingItem($currentItemQuery);
+            $listingItem = $this->listingItemReader
+                                ->fetchListingItem($currentItemQuery);
             $this->em->lock($listingItem, LockMode::PESSIMISTIC_READ);
 
-            try {
-                /** @var ListingItem $nextListingItem */
-                $nextListingItem = $this->listingItemReader->fetchListingItem($nextItemQuery);
-                $nextListingItem->setLocality($listingItem->getLocality());
-                $nextListingItem->setWorkedTime(
-                    $listingItem->getWorkedHours(),
-                    $listingItem->descOtherHours
-                );
-                $nextListingItem->setDescription($listingItem->description);
+            $shiftedItem = $this->listingItemWriter
+                                ->shiftCopyOfListingItem($listingItem, $direction);
 
-            } catch (ListingItemNotFoundException $li) {
-                $nextListingItem = clone $listingItem;
-                $nextListingItem->setDay($day + 1);
-            }
-
-            $this->em->persist($nextListingItem)->flush();
             $this->em->commit();
 
+            return $shiftedItem;
+
         } catch (\Exception $e) {
-            $this->em->rollback();
             $this->em->close();
 
+            Debugger::log($e, Debugger::ERROR);
             throw $e;
         }
-
-        return $nextListingItem;
     }
 
 }

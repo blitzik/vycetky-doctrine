@@ -8,7 +8,8 @@ use App\Model\Domain\ListingItemDecorator;
 use App\Model\Query\ListingsQuery;
 use blitzik\Arrays\Arrays;
 use Doctrine\ORM\EntityRepository;
-use Exceptions\Runtime\DayExceedCurrentMonthException;
+use Exceptions\Runtime\DayExceedException;
+use Exceptions\Runtime\ShiftItemDownException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Utils\DateTime;
 use Nextras\Application\UI\SecuredLinksControlTrait;
@@ -193,21 +194,14 @@ class ListingTableControl extends Control
                                        $this->listing
                                    );
 
-        } catch (ListingItemNotFoundException $is) {
-            $this->presenter->flashMessage(
-                'Řádek výčetky nemohl být zkopírován, protože nebyl nalezen.',
-                'error'
-            );
-            $err++;
-
-        } catch (DayExceedCurrentMonthException $is) {
+        }  catch (ShiftItemDownException $sd) {
             $this->presenter->flashMessage(
                 'Nelze vytvořit kopii poslední položky ve výčetce.',
                 'error'
             );
             $err++;
 
-        } catch (\DibiException $e) {
+        } catch (\Exception $e) {
             $this->presenter->flashMessage(
                 'Kopie položky nemohla být založena.
                  Zkuste akci opakovat později.',
