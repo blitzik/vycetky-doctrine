@@ -6,8 +6,8 @@ use App\Model\Components\ItemUpdateFormFactory;
 use App\Model\Query\ListingItemsQuery;
 use App\Model\Query\ListingsQuery;
 use Nette\Application\Responses\JsonResponse;
-use App\Model\Facades\LocalityFacade;
-use App\Model\Facades\ItemFacade;
+use App\Model\Facades\LocalitiesFacade;
+use App\Model\Facades\ItemsFacade;
 use Nette\Application\UI\Form;
 use App\Model\Time\TimeUtils;
 use \App\Model\Domain\Entities;
@@ -24,16 +24,16 @@ class ItemPresenter extends SecurityPresenter
     public $itemUpdateFormFactory;
 
     /**
-     * @var LocalityFacade
+     * @var LocalitiesFacade
      * @inject
      */
-    public $localityFacade;
+    public $localitiesFacade;
 
     /**
-     * @var ItemFacade
+     * @var ItemsFacade
      * @inject
      */
-    public $itemFacade;
+    public $itemsFacade;
 
     /**
      * @var Entities\ListingItem
@@ -61,7 +61,7 @@ class ItemPresenter extends SecurityPresenter
     public function actionEdit($id, $day)
     {
         try {
-            $this->listing = $this->listingFacade->fetchListing(
+            $this->listing = $this->listingsFacade->fetchListing(
                 (new ListingsQuery())->byId($id)->byUser($this->user->getIdentity())
             )['listing'];
 
@@ -73,7 +73,7 @@ class ItemPresenter extends SecurityPresenter
             if ($this->date === false)
                 $this->redirect('Listing:detail', ['id' => $this->listing->getId()]);
 
-            $this->listingItem = $this->itemFacade->fetchListingItem(
+            $this->listingItem = $this->itemsFacade->fetchListingItem(
                 (new ListingItemsQuery())->byListing($this->listing)->byDay($day)
             );
 
@@ -138,7 +138,7 @@ class ItemPresenter extends SecurityPresenter
     {
         if ($term and mb_strlen($term) >= 3) {
             $this->sendResponse(
-                new JsonResponse($this->localityFacade
+                new JsonResponse($this->localitiesFacade
                                       ->findLocalitiesForAutocomplete($term, 10, $this->user->getIdentity()))
             );
         }
@@ -162,7 +162,7 @@ class ItemPresenter extends SecurityPresenter
         $values['listing'] = $this->listing;
 
         try{
-            $listingItem = $this->itemFacade
+            $listingItem = $this->itemsFacade
                                 ->saveListingItem((array)$values, $this->listingItem);
 
         } catch (Runtime\OtherHoursZeroTimeException $zt) {

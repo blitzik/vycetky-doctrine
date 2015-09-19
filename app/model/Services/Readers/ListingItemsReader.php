@@ -3,14 +3,15 @@
 namespace App\Model\Services\Readers;
 
 use Exceptions\Runtime\ListingItemNotFoundException;
-use App\Model\Services\Writers\ListingItemWriter;
+use App\Model\Services\Writers\ListingItemsWriter;
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\Domain\Entities\Listing;
 use App\Model\Query\ListingItemsQuery;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 
-class ListingItemReader extends Object
+class ListingItemsReader extends Object
 {
     /**
      * @var EntityManager
@@ -63,7 +64,7 @@ class ListingItemReader extends Object
     {
         $previousItemQuery = new ListingItemsQuery();
         $previousItemQuery->byListing($listingItem->getListing())
-                          ->byDay($listingItem->day + ListingItemWriter::WRITE_UP);
+                          ->byDay($listingItem->day + ListingItemsWriter::WRITE_UP);
 
         return $this->fetchListingItem($previousItemQuery);
     }
@@ -77,8 +78,31 @@ class ListingItemReader extends Object
     {
         $nextItemQuery = new ListingItemsQuery();
         $nextItemQuery->byListing($listingItem->getListing())
-                      ->byDay($listingItem->day + ListingItemWriter::WRITE_DOWN);
+                      ->byDay($listingItem->day + ListingItemsWriter::WRITE_DOWN);
 
         return $this->fetchListingItem($nextItemQuery);
+    }
+
+    /**
+     * @param Listing $listing
+     * @param array $days
+     * @return array
+     */
+    public function findListingItems(Listing $listing, array $days = null)
+    {
+        $listingItems = $this->em->createQueryBuilder();
+        $listingItems->select('li, lo, wh')
+                     ->from(ListingItem::class, 'li')
+                     ->innerJoin('li.locality', 'lo')
+                     ->innerJoin('li.workedHours', 'wh')
+                     ->where('li.listing = :listing')
+                     ->setParameter('listing', $listing);
+
+        if (isset($days) and !empty($days)) {
+            $listingItems->andWhere('li.day IN(:days)')
+                         ->setParameter('days', $days);
+        }
+
+        return $listingItems->getQuery()->getResult();
     }
 }

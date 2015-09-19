@@ -5,7 +5,6 @@ namespace App\Model\Components;
 use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\Listing;
 use Nette\Application\UI\Multiplier;
-use App\Model\Facades\ListingFacade;
 use Nette\Application\UI\Control;
 use Nextras\Datagrid\Datagrid;
 use blitzik\Arrays\Arrays;

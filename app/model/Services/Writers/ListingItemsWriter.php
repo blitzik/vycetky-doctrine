@@ -3,9 +3,10 @@
 namespace App\Model\Services\Writers;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\ORMException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\ListingItemNotFoundException;
-use App\Model\Services\Readers\ListingItemReader;
+use App\Model\Services\Readers\ListingItemsReader;
 use Exceptions\Logic\InvalidArgumentException;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
@@ -14,7 +15,7 @@ use Kdyby\Doctrine\EntityManager;
 use Tracy\Debugger;
 use Nette\Object;
 
-class ListingItemWriter extends Object
+class ListingItemsWriter extends Object
 {
     const WRITE_DOWN = 1;
     const WRITE_UP   = -1;
@@ -25,13 +26,13 @@ class ListingItemWriter extends Object
     private $em;
 
     /**
-     * @var ListingItemReader
+     * @var ListingItemsReader
      */
     private $listingItemReader;
 
     public function __construct(
         EntityManager $entityManager,
-        ListingItemReader $listingItemReader
+        ListingItemsReader $listingItemReader
     ) {
         $this->em = $entityManager;
         $this->listingItemReader = $listingItemReader;
@@ -71,7 +72,7 @@ class ListingItemWriter extends Object
      * @throws ShiftItemDownException
      * @throws \Exception
      */
-    public function shiftCopyOfListingItem(
+    public function copyListingItem(
         ListingItem $listingItem,
         $direction
     ) {

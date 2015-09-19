@@ -37,7 +37,7 @@
         <tr n:class="$item->isCurrentDay() ? currentDay, $item->isWeekDay() ? weekDay"
             n:snippet="itemDay-$day">
             {if $showCheckBoxes}
-                {if !$item->isFilling()}<td><input type="checkbox" class="itemToCheck" name="items[]" value="{$item->listingItemID}"></td>
+                {if !$item->isFilling()}<td><input type="checkbox" class="itemToCheck" name="items[]" value="{$day}"></td>
                 {else}<td></td>{/if}
             {/if}
            <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$day}</td>
@@ -48,7 +48,7 @@
             {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}
             {var $localityDesc = $item->locality . $description}
 
-            <td><a name="{$item->getDay()->format('j')}">{$localityDesc|truncate:40}</a></td>
+            <td><a id="{$item->getDay()->format('j')}">{$localityDesc|truncate:40}</a></td>
             <td>{if !$item->areWorkedHoursWithoutLunchZero()}
                 {$item->workStart|date:'H:i'} - {$item->workEnd|date:'H:i'}{/if}</td>
 

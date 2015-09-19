@@ -2,12 +2,13 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\Listing;
+
 interface IListingDescriptionControlFactory
 {
     /**
-     * @param \DateTime $period
-     * @param $description
+     * @param Listing $listing
      * @return ListingDescriptionControl
      */
-    public function create(\DateTime $period, $description);
+    public function create(Listing $listing);
 }

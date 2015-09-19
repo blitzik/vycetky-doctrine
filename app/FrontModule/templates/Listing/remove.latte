@@ -4,29 +4,7 @@
 
 <h2 n:block="title">Odstranění výčetky</h2>
 
-{form deleteListingForm}
-<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
-    {$error}
-</div>
-
-<div class="box box-red">
-<p>Skutečně si přejete <b>odstranit</b> vámi zvolenou výčetku?</p>
-<p>
-    <b>{$listing->period|listingMonthYear}</b> |
-        {if $listing->description}
-            {$listing->description}
-        {else}
-            Bez popisu
-        {/if}
-</p>
-
-<table>
-        <tr><th colspan="2">{label check /}</th></tr>
-        <tr><td colspan="2">{input check}</td></tr>
-        <tr><td>{input delete}</td><td>{input cancel}</td></tr>
-</table>
-</div>
-{/form deleteListingForm}
+{control listingRemovalForm}
 
 <div class="box box-hint">
     <h3>Odstranění výčetky</h3>
@@ -35,24 +13,5 @@
       výčetka nenávratně vymaže ze systému. Smazáním výčetky
       taktéž přijdete o všechny položky, které tato výčetka obsahovala.</p>
 </div>
-
-<script>
-$(function () {
-    var deleteButton = $('#listing-remove-button');
-    var checkInput = $('#listing-check-input');
-
-    deleteButton.attr('disabled', true);
-
-    checkInput.keyup(function () {
-        var self = $(this);
-        if (self.val() == 'smazat') {
-            deleteButton.attr('disabled', false);
-        } else {
-            deleteButton.attr('disabled', true);
-        }
-    });
-
-});
-</script>
 
 {/block}

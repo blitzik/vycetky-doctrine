@@ -11,7 +11,7 @@ use App\Model\Domain\Entities;
 use App\Model\Time\TimeUtils;
 use Nette\Object;
 
-class ItemService extends Object
+class ItemsService extends Object
 {
 
     /**
@@ -64,15 +64,15 @@ class ItemService extends Object
     }
 
     /**
-     * @param array $listingItems
+     * @param Entities\ListingItem[] $listingItems
      * @return array Array of ListingItemDecorators
      */
-    public function createDecoratorsCollection(
+    public function convert2DisplayableItems(
         array $listingItems
     ) {
         $collection = [];
         foreach ($listingItems as $listingItem) {
-            if ($listingItem instanceof FillingItem) {
+            if ($listingItem instanceof IDisplayableItem) {
                 $collection[$listingItem->day->format('j')] = $listingItem;
 
             } else if ($listingItem instanceof Entities\ListingItem) {
@@ -138,11 +138,11 @@ class ItemService extends Object
     }
 
     /**
-     * @param ListingItemDecorator[] $listingItemsDecorators
+     * @param IDisplayableItem[] $listingItemsDecorators
      * @param \DateTime $period
      * @return array
      */
-    public function generateListingItemDecoratorsForEntireTable(
+    public function generateEntireTable(
         array $listingItemsDecorators,
         \DateTime $period
     ) {

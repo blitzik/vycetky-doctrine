@@ -2,6 +2,9 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IListingCopyFormControlFactory;
+use App\Model\Components\IListingPDFGenerationControlFactory;
+use App\Model\Components\IListingRemovalControlFactory;
 use App\Model\Components\ListingTable\IListingTableControlFactory;
 use App\Model\Components\IListingActionsMenuControlFactory;
 use App\Model\Components\IListingsOverviewControlFactory;
@@ -11,17 +14,10 @@ use App\Model\Components\IListingFormControlFactory;
 use App\Model\Components\IFilterControlFactory;
 use App\Model\Components\ListingFormFactory;
 use App\Model\Domain\Entities\Listing;
-use App\Model\Domain\Entities\ListingItem;
 use App\Model\Query\ListingsQuery;
-use Doctrine\ORM\AbstractQuery;
-use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\EntityRepository;
-use Nette\Forms\Controls\SubmitButton;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\UserManager;
-use App\Model\Facades\ItemFacade;
-use Nette\Application\UI\Form;
-use App\Model\Time\TimeUtils;
+use App\Model\Facades\ItemsFacade;
 use Exceptions\Runtime;
 use App\Model\Entities;
 
@@ -33,9 +29,10 @@ class ListingPresenter extends SecurityPresenter
     public $backlink = null;
 
     /**
-     * @var array
+     * @var IListingPDFGenerationControlFactory
+     * @inject
      */
-    private $companyParameters;
+    public $listingPDFGenerationControlFactory;
 
     /**
      * @var ISharingListingControlFactory
@@ -54,6 +51,18 @@ class ListingPresenter extends SecurityPresenter
      * @inject
      */
     public $massItemChangeControlFactory;
+
+    /**
+     * @var IListingCopyFormControlFactory
+     * @inject
+     */
+    public $listingCopyFormControlFactory;
+
+    /**
+     * @var IListingRemovalControlFactory
+     * @inject
+     */
+    public $listingRemovalControlFactory;
 
     /**
      * @var IListingTableControlFactory
@@ -98,21 +107,15 @@ class ListingPresenter extends SecurityPresenter
     public $userManager;
 
     /**
-     * @var ItemFacade
+     * @var ItemsFacade
      * @inject
      */
-    public $itemFacade;
+    public $itemsFacade;
 
     /**
-     *
      * @var Listing
      */
     private $listing;
-
-    /**
-     * @var array
-     */
-    private $listingData;
 
     private $numberOfMessages;
 
@@ -125,11 +128,6 @@ class ListingPresenter extends SecurityPresenter
         return $comp;
     }
 
-    public function setCompanyParameters(array $companyParameters)
-    {
-        $this->companyParameters = $companyParameters;
-    }
-
     /*
      * --------------------
      * ----- OVERVIEW -----
@@ -140,7 +138,7 @@ class ListingPresenter extends SecurityPresenter
     {
         $this->setPeriodParametersForFilter($year, $month);
 
-        $listingsData = $this->listingFacade->fetchListings(
+        $listingsData = $this->listingsFacade->fetchListings(
             (new ListingsQuery())
                 ->forOverviewDatagrid()
                 ->withNumberOfWorkedDays()
@@ -219,62 +217,46 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionRemove($id)
     {
-        $this->listing = $this->getEntireListingByID($id);
+        $this->listing = $this->getListingById($id);
     }
 
     public function renderRemove($id)
     {
-        $this->template->listing = $this->listing;
+
     }
 
     /**
      * @Actions remove
      */
-    protected function createComponentDeleteListingForm()
+    protected function createComponentListingRemovalForm()
     {
-        $form = new Form();
+        $comp = $this->listingRemovalControlFactory->create($this->listing);
 
-        $form->addText('check', 'Pro smazání výčetky napište do pole "smazat".')
-                ->addRule(Form::FILLED, 'Kontrola musí být vyplněna.')
-                ->addRule(Form::EQUAL, 'Pro smazání výčetky musí být vyplňeno správné kontrolní slovo.', 'smazat')
-                ->setHtmlId('listing-check-input');
+        $comp->onRemoveSuccess[] = [$this, 'onListingRemoveSuccess'];
+        $comp->onCancelClick[]   = [$this, 'onListingRemovalCancelClick'];
 
-        $form->addSubmit('delete', 'Odstranit výčetku')
-                ->setHtmlId('listing-remove-button')
-                ->onClick[] = callback($this, 'processDeleteListing');
-
-        $form->addSubmit('cancel', 'Vrátit se zpět')
-                ->setValidationScope(false)
-                ->onClick[] = callback($this, 'processCancel');
-
-        $form->addProtection();
-
-        return $form;
+        return $comp;
     }
 
-    public function processDeleteListing(\Nette\Forms\Controls\SubmitButton $button)
+    public function onListingRemoveSuccess($year, $month)
     {
-        $this->listingFacade->removeListing($this->listing);
-
         $this->flashMessage('Výčetka byla odstraněna.', 'success');
 
-        $this->backlink = NULL;
+        $this->backlink = null;
         $this->redirect(
             'Listing:overview',
-            array('month' => $this->listing->month,
-                  'year'  => $this->listing->year)
+            ['month' => $month, 'year'  => $year]
         );
     }
 
-    public function processCancel()
+    public function onListingRemovalCancelClick($year, $month)
     {
         if (isset($this->backlink))
             $this->restoreRequest($this->backlink);
 
         $this->redirect(
             'Listing:overview',
-            array('month' => $this->listing->month,
-                  'year'  => $this->listing->year)
+            ['month' => $month, 'year'  => $year]
         );
     }
 
@@ -286,21 +268,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionDetail($id)
     {
-        $this->listingData = $this->listingFacade
-                                  ->fetchListing(
-                                      (new ListingsQuery())
-                                      ->withNumberOfWorkedDays()
-                                      ->withTotalWorkedHours()
-                                      ->byId($id)
-                                      ->byUser($this->user->getIdentity())
-                                  );
-
-        if ($this->listingData['listing'] === null) {
-            $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
-            $this->redirect('Listing:overview');
-        }
-
-        $this->listing = $this->listingData['listing'];
+        $this->listing = $this->getListingById($id);
     }
 
     public function renderDetail($id)
@@ -313,7 +281,7 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingItemsTable()
     {
-        $comp = $this->listingTableControlFactory->create($this->listingData);
+        $comp = $this->listingTableControlFactory->create($this->listing);
 
         return $comp;
     }
@@ -327,15 +295,6 @@ class ListingPresenter extends SecurityPresenter
     public function actionCopy($id)
     {
         $this->listing = $this->getListingByID($id);
-
-        $this['simpleCopyForm']['month']->setDefaultValue(
-            TimeUtils::getMonthName($this->listing->getMonth())
-        );
-        $this['simpleCopyForm']['year']->setDefaultValue($this->listing->getYear());
-        $this['simpleCopyForm']['description']->setDefaultValue(
-            $this->listing->description == null ?
-                                           'Popis nebyl zadán' :
-                                           $this->listing->description);
     }
 
     public function renderCopy($id)
@@ -347,44 +306,20 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentSimpleCopyForm()
     {
-        $form = new Form();
+        $comp = $this->listingCopyFormControlFactory->create($this->listing);
 
-        $form->addText('month', 'Měsíc', 4)
-                ->setDisabled();
+        $comp->onListingCopySuccess[] = [$this, 'onListingCopySuccess'];
 
-        $form->addText('year', 'Rok', 4)
-                ->setDisabled();
-
-        $form->addText('description', 'Popis výčetky')
-                ->setDisabled()
-                ->getControlPrototype()->class = 'description';
-
-        $form->addSubmit('save', 'Vytvořit kopii výčetky');
-
-        $form->onSuccess[] = [$this, 'processSimpleCopy'];
-
-        return $form;
+        return $comp;
     }
 
-    public function processSimpleCopy(Form $form)
+    public function onListingCopySuccess(Listing $listing)
     {
-        try {
-            $this->listingFacade->establishListingCopy($this->listing);
-
-        } catch (\DibiException $e) {
-            $this->flashMessage(
-                'Kopie výčetky nemohla být založena. Zkuste prosím akci
-                 opakovat později.',
-                'error'
-            );
-            $this->redirect('this');
-        }
-
         $this->flashMessage('Byla založena kopie výčetky.', 'success');
         $this->redirect(
             'Listing:overview',
-            array('year'  => $this->listing->year,
-                  'month' => $this->listing->month)
+            array('year'  => $listing->getYear(),
+                  'month' => $listing->getMonth())
         );
     }
 
@@ -396,10 +331,21 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionMassItemsChange($id)
     {
-        $this->listing = $this->getEntireListingByID($id);
-        if ($this->listing->workedDays == 0) {
-            $this->flashMessage('Nelze upravovat prázdnou výčetku.', 'warning');
-            $this->redirect('Listing:detail', ['id' => $id]);
+        try {
+            $listingData = $this->listingsFacade
+                                ->fetchListing((new ListingsQuery())
+                                                ->withNumberOfWorkedDays());
+
+            if ($listingData['worked_days'] == 0) {
+                $this->flashMessage('Nelze upravovat prázdnou výčetku.', 'warning');
+                $this->redirect('Listing:detail', ['id' => $id]);
+            }
+
+            $this->listing = $listingData['listing'];
+
+        } catch (Runtime\ListingNotFoundException $e) {
+            $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
+            $this->redirect('Listing:overview');
         }
     }
 
@@ -454,73 +400,20 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionPdfGeneration($id)
     {
-        $this->listing = $this->getEntireListingByID($id);
-
-        $this['listingResultSettings']['name']->setDefaultValue($this->user->getIdentity()->name);
+        $this->listing = $this->getListingById($id);
     }
 
     public function renderPdfGeneration($id)
     {
-        $this->template->listing = $this->listing;
-        $this->template->_form = $this['listingResultSettings'];
+
     }
 
     /**
      * @Actions pdfGeneration
      */
-    protected function createComponentListingResultSettings()
+    protected function createComponentListingPDFGeneration()
     {
-        $form = new Form();
-
-        $form->addText('employer', 'Zaměstnavatel:', 25, 70)
-                ->setDefaultValue($this->companyParameters['name']);
-
-        $form->addText('name', 'Jméno:', 25, 70);
-
-        $form->addCheckbox('wage', 'Zobrazit "Základní mzdu"')
-                ->setDefaultValue(true);
-
-        $form->addCheckbox('otherHours', 'Zobrazit "Ostatní hodiny"');
-        $form->addCheckbox('workedHours', 'Zobrazit "Odpracované hodiny"');
-        $form->addCheckbox('lunch', 'Zobrazit hodiny strávené obědem');
-
-        $form->addSubmit('generatePdf', 'Vygeneruj PDF')
-                ->onClick[] = [$this, 'generatePdf'];
-
-        $form->addSubmit('reset', 'Reset nastavení')
-                ->onClick[] = [$this, 'processReset'];
-
-        return $form;
-    }
-
-    public function generatePdf(SubmitButton $button)
-    {
-        $values = $button->getForm()->getValues();
-
-        $template = $this->createTemplate()
-                         ->setFile(__DIR__ . '/../templates/Listing/pdf.latte');
-
-        $template->itemsCollection = $this->itemFacade
-                                          ->generateEntireTable($this->listing);
-
-        $template->listing = $this->listing;
-        $template->username = $values['name'] == null ?: $values['name'];
-        $template->employer = $values['employer'];
-        $template->employeeName = $values['name'];
-
-        $template->wage = $values['wage'];
-        $template->otherHours = $values['otherHours'];
-        $template->workedHours = $values['workedHours'];
-        $template->lunchHours = $values['lunch'];
-
-        $pdf = new \PdfResponse\PdfResponse($template);
-
-        $this->presenter->sendResponse($pdf);
-    }
-
-    public function processReset(SubmitButton $button)
-    {
-        $this->redirect('this');
+        return $this->listingPDFGenerationControlFactory->create($this->listing);
     }
 
 }

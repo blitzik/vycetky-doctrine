@@ -4,10 +4,14 @@ namespace App\Model\Components\ItemsTable;
 
 use App\Model\Components\IListingDescriptionControlFactory;
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\Domain\FillingItem;
+use App\Model\Domain\IDisplayableItem;
+use App\Model\Facades\ListingsFacade;
+use App\Model\Query\ListingsQuery;
+use Exceptions\Logic\InvalidArgumentException;
 use Nette\Application\UI\Control;
-use App\Model\Facades\ItemFacade;
+use App\Model\Facades\ItemsFacade;
 use App\Model\Domain\Entities\Listing;
-use Tracy\Debugger;
 
 class ItemsTableControl extends Control
 {
@@ -17,7 +21,12 @@ class ItemsTableControl extends Control
     private $listingDescriptionControlFactory;
 
     /**
-     * @var ItemFacade
+     * @var ListingsFacade
+     */
+    private $listingsFacade;
+
+    /**
+     * @var ItemsFacade
      */
     private $itemFacade;
 
@@ -40,65 +49,73 @@ class ItemsTableControl extends Control
     private $showCheckBoxes = false;
     private $isTableCaptionVisible = false;
 
-    private $tableCaptionDescription;
     private $workedDays;
     private $totalWorkedHours;
 
     public function __construct(
         Listing $listing,
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
-        ItemFacade $itemFacade
+        ListingsFacade $listingsFacade,
+        ItemsFacade $itemFacade
     ) {
         $this->listing = $listing;
         $this->listingDescriptionControlFactory = $listingDescriptionControlFactory;
+        $this->listingsFacade = $listingsFacade;
         $this->itemFacade = $itemFacade;
     }
 
     /**
-     * @param ListingItem[] $listingItems
+     * @param ListingItem[]|IDisplayableItem[] $listingItems
      */
-    public function setListingItems(array $listingItems)
+    public function refreshTable(array $listingItems)
     {
-        /*$this->items = $this->itemFacade
-                            ->createListingItemDecoratorsCollection($listingItems);*/
+        foreach ($listingItems as $listingItem) {
+            // Items must be from same Listing for which has been defined this component
+            if (!$listingItem instanceof FillingItem and
+                $listingItem->getListing()->getId() !== $this->listing->getId()) {
+                throw new InvalidArgumentException(
+                    'Some members of collection does NOT belong to Listing'
+                );
+            }
+        }
 
         $this->items = $listingItems;
+        $this->redrawControl();
     }
 
     protected function createComponentDescription()
     {
-        $comp = $this->listingDescriptionControlFactory->create(
-            $this->listing->period,
-            $this->tableCaptionDescription
-        );
+        $comp = $this->listingDescriptionControlFactory
+                     ->create($this->listing);
 
         return $comp;
     }
 
     public function showTableCaption(
-        $description,
-        $workedDays,
-        $totalWorkedHours,
         $destination = null,
         array $params = []
     ) {
-        $this->tableCaptionDescription = $description;
-        $this->workedDays = $workedDays;
-        $this->totalWorkedHours = $totalWorkedHours;
-
         if ($destination !== null) {
             $this['description']->setAsClickable($destination, $params);
         }
+
+        $listingData = $this->listingsFacade
+                            ->fetchListings(
+                                (new ListingsQuery())
+                                ->resetSelect()
+                                ->withNumberOfWorkedDays()
+                                ->withTotalWorkedHours()
+                                ->byId($this->listing->getId())
+                            )->toArray()[0];
+
+        $this->workedDays = $listingData['worked_days'];
+        $this->totalWorkedHours = new \InvoiceTime((int)$listingData['total_worked_hours']);
 
         $this->isTableCaptionVisible = true;
     }
 
     public function showActions($path, array $parameters = null)
     {
-        /*if (!$path instanceof Template) {
-            throw new InvalidArgumentException('chybka');
-        }*/
-
         $this->parameters = $parameters;
         $this->showActions = $path;
     }
@@ -117,7 +134,7 @@ class ItemsTableControl extends Control
             $this->items = $this->itemFacade
                                 ->generateEntireTable($this->listing);
         } else {
-            $this->items = $this->itemFacade->createListingItemDecoratorsCollection(
+            $this->items = $this->itemFacade->convert2DisplayableItems(
                 $this->items
             );
         }

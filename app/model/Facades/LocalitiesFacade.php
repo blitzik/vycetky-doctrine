@@ -4,13 +4,13 @@ namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\Locality;
 use App\Model\Repositories\LocalityRepository;
-use App\Model\Services\LocalityService;
+use App\Model\Services\LocalitiesService;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Utils\Arrays;
 use Nette\Utils\Validators;
 use Nette\Security\User;
 
-class LocalityFacade extends BaseFacade
+class LocalitiesFacade extends BaseFacade
 {
     /**
      * @var EntityManager
@@ -23,14 +23,14 @@ class LocalityFacade extends BaseFacade
     private $localityRepository;
 
     /**
-     * @var LocalityService
+     * @var LocalitiesService
      */
     private $localityService;
 
     public function __construct(
         EntityManager $entityManager,
         LocalityRepository $localityRepository,
-        LocalityService $localityService,
+        LocalitiesService $localityService,
         User $user
     ) {
         parent::__construct($user);

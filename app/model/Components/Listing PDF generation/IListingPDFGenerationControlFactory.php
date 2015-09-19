@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Model\Components\ListingTable;
+namespace App\Model\Components;
 
 use App\Model\Domain\Entities\Listing;
 
-interface IListingTableControlFactory
+interface IListingPDFGenerationControlFactory
 {
     /**
      * @param Listing $listing
-     * @return ListingTableControl
+     * @return ListingPDFGenerationControl
      */
     public function create(Listing $listing);
 }

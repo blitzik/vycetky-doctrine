@@ -4,7 +4,7 @@ namespace App\Model\Services;
 
 use Nette\Object;
 
-class LocalityService extends Object
+class LocalitiesService extends Object
 {
     /**
      * @param array $localities

@@ -59,9 +59,9 @@ class ListingItemDecorator extends FillingItem
         return $this->isFromBaseListing;
     }
 
-    public function getListingID()
+    public function getListing()
     {
-        return $this->listingItem->listing->getId();
+        return $this->listingItem->listing;
     }
 
     public function getListingItemID()
@@ -72,11 +72,6 @@ class ListingItemDecorator extends FillingItem
     public function getLocality()
     {
         return $this->listingItem->locality->name;
-    }
-
-    public function getDay()
-    {
-        return $this->date;
     }
 
     public function getWorkStart()
@@ -112,11 +107,6 @@ class ListingItemDecorator extends FillingItem
     public function getDescription()
     {
         return $this->listingItem->description;
-    }
-
-    public function getListingItem()
-    {
-        return $this->listingItem;
     }
 
     /**

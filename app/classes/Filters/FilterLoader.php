@@ -27,10 +27,6 @@ class FilterLoader extends Object
     public function toTimeWithComma($time, $isZeroVisible = false)
     {
         if (!$time instanceof \InvoiceTime) {
-            if (Validators::is($time, 'numericint')) {
-                $time = (int)$time;
-            }
-
             $time = new \InvoiceTime($time);
         }
 

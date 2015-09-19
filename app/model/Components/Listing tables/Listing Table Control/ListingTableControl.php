@@ -3,25 +3,15 @@
 namespace App\Model\Components\ListingTable;
 
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
-use App\Model\Domain\FillingItem;
-use App\Model\Domain\ListingItemDecorator;
-use App\Model\Query\ListingsQuery;
-use blitzik\Arrays\Arrays;
-use Doctrine\ORM\EntityRepository;
-use Exceptions\Runtime\DayExceedException;
-use Exceptions\Runtime\ShiftItemDownException;
-use Kdyby\Doctrine\EntityManager;
-use Nette\Utils\DateTime;
 use Nextras\Application\UI\SecuredLinksControlTrait;
-use Exceptions\Runtime\ListingItemNotFoundException;
 use Exceptions\Runtime\ListingNotFoundException;
-use App\Model\Facades\ListingFacade;
-use App\Model\Domain\Entities\ListingItem;
-use App\Model\Facades\ItemFacade;
-use Nette\Application\UI\Control;
+use Exceptions\Runtime\ShiftItemDownException;
 use App\Model\Domain\Entities\Listing;
-use Nette\Security\User;
-use Tracy\Debugger;
+use App\Model\Facades\ListingsFacade;
+use App\Model\Facades\ItemsFacade;
+use Nette\Application\UI\Control;
+use App\Model\Domain\FillingItem;
+use Nette\Utils\DateTime;
 
 class ListingTableControl extends Control
 {
@@ -33,63 +23,33 @@ class ListingTableControl extends Control
     private $itemsTableControlFactory;
 
     /**
-     * @var EntityRepository
-     */
-    private $listingRepository;
-
-    /**
-     * @var ListingFacade
+     * @var ListingsFacade
      */
     private $listingFacade;
 
     /**
-     * @var ItemFacade
+     * @var ItemsFacade
      */
     private $itemFacade;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var ListingItem[]
-     */
-    private $itemsCollection;
 
     /**
      * @var Listing
      */
     private $listing;
 
-    private $workedDays;
-    private $totalWorkedHours;
-
 
     public function __construct(
-        array $listingData,
+        Listing $listing,
         IItemsTableControlFactory $itemsTableControlFactory,
-        ListingFacade $listingFacade,
-        EntityManager $entityManager,
-        ItemFacade $itemFacade,
-        User $user
+        ListingsFacade $listingFacade,
+        ItemsFacade $itemFacade
     ) {
-        $this->listing = $listingData['listing'];
-        $this->workedDays = $listingData['worked_days'];
-        $this->totalWorkedHours = $listingData['total_worked_hours'];
-
-        $this->em = $entityManager;
-        $this->listingRepository = $entityManager->getRepository(Listing::class);
+        $this->listing = $listing;
 
         $this->itemsTableControlFactory = $itemsTableControlFactory;
         $this->listingFacade = $listingFacade;
         $this->itemFacade = $itemFacade;
-        $this->user = $user;
+
     }
 
     protected function createComponentItemsTable()
@@ -100,11 +60,7 @@ class ListingTableControl extends Control
             ['listingID' => $this->listing->getId()]
         );
 
-        $comp->showTableCaption(
-            $this->listing->description,
-            $this->workedDays,
-            $this->totalWorkedHours
-        );
+        $comp->showTableCaption();
 
         return $comp;
     }
@@ -113,20 +69,6 @@ class ListingTableControl extends Control
     {
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/templates/template.latte');
-
-        /*if (!isset($this->itemsCollection)) {
-            $this->itemsCollection = $this->em->createQuery(
-                'SELECT li, lo, wh FROM ' .ListingItem::class. ' li
-                 JOIN li.locality lo
-                 JOIN li.workedHours wh
-                 WHERE li.listing = :listing'
-            )->setParameter('listing', $this->listing)
-             ->getResult();
-        }*/
-
-        //$this['itemsTable']->setListingItems($this->itemsCollection);
-
-        //$template->listing = $this->listing;
 
         $template->render();
     }
@@ -144,18 +86,6 @@ class ListingTableControl extends Control
             $this->itemFacade->removeListingItem($day, $this->listing);
 
             if ($this->presenter->isAjax()) {
-                $listingData = $this->listingFacade
-                                    ->fetchListing(
-                                        (new ListingsQuery())
-                                        ->resetSelect()
-                                        ->withNumberOfWorkedDays()
-                                        ->withTotalWorkedHours()
-                                        ->byId($this->listing->getId())
-                                    );
-
-                $this->workedDays = $listingData['worked_days'];
-                $this->totalWorkedHours = $listingData['total_worked_hours'];
-
                 $item = new FillingItem(
                     DateTime::createFromFormat(
                         'd.m.Y',
@@ -163,8 +93,7 @@ class ListingTableControl extends Control
                         )
                 );
 
-                $this['itemsTable']->setListingItems([$item]);
-                $this['itemsTable']->redrawControl();
+                $this['itemsTable']->refreshTable([$item]);
             } else {
                 $this->flashMessage('Řádek byl vymazán.', 'success');
                 $this->redirect('this');
@@ -177,7 +106,6 @@ class ListingTableControl extends Control
     }
 
     /**
-     * @param int $day Numeric representation of the day of the month
      * @secured
      */
     public function handleCopyItem($day)
@@ -189,7 +117,7 @@ class ListingTableControl extends Control
         $err = 0;
         try {
             $newListingItem = $this->itemFacade
-                                   ->shiftCopyOfListingItemDown(
+                                   ->copyListingItemDown(
                                        $day,
                                        $this->listing
                                    );
@@ -219,22 +147,7 @@ class ListingTableControl extends Control
         }
 
         if ($this->presenter->isAjax()) {
-            $listingData = $this->listingFacade
-                ->fetchListing(
-                    (new ListingsQuery())
-                        ->resetSelect()
-                        ->withNumberOfWorkedDays()
-                        ->withTotalWorkedHours()
-                        ->byId($this->listing->getId())
-                );
-
-            $this->workedDays = $listingData['worked_days'];
-            $this->totalWorkedHours = $listingData['total_worked_hours'];
-
-            $item = new ListingItemDecorator($newListingItem);
-
-            $this['itemsTable']->setListingItems([$item]);
-            $this['itemsTable']->redrawControl();
+            $this['itemsTable']->refreshTable([$newListingItem]);
         } else {
             $this->flashMessage('Řádek byl zkopírován.', 'success');
             $this->redirect('this#' . $newListingItem->getDay());

@@ -2,6 +2,7 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\Listing;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Control;
 
@@ -13,25 +14,18 @@ class ListingDescriptionControl extends Control
     private $linkGenerator;
 
     /**
-     * @var \DateTime
+     * @var Listing
      */
-    private $period;
-
-    /**
-     * @var string
-     */
-    private $description;
+    private $listing;
 
     private $link;
     private $isClickable = false;
 
     public function __construct(
-        \DateTime $period,
-        $description,
+        Listing $listing,
         LinkGenerator $linkGenerator
     ) {
-        $this->period = $period;
-        $this->description = $description;
+        $this->listing = $listing;
         $this->linkGenerator = $linkGenerator;
     }
 
@@ -50,8 +44,8 @@ class ListingDescriptionControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        $template->period = $this->period;
-        $template->description = $this->description;
+        $template->period = $this->listing->getPeriod();
+        $template->description = $this->listing->description;
         $template->link = $this->link;
         $template->isClickable = $this->isClickable;
 

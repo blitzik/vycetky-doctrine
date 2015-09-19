@@ -116,9 +116,9 @@
         <th class="w120">Dovolená hod.</th>
         <td></td>
         <th class="w120">Ostat. hod.</th>
-        <td>{if $otherHours}{$listing->otherHours|toTimeWithComma}{/if}</td>
+        <td>{if $areOtherHoursVisible}{$otherHours|toTimeWithComma}{/if}</td>
         <th class="w120">Odprac. hod.</th>
-        <td class="w130">{if $workedHours}{$listing->workedHours|toTimeWithComma}{/if}</td>
+        <td class="w130">{if $areWorkedHoursVisible}{$workedHours|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th>Nemoc hod.</th>
@@ -126,11 +126,11 @@
         <th>Svátek</th>
         <td></td>
         <th>Obědy</th>
-        <td>{if $lunchHours}{$listing->lunchHours|toTimeWithComma}{/if}</td>
+        <td>{if $areLunchHoursVisible}{$lunchHours|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th colspan="5" class="totalHours"><b>Hodin celkem</b></th>
-        <td><b>{$listing->totalWorkedHours|toTimeWithComma}</b></td>
+        <td><b>{$totalWorkedHours|toTimeWithComma}</b></td>
     </tr>
 
 </table>
@@ -139,7 +139,7 @@
 
     <tr>
         <th style="width: 215px"><b>Základní mzda</b></th>
-        <td class="w120">{if $wage and $listing->hourlyWage > 0}{$listing->hourlyWage} Kč/h{/if}</td>
+        <td class="w120">{if $isWageVisible and $listing->hourlyWage > 0}{$listing->hourlyWage} Kč/h{/if}</td>
         <th style="">Dovolená - dni</th>
         <td class="w130"></td>
     </tr>

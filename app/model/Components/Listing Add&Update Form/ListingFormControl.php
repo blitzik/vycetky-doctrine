@@ -2,8 +2,7 @@
 
 namespace App\Model\Components;
 
-use Nextras\Application\UI\SecuredLinksControlTrait;
-use App\Model\Facades\ListingFacade;
+use App\Model\Facades\ListingsFacade;
 use Nette\InvalidArgumentException;
 use Nette\Application\UI\Control;
 use App\Model\Domain\Entities\Listing;
@@ -13,8 +12,6 @@ use Nette\Security\User;
 
 class ListingFormControl extends Control
 {
-    use SecuredLinksControlTrait;
-
     /**
      * @var IListingDescriptionControlFactory
      *
@@ -27,7 +24,7 @@ class ListingFormControl extends Control
     private $listingFormFactory;
 
     /**
-     * @var ListingFacade
+     * @var ListingsFacade
      */
     private $listingFacade;
 
@@ -45,7 +42,7 @@ class ListingFormControl extends Control
         $listing,
         IListingDescriptionControlFactory $listingDescriptionFactory,
         ListingFormFactory $listingFormFactory,
-        ListingFacade $listingFacade,
+        ListingsFacade $listingFacade,
         User $user
     ) {
         parent::__construct();
@@ -65,13 +62,11 @@ class ListingFormControl extends Control
     protected function createComponentListingDescription()
     {
         $desc = $this->listingDescriptionFactory
-            ->create(
-                $this->listing->period,
-                $this->listing->description
-            );
+                     ->create($this->listing);
+
         $desc->setAsClickable(
             'Front:Listing:detail',
-            ['id' => $this->listing->id]
+            ['id' => $this->listing->getId()]
         );
 
         return $desc;

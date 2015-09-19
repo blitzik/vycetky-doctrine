@@ -21,7 +21,7 @@
 
 {define col-total_worked_hours}
 <td>
-    {$row->total_worked_hours|toTimeWithComma:true}
+    {(int)$row->total_worked_hours|toTimeWithComma:true}
 </td>
 {/define}
 

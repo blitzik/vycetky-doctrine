@@ -2,7 +2,7 @@
 
 namespace App\Model\Components;
 
-use App\Model\Entities\Listing;
+use App\Model\Domain\Entities\Listing;
 
 interface IMassItemsChangeControlFactory
 {

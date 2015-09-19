@@ -3,7 +3,7 @@
 namespace App\FrontModule\Presenters;
 
 use Nette\Forms\Controls\SubmitButton;
-use App\Model\Facades\LocalityFacade;
+use App\Model\Facades\LocalitiesFacade;
 use App\Model\Entities\Locality;
 use Nette\Application\UI\Form;
 
@@ -17,7 +17,7 @@ class LocalityPresenter extends SecurityPresenter
     public $search;
 
     /**
-     * @var LocalityFacade
+     * @var LocalitiesFacade
      * @inject
      */
     public $localityFacade;

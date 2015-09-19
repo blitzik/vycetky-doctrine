@@ -6,7 +6,7 @@ use App\Model\Components\ItemsTable\IItemsTableControlFactory;
 use App\Model\Notifications\SharedListingNotification;
 use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Facades\ListingFacade;
+use App\Model\Facades\ListingsFacade;
 use App\Model\Facades\UserManager;
 use Nette\Application\UI\Control;
 use App\Model\Entities\Listing;
@@ -28,7 +28,7 @@ class SharingListingControl extends Control
     private $itemsTableControlFactory;
 
     /**
-     * @var ListingFacade
+     * @var ListingsFacade
      */
     private $listingFacade;
 
@@ -69,7 +69,7 @@ class SharingListingControl extends Control
         SharedListingNotification $sharedListingNotification,
         IItemsTableControlFactory $itemsTableControlFactory,
         MessagesFacade $messagesFacade,
-        ListingFacade $listingFacade,
+        ListingsFacade $listingFacade,
         UserManager $userManager,
         User $user
     ) {

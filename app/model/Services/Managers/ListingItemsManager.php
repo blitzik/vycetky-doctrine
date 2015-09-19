@@ -2,14 +2,17 @@
 
 namespace App\Model\Services\Managers;
 
+use App\Model\Domain\IDisplayableItem;
+use App\Model\Services\ItemsService;
+use Doctrine\ORM\ORMException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use App\Model\Services\Providers\WorkedHoursProvider;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
 use App\Model\Services\Providers\LocalityProvider;
-use App\Model\Services\Readers\ListingItemReader;
-use App\Model\Services\Writers\ListingItemWriter;
+use App\Model\Services\Readers\ListingItemsReader;
+use App\Model\Services\Writers\ListingItemsWriter;
 use Exceptions\Logic\InvalidArgumentException;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
@@ -24,7 +27,7 @@ use Doctrine\DBAL\LockMode;
 use Tracy\Debugger;
 use Nette\Object;
 
-class ListingItemManager extends Object
+class ListingItemsManager extends Object
 {
     /**
      * @var EntityRepository
@@ -32,14 +35,14 @@ class ListingItemManager extends Object
     private $listingItemRepository;
 
     /**
-     * @var ListingItemWriter
+     * @var ListingItemsWriter
      */
-    private $listingItemWriter;
+    private $listingItemsWriter;
 
     /**
-     * @var ListingItemReader
+     * @var ListingItemsReader
      */
-    private $listingItemReader;
+    private $listingItemsReader;
 
     /**
      * @var WorkedHoursProvider
@@ -52,21 +55,28 @@ class ListingItemManager extends Object
     private $localityProvider;
 
     /**
+     * @var ItemsService
+     */
+    private $itemsService;
+
+    /**
      * @var EntityManager
      */
     private $em;
 
     public function __construct(
-        ListingItemWriter $listingItemWriter,
-        ListingItemReader $listingItemReader,
+        ListingItemsWriter $listingItemWriter,
+        ListingItemsReader $listingItemReader,
         WorkedHoursProvider $workedHoursProvider,
         LocalityProvider $localityProvider,
+        ItemsService $itemsService,
         EntityManager $entityManager
     ) {
-        $this->listingItemWriter = $listingItemWriter;
-        $this->listingItemReader = $listingItemReader;
+        $this->listingItemsWriter = $listingItemWriter;
+        $this->listingItemsReader = $listingItemReader;
         $this->workedHoursProvider = $workedHoursProvider;
         $this->localityProvider = $localityProvider;
+        $this->itemsService = $itemsService;
         $this->em = $entityManager;
 
         $this->listingItemRepository = $this->em->getRepository(ListingItem::class);
@@ -80,7 +90,7 @@ class ListingItemManager extends Object
      */
     public function saveListingItem(ListingItem $listingItem)
     {
-        $this->listingItemWriter->saveListingItem($listingItem);
+        $this->listingItemsWriter->saveListingItem($listingItem);
 
         return $listingItem;
     }
@@ -160,7 +170,7 @@ class ListingItemManager extends Object
      * @throws ShiftItemUpException
      * @throws \Exception
      */
-    public function shiftCopyOfListingItem(
+    public function copyListingItem(
         $day,
         Listing $listing,
         $direction
@@ -173,12 +183,12 @@ class ListingItemManager extends Object
             $this->em->beginTransaction();
 
             /** @var ListingItem $listingItem */
-            $listingItem = $this->listingItemReader
+            $listingItem = $this->listingItemsReader
                                 ->fetchListingItem($currentItemQuery);
             $this->em->lock($listingItem, LockMode::PESSIMISTIC_READ);
 
-            $shiftedItem = $this->listingItemWriter
-                                ->shiftCopyOfListingItem($listingItem, $direction);
+            $shiftedItem = $this->listingItemsWriter
+                                ->copyListingItem($listingItem, $direction);
 
             $this->em->commit();
 

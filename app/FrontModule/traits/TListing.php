@@ -5,16 +5,16 @@ namespace App\FrontModule\Presenters;
 use App\Model\Components\IListingDescriptionControlFactory;
 use App\Model\Query\ListingsQuery;
 use Exceptions\Runtime\ListingNotFoundException;
-use App\Model\Facades\ListingFacade;
+use App\Model\Facades\ListingsFacade;
 use Nette\InvalidArgumentException;
 
 trait TListing
 {
     /**
-     * @var ListingFacade
+     * @var ListingsFacade
      * @inject
      */
-    public $listingFacade;
+    public $listingsFacade;
 
     /**
      * @var IListingDescriptionControlFactory
@@ -25,7 +25,7 @@ trait TListing
     private function getListingByID($listingID)
     {
         try {
-            return $this->listingFacade->fetchListing(
+            return $this->listingsFacade->fetchListing(
                 (new ListingsQuery())
                 ->byId($listingID)
                 ->byUser($this->user->getIdentity())
@@ -41,10 +41,8 @@ trait TListing
     protected function createComponentListingDescription()
     {
         $desc = $this->listingDescriptionFactory
-                     ->create(
-                         $this->listing->period,
-                         $this->listing->description
-                     );
+                     ->create($this->listing);
+
         $desc->setAsClickable(
             'Front:Listing:detail',
             ['id' => $this->listing->id]

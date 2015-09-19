@@ -3,14 +3,14 @@
 namespace App\Model\Components;
 
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
+use App\Model\Domain\Entities\ListingItem;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
-use App\Model\Facades\ListingFacade;
-use App\Model\Entities\WorkedHours;
+use App\Model\Facades\ListingsFacade;
+use App\Model\Domain\Entities\WorkedHours;
 use Nette\Application\UI\Control;
-use App\Model\Entities\Listing;
+use App\Model\Domain\Entities\Listing;
 use Nette\Application\UI\Form;
-use Tracy\Debugger;
 
 class MassItemsChangeControl extends Control
 {
@@ -30,7 +30,7 @@ class MassItemsChangeControl extends Control
     private $itemUpdateFormFactory;
 
     /**
-     * @var ListingFacade
+     * @var ListingsFacade
      */
     private $listingFacade;
 
@@ -51,7 +51,7 @@ class MassItemsChangeControl extends Control
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
         IItemsTableControlFactory $itemsTableControlFactory,
         ItemUpdateFormFactory $itemUpdateFormFactory,
-        ListingFacade $listingFacade
+        ListingsFacade $listingFacade
     ) {
         $this->listing = $listing;
 
@@ -63,14 +63,12 @@ class MassItemsChangeControl extends Control
 
     protected function createComponentListingDescription()
     {
-        $comp = $this->listingDescriptionControlFactory->create(
-            $this->listing->period,
-            $this->listing->description
-        );
+        $comp = $this->listingDescriptionControlFactory
+                     ->create($this->listing);
 
         $comp->setAsClickable(
             'Front:Listing:detail',
-            ['id' => $this->listing->listingID]
+            ['id' => $this->listing->getId()]
         );
 
         return $comp;
@@ -79,13 +77,9 @@ class MassItemsChangeControl extends Control
     protected function createComponentItemsTable()
     {
         $comp = $this->itemsTableControlFactory->create($this->listing);
-        $comp->showCheckBoxes();
 
-        $comp->showTableCaption(
-            $this->listing->description,
-            $this->listing->workedDays,
-            $this->listing->totalWorkedHours
-        );
+        $comp->showCheckBoxes();
+        $comp->showTableCaption();
 
         return $comp;
     }
@@ -102,20 +96,21 @@ class MassItemsChangeControl extends Control
                 ->setDefaultValue(true);
 
         $form['save']->caption = 'Změnit položky';
-        $form['save']->setAttribute('class', 'ajax');
 
         $form->onSuccess[] = $this->processMassItemsChange;
 
         $form->addProtection();
+
+        $form->getElementPrototype()->class = 'ajax';
 
         return $form;
     }
 
     public function processMassItemsChange(Form $form, $values)
     {
-        $selectedItems = $form->getHttpData(Form::DATA_TEXT, 'items[]');
+        $daysToChange = $form->getHttpData(Form::DATA_TEXT, 'items[]');
 
-        if (empty($selectedItems)) {
+        if (empty($daysToChange)) {
             $this->flashMessage('Označte řádky, které chcete změnit.', 'warning');
             if ($this->presenter->isAjax()) {
                 $this->redrawControl('flashMessage');
@@ -133,13 +128,12 @@ class MassItemsChangeControl extends Control
                 $values['otherHours']
             );
 
-            $data = $this->listingFacade
-                         ->changeItemsInListing(
-                             $this->listing,
-                             $workedHours,
-                             $values['newListing'],
-                             $selectedItems
-                         );
+            $changedItems = $this->listingFacade
+                                 ->changeWorkedHours(
+                                     $this->listing,
+                                     $workedHours,
+                                     $daysToChange
+                                 );
 
         } catch (ShiftEndBeforeStartException $s) {
             $form->addError(
@@ -156,29 +150,24 @@ class MassItemsChangeControl extends Control
             return;
         }
 
-        if ($values['newListing'] === true) {
+        /*if ($values['newListing'] === true) {
             $this->presenter->redirect(
                 'Listing:detail',
                 ['id' => $data['listing']->listingID]
             );
 
-        } else {
+        } else {*/
             if ($this->presenter->isAjax()) {
-                $this->listing = $this->listingFacade
-                    ->getEntireListingByID($this->listing->listingID);
-
-                $this->itemsCollection = $data['changedItems'];
-
                 $this->flashMessage('Hodnoty byly úspěšně hromadně změneny.', 'success');
 
                 $this->redrawControl('flashMessage');
                 $this->redrawControl('formErrors');
-                $this['itemsTable']->redrawControl();
-            } else {
 
+                $this['itemsTable']->refreshTable($changedItems);
+            } else {
                 $this->redirect('this');
             }
-        }
+        //}
     }
 
     public function render()
@@ -186,14 +175,9 @@ class MassItemsChangeControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/templates/template.latte');
 
-        if (!isset($this->itemsCollection)) {
-            $this->itemsCollection = $this->listing->listingItems;
-        }
-
-        $this['itemsTable']->setListingItems($this->itemsCollection);
-
         $template->defaultWorkedHours = $this->itemUpdateFormFactory
                                              ->getDefaultTimeValue('workedHours');
+
         $template->form = $this['listingMassItemsChangeForm'];
 
         $template->render();

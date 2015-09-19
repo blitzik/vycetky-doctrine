@@ -22,24 +22,32 @@ services:
 		class: App\Model\Services\Providers\WorkedHoursProvider
 
 	# Writers
-	listingItemWriter:
-		class: App\Model\Services\Writers\ListingItemWriter
+	listingsWriter:
+		class: App\Model\Services\Writers\ListingsWriter
+
+	listingItemsWriter:
+		class: App\Model\Services\Writers\ListingItemsWriter
 
 	# Readers
-	listingItemReader:
-		class: App\Model\Services\Readers\ListingItemReader
+	listingsReader:
+		class: App\Model\Services\Readers\ListingsReader
+
+	listingItemsReader:
+		class: App\Model\Services\Readers\ListingItemsReader
 
 	# Managers
-	listingItemManager:
-		class: App\Model\Services\Managers\ListingItemManager
+	listingsManager:
+		class: App\Model\Services\Managers\ListingsManager
+
+	listingItemsManager:
+		class: App\Model\Services\Managers\ListingItemsManager
+
+
+
+
 
 
 	# Presenters
-	listingPresenter:
-		class: App\FrontModule\Presenters\ListingPresenter
-		setup:
-			- setCompanyParameters(%company%)
-
 	helpPresenter:
 		class: App\FrontModule\Presenters\HelpPresenter
 		setup:
@@ -75,6 +83,23 @@ services:
 	filterControlFactory:
 		implement: App\Model\Components\IFilterControlFactory
 
+	listingCopyFormControlFactory:
+		implement: App\Model\Components\IListingCopyFormControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingRemovalControlFactory:
+		implement: App\Model\Components\IListingRemovalControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingPDFGenerationControlFactory:
+		implement: App\Model\Components\IListingPDFGenerationControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+		setup:
+			- setCompanyParameters(%company%)
+
 	listingActionMenuControlFactory:
 		implement: App\Model\Components\IListingActionsMenuControlFactory
 		parameters: [App\Model\Domain\Entities\Listing listing]
@@ -92,12 +117,12 @@ services:
 
 	listingTableControlFactory:
 		implement: App\Model\Components\ListingTable\IListingTableControlFactory
-		parameters: [array listingData]
-		arguments: [%listingData%]
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
 
 	massItemChangeControlFactory:
 		implement: App\Model\Components\IMassItemsChangeControlFactory
-		parameters: [App\Model\Entities\Listing listing]
+		parameters: [App\Model\Domain\Entities\Listing listing]
 		arguments: [%listing%]
 
 	sharingListingControlFactory:
@@ -112,8 +137,8 @@ services:
 
 	listingDescriptionControlFactory:
 		implement: App\Model\Components\IListingDescriptionControlFactory
-		parameters: [\DateTime period, description]
-		arguments: [%period%, %description%]
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
 
 	listingsOverviewControlFactory:
 		implement: App\Model\Components\IListingsOverviewControlFactory
@@ -127,9 +152,9 @@ services:
 	# Repositories
 	userMessageRepository: App\Model\Repositories\UserMessageRepository
 	listingItemRepository: App\Model\Repositories\ListingItemRepository
-	workedHoursRepository: App\Model\Repositories\WorkedHoursRepository # dont remove
+	workedHoursRepository: App\Model\Repositories\WorkedHoursRepository
 	invitationRepository: App\Model\Repositories\InvitationRepository
-	localityRepository: App\Model\Repositories\LocalityRepository # dont remove
+	localityRepository: App\Model\Repositories\LocalityRepository
 	listingRepository: App\Model\Repositories\ListingRepository
 	messageRepository: App\Model\Repositories\MessageRepository
 	userRepository: App\Model\Repositories\UserRepository
@@ -138,15 +163,15 @@ services:
 	transaction: Transaction
 
 	# Service layers
-	localityService: App\Model\Services\LocalityService
-	itemService: App\Model\Services\ItemService
+	localitiesService: App\Model\Services\LocalitiesService
+	itemsService: App\Model\Services\ItemsService
 
 	# Facades
 	messagesFacade: App\Model\Facades\MessagesFacade
-	localityFacade: App\Model\Facades\LocalityFacade
-	listingFacade: App\Model\Facades\ListingFacade
+	localitiesFacade: App\Model\Facades\LocalitiesFacade
+	listingsFacade: App\Model\Facades\ListingsFacade
 	userManager: App\Model\Facades\UserManager
-	itemFacade: App\Model\Facades\ItemFacade
+	itemsFacade: App\Model\Facades\ItemsFacade
 
 	# Messages Loaders
 	receivedUnreadMessagesLoader: MessagesLoaders\ReceivedUnreadMessagesLoader

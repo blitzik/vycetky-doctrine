@@ -56,7 +56,7 @@ class MergePresenter extends SecurityPresenter
     {
         $this->listing  = $this->getEntireListingByID($id);
 
-        $listings = $this->listingFacade
+        $listings = $this->listingsFacade
                          ->findPartialListingsDataForSelect(
                              $this->listing->year,
                              $this->listing->month
@@ -132,8 +132,8 @@ class MergePresenter extends SecurityPresenter
         }
 
         try {
-            $this->listingToMerge = $this->listingFacade->getListingByID($listingToMergeID);
-            if (!$this->listingFacade->haveListingsSamePeriod($this->listing, $this->listingToMerge)) {
+            $this->listingToMerge = $this->listingsFacade->getListingByID($listingToMergeID);
+            if (!$this->listingsFacade->haveListingsSamePeriod($this->listing, $this->listingToMerge)) {
                 $this->flashMessage(
                     'Lze spojit pouze výčetky se stejným obdobím.',
                     'warning'
@@ -150,7 +150,7 @@ class MergePresenter extends SecurityPresenter
 
         }
 
-        $this->mergedListingsItems = $this->listingFacade
+        $this->mergedListingsItems = $this->listingsFacade
                                           ->getMergedListingsItemsForEntireTable(
                                               $this->listing,
                                               $this->listingToMerge
@@ -189,7 +189,7 @@ class MergePresenter extends SecurityPresenter
         $selectedCollisionItems = $form->getHttpData(Form::DATA_TEXT, 'itm[]');
 
         try {
-            $this->listingFacade->mergeListings(
+            $this->listingsFacade->mergeListings(
                 $this->listing,
                 $this->listingToMerge,
                 $selectedCollisionItems

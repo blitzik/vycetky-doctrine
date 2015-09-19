@@ -7,9 +7,9 @@ use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\ListingItemNotFoundException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
-use App\Model\Services\Managers\ListingItemManager;
-use App\Model\Services\Readers\ListingItemReader;
-use App\Model\Services\Writers\ListingItemWriter;
+use App\Model\Services\Managers\ListingItemsManager;
+use App\Model\Services\Readers\ListingItemsReader;
+use App\Model\Services\Writers\ListingItemsWriter;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\ListingItemDecorator;
@@ -17,11 +17,11 @@ use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Query\ListingItemsQuery;
 use Kdyby\Doctrine\EntityRepository;
-use App\Model\Services\ItemService;
+use App\Model\Services\ItemsService;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Security\User;
 
-class ItemFacade extends BaseFacade
+class ItemsFacade extends BaseFacade
 {
     /**
      * @var array
@@ -35,14 +35,14 @@ class ItemFacade extends BaseFacade
     private $listingItemRepository;
 
     /**
-     * @var ListingItemManager
+     * @var ListingItemsManager
      */
-    private $listingItemManager;
+    private $listingItemsManager;
 
     /**
-     * @var ListingItemReader
+     * @var ListingItemsReader
      */
-    private $listingItemReader;
+    private $listingItemsReader;
 
     /**
      * @var EntityManager
@@ -50,26 +50,26 @@ class ItemFacade extends BaseFacade
     private $em;
 
     /**
-     * @var ItemService
+     * @var ItemsService
      */
-    private $itemService;
+    private $itemsService;
 
     public function __construct(
-        ListingItemManager $listingItemManager,
-        ListingItemReader $listingItemReader,
+        ListingItemsManager $listingItemManager,
+        ListingItemsReader $listingItemReader,
         EntityManager $entityManager,
-        ItemService $itemService,
+        ItemsService $itemService,
         User $user
     ) {
         parent::__construct($user);
 
-        $this->listingItemManager = $listingItemManager;
-        $this->listingItemReader = $listingItemReader;
+        $this->listingItemsManager = $listingItemManager;
+        $this->listingItemsReader = $listingItemReader;
         $this->em = $entityManager;
 
         $this->listingItemRepository = $this->em->getRepository(ListingItem::class);
 
-        $this->itemService = $itemService;
+        $this->itemsService = $itemService;
     }
 
     /**
@@ -84,9 +84,9 @@ class ItemFacade extends BaseFacade
      */
     public function saveListingItem(array $newValues, ListingItem $listingItem = null)
     {
-        $item = $this->listingItemManager->prepareListingItemByFormsData($newValues, $listingItem);
+        $item = $this->listingItemsManager->prepareListingItemByFormsData($newValues, $listingItem);
 
-        return $this->listingItemManager->saveListingItem($item);
+        return $this->listingItemsManager->saveListingItem($item);
     }
 
     /**
@@ -96,7 +96,7 @@ class ItemFacade extends BaseFacade
      */
     public function fetchListingItem(ListingItemsQuery $listingItemsQuery)
     {
-        return $this->listingItemReader->fetchListingItem($listingItemsQuery);
+        return $this->listingItemsReader->fetchListingItem($listingItemsQuery);
     }
 
     /**
@@ -105,7 +105,7 @@ class ItemFacade extends BaseFacade
      */
     public function fetchListingItems(ListingItemsQuery $listingItemsQuery)
     {
-        return $this->listingItemReader->fetchListingItems($listingItemsQuery);
+        return $this->listingItemsReader->fetchListingItems($listingItemsQuery);
     }
 
     /**
@@ -114,7 +114,7 @@ class ItemFacade extends BaseFacade
      */
     public function removeListingItem($day, Listing $listing)
     {
-        $this->listingItemManager->removeListingItem($day, $listing);
+        $this->listingItemsManager->removeListingItem($day, $listing);
     }
 
     /**
@@ -124,15 +124,15 @@ class ItemFacade extends BaseFacade
      * @throws ShiftItemDownException
      * @throws \Exception
      */
-    public function shiftCopyOfListingItemDown(
+    public function copyListingItemDown(
         $day,
         Listing $listing
     ) {
-        return $this->listingItemManager
-                    ->shiftCopyOfListingItem(
+        return $this->listingItemsManager
+                    ->copyListingItem(
                         $day,
                         $listing,
-                        ListingItemWriter::WRITE_DOWN
+                        ListingItemsWriter::WRITE_DOWN
                     );
     }
 
@@ -143,15 +143,15 @@ class ItemFacade extends BaseFacade
      * @throws ShiftItemUpException
      * @throws \Exception
      */
-    public function shiftCopyOfListingItemUp(
+    public function copyListingItemUp(
         $day,
         Listing $listing
     ) {
-        return $this->listingItemManager
-                    ->shiftCopyOfListingItem(
+        return $this->listingItemsManager
+                    ->copyListingItem(
                         $day,
                         $listing,
-                        ListingItemWriter::WRITE_UP
+                        ListingItemsWriter::WRITE_UP
                     );
     }
 
@@ -159,9 +159,9 @@ class ItemFacade extends BaseFacade
      * @param array $listingItems
      * @return array Array of ListingItemDecorators
      */
-    public function createListingItemDecoratorsCollection(array $listingItems)
+    public function convert2DisplayableItems(array $listingItems)
     {
-        return $this->itemService->createDecoratorsCollection($listingItems);
+        return $this->itemsService->convert2DisplayableItems($listingItems);
     }
 
     /**
@@ -171,19 +171,13 @@ class ItemFacade extends BaseFacade
     public function generateEntireTable(
         Listing $listing
     ) {
-        $listingItems = $this->em->createQuery(
-            'SELECT li, lo, wh FROM ' .ListingItem::class. ' li
-             JOIN li.locality lo
-             JOIN li.workedHours wh
-             WHERE li.listing = :listing'
-        )->setParameter('listing', $listing)
-         ->getResult();
+        $listingItems = $this->listingItemsReader->findListingItems($listing);
 
-        $collectionOfDecorators = $this->createListingItemDecoratorsCollection(
+        $collectionOfDecorators = $this->convert2DisplayableItems(
             $listingItems
         );
 
-        return $this->itemService->generateListingItemDecoratorsForEntireTable(
+        return $this->itemsService->generateEntireTable(
             $collectionOfDecorators,
             $listing->getPeriod()
         );
