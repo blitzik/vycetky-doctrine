@@ -32,7 +32,7 @@ class MassItemsChangeControl extends Control
     /**
      * @var ListingsFacade
      */
-    private $listingFacade;
+    private $listingsFacade;
 
 
     /**
@@ -51,14 +51,14 @@ class MassItemsChangeControl extends Control
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
         IItemsTableControlFactory $itemsTableControlFactory,
         ItemUpdateFormFactory $itemUpdateFormFactory,
-        ListingsFacade $listingFacade
+        ListingsFacade $listingsFacade
     ) {
         $this->listing = $listing;
 
         $this->listingDescriptionControlFactory = $listingDescriptionControlFactory;
         $this->itemsTableControlFactory = $itemsTableControlFactory;
         $this->itemUpdateFormFactory = $itemUpdateFormFactory;
-        $this->listingFacade = $listingFacade;
+        $this->listingsFacade = $listingsFacade;
     }
 
     protected function createComponentListingDescription()
@@ -128,12 +128,21 @@ class MassItemsChangeControl extends Control
                 $values['otherHours']
             );
 
-            $changedItems = $this->listingFacade
-                                 ->changeWorkedHours(
-                                     $this->listing,
-                                     $workedHours,
-                                     $daysToChange
-                                 );
+            if ($values['newListing'] === true) {
+                $newListing = $this->listingsFacade
+                                   ->baseListingOn(
+                                       $this->listing,
+                                       $workedHours,
+                                       $daysToChange
+                                   );
+            } else {
+                $changedItems = $this->listingsFacade
+                                    ->changeItems(
+                                        $this->listing,
+                                        $workedHours,
+                                        $daysToChange
+                                    );
+            }
 
         } catch (ShiftEndBeforeStartException $s) {
             $form->addError(
@@ -150,13 +159,13 @@ class MassItemsChangeControl extends Control
             return;
         }
 
-        /*if ($values['newListing'] === true) {
+        if ($values['newListing'] === true) {
             $this->presenter->redirect(
-                'Listing:detail',
-                ['id' => $data['listing']->listingID]
+                'Listing:overview',
+                ['year' => $newListing->getYear(), 'month' => $newListing->getMonth()]
             );
 
-        } else {*/
+        } else {
             if ($this->presenter->isAjax()) {
                 $this->flashMessage('Hodnoty byly úspěšně hromadně změneny.', 'success');
 
@@ -167,7 +176,7 @@ class MassItemsChangeControl extends Control
             } else {
                 $this->redirect('this');
             }
-        //}
+        }
     }
 
     public function render()

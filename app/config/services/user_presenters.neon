@@ -1,0 +1,9 @@
+services:
+
+	accountPresenter:
+		class: App\UserModule\Presenters\AccountPresenter
+
+	passwordPresenter:
+		class: App\UserModule\Presenters\PasswordPresenter
+		setup:
+			- setSystemEmail(%emails.system%)

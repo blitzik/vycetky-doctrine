@@ -1,0 +1,10 @@
+services:
+
+	usersReader:
+		class: App\Model\Services\Readers\UsersReader
+
+	listingsReader:
+		class: App\Model\Services\Readers\ListingsReader
+
+	listingItemsReader:
+		class: App\Model\Services\Readers\ListingItemsReader

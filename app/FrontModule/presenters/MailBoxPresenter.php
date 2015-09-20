@@ -3,6 +3,7 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Components\IMessagesTableControlFactory;
+use App\Model\Facades\UsersFacade;
 use MessagesLoaders\ReceivedUnreadMessagesLoader;
 use Exceptions\Runtime\MessageNotFoundException;
 use MessagesLoaders\ReceivedReadMessagesLoader;
@@ -21,42 +22,42 @@ class MailBoxPresenter extends SecurityPresenter
      * @var ReceivedUnreadMessagesLoader
      * @inject
      */
-    public $receivedUnreadMessagesLoader;
+    //public $receivedUnreadMessagesLoader;
 
     /**
      * @var ReceivedReadMessagesLoader
      * @inject
      */
-    public $receivedReadMessagesLoader;
+    //public $receivedReadMessagesLoader;
 
     /**
      * @var SentMessagesLoader
      * @inject
      */
-    public $sentMessagesLoader;
+    //public $sentMessagesLoader;
 
     /**
      * @var IMessagesTableControlFactory
      * @inject
      */
-    public $messagesTableControlFactory;
+    //public $messagesTableControlFactory;
 
     /**
-     * @var UserManager
+     * @var UsersFacade
      * @inject
      */
-    public $userManager;
+    public $usersFacade;
 
     /**
      * @var MessagesFacade
      * @inject
      */
-    public $messagesFacade;
+    //public $messagesFacade;
 
     /**
      * @var UserMessage
      */
-    private $message;
+    //private $message;
 
     /**
      * @var IMessagesLoader
@@ -167,7 +168,7 @@ class MailBoxPresenter extends SecurityPresenter
                 ->addRule(Form::MAX_LENGTH, 'Zpráva může obsahovat maximálně %d znaků.', 2000);
 
         $form->addMultiSelect('receivers', 'Příjemci',
-                              $this->userManager
+                              $this->usersFacade
                                    ->findAllUsers([$this->user->id]), 13)
                 ->setRequired('Vyberte alespoň jednoho příjemce.');
 

@@ -2,199 +2,30 @@ services:
 
 	security.userStorage: App\Model\Authentication\UserStorage
 
-	# Authentication
 	userAuthenticator: App\Model\Authentication\UserAuthenticator
-
-
-	# Listeners
-	authenticationListener:
-		class: App\Model\Listeners\AuthenticationListener
-		tags: [kdyby.subscriber]
-
-	# Database Backup
-	databaseBackup:
-		class: DatabaseBackup(%database%)
-
-	localityProvider:
-		class: App\Model\Services\Providers\LocalityProvider
-
-	workedHoursProvider:
-		class: App\Model\Services\Providers\WorkedHoursProvider
-
-	# Writers
-	listingsWriter:
-		class: App\Model\Services\Writers\ListingsWriter
-
-	listingItemsWriter:
-		class: App\Model\Services\Writers\ListingItemsWriter
-
-	# Readers
-	listingsReader:
-		class: App\Model\Services\Readers\ListingsReader
-
-	listingItemsReader:
-		class: App\Model\Services\Readers\ListingItemsReader
-
-	# Managers
-	listingsManager:
-		class: App\Model\Services\Managers\ListingsManager
-
-	listingItemsManager:
-		class: App\Model\Services\Managers\ListingItemsManager
-
-
-
-
-
-
-	# Presenters
-	helpPresenter:
-		class: App\FrontModule\Presenters\HelpPresenter
-		setup:
-			- setemails(%emails%)
-
-	profilePresenter:
-		class: App\FrontModule\Presenters\ProfilePresenter
-		setup:
-			- setEmails(%emails%)
-
-	backupPresenter:
-		class: App\FrontModule\Presenters\BackupPresenter
-		setup:
-			- setEmails(%emails%)
-
-	passwordPresenter:
-		class: App\UserModule\Presenters\PasswordPresenter
-		setup:
-			- setSystemEmail(%emails.system%)
-
-	# -----------------
 
 	nette.latteFactory:
 		setup:
 			- addFilter(null, [Filters\FilterLoader(), 'loader'])
 
-	listingFormFactory: App\Model\Components\ListingFormFactory
-
-	# Factories
-	itemUpdateFormFactory:
-		class: App\Model\Components\ItemUpdateFormFactory(%defaultItemTime%)
-
-	filterControlFactory:
-		implement: App\Model\Components\IFilterControlFactory
-
-	listingCopyFormControlFactory:
-		implement: App\Model\Components\IListingCopyFormControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	listingRemovalControlFactory:
-		implement: App\Model\Components\IListingRemovalControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	listingPDFGenerationControlFactory:
-		implement: App\Model\Components\IListingPDFGenerationControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-		setup:
-			- setCompanyParameters(%company%)
-
-	listingActionMenuControlFactory:
-		implement: App\Model\Components\IListingActionsMenuControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	messagesTableControlFactory:
-		implement: App\Model\Components\IMessagesTableControlFactory
-		parameters: [MessagesLoaders\IMessagesLoader loader]
-		arguments: [%loader%]
-
-	itemsTableControlFactory:
-		implement: App\Model\Components\ItemsTable\IItemsTableControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	listingTableControlFactory:
-		implement: App\Model\Components\ListingTable\IListingTableControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	massItemChangeControlFactory:
-		implement: App\Model\Components\IMassItemsChangeControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	sharingListingControlFactory:
-		implement: App\Model\Components\ISharingListingControlFactory
-		parameters: [App\Model\Entities\Listing listing]
-		arguments: [%listing%]
-
-	listingFormControlFactory:
-		implement: App\Model\Components\IListingFormControlFactory
-		parameters: [listing]
-		arguments: [%listing%]
-
-	listingDescriptionControlFactory:
-		implement: App\Model\Components\IListingDescriptionControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
-
-	listingsOverviewControlFactory:
-		implement: App\Model\Components\IListingsOverviewControlFactory
-
-	paginatorFactory: \Components\IPaginatorFactory
-
-	# LeanMapper
-	standardMapper: App\Model\Mapper\StandardMapper
-	entityFactory: EntityFactory
-
-	# Repositories
-	userMessageRepository: App\Model\Repositories\UserMessageRepository
-	listingItemRepository: App\Model\Repositories\ListingItemRepository
-	workedHoursRepository: App\Model\Repositories\WorkedHoursRepository
-	invitationRepository: App\Model\Repositories\InvitationRepository
-	localityRepository: App\Model\Repositories\LocalityRepository
-	listingRepository: App\Model\Repositories\ListingRepository
-	messageRepository: App\Model\Repositories\MessageRepository
-	userRepository: App\Model\Repositories\UserRepository
-
-	# Transaction class
-	transaction: Transaction
 
 	# Service layers
 	localitiesService: App\Model\Services\LocalitiesService
 	itemsService: App\Model\Services\ItemsService
 
-	# Facades
-	messagesFacade: App\Model\Facades\MessagesFacade
-	localitiesFacade: App\Model\Facades\LocalitiesFacade
-	listingsFacade: App\Model\Facades\ListingsFacade
-	userManager: App\Model\Facades\UserManager
-	itemsFacade: App\Model\Facades\ItemsFacade
+	# Messages Loaders todo
+	#receivedUnreadMessagesLoader: MessagesLoaders\ReceivedUnreadMessagesLoader
+	#receivedReadMessagesLoader: MessagesLoaders\ReceivedReadMessagesLoader
+	#sentMessagesLoader: MessagesLoaders\SentMessagesLoader
 
-	# Messages Loaders
-	receivedUnreadMessagesLoader: MessagesLoaders\ReceivedUnreadMessagesLoader
-	receivedReadMessagesLoader: MessagesLoaders\ReceivedReadMessagesLoader
-	sentMessagesLoader: MessagesLoaders\SentMessagesLoader
-
-	# Authentication
-	#userAuthenticator: App\Model\Authenticators\UserAuthenticator
-
-	# Notifications
-
-		#Profile
+	#Profile
 	emailNotifier: App\Model\Notifications\EmailNotifier
 
 	sharedListingNotification: App\Model\Notifications\SharedListingNotification
 
-	databaseBackupControlFactory:
-		implement: App\Model\Components\IDatabaseBackupControlFactory
-		parameters: [array emails]
-		arguments: [%emails%]
-		setup:
-			- setPasswordForBackup(%backup.database.password%)
-
+	# Database Backup
+	databaseBackup:
+		class: DatabaseBackup(%database%)
 
 	# Router
 	- App\RouterFactory

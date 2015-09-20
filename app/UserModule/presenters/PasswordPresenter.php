@@ -2,9 +2,9 @@
 
 namespace App\UserModule\Presenters;
 
+use App\Model\Facades\UsersFacade;
 use App\Model\Notifications\EmailNotifier;
 use Nette\Application\UI\ITemplate;
-use App\Model\Facades\UserManager;
 use Nette\Application\UI\Form;
 use Tracy\Debugger;
 use Nette;
@@ -18,13 +18,13 @@ class PasswordPresenter extends BasePresenter
     public $emailNotifier;
 
     /**
-     * @var UserManager
+     * @var UsersFacade
      * @inject
      */
-    public $userManager;
+    public $usersFacade;
 
     /**
-     * @var \App\Model\Entities\User
+     * @var \App\Model\Domain\Entities\User
      */
     private $user;
 
@@ -58,7 +58,7 @@ class PasswordPresenter extends BasePresenter
         $values = $form->getValues();
 
         try {
-            $user = $this->userManager->resetPassword($values['email']);
+            $user = $this->usersFacade->resetPassword($values['email']);
 
         } catch (\Exceptions\Runtime\UserNotFoundException $u) {
             $form->addError('Nelze obnovit heslo na zadaném E-mailu.');
@@ -98,7 +98,7 @@ class PasswordPresenter extends BasePresenter
     public function actionChange($email, $token)
     {
         try {
-            $this->user = $this->userManager->findUserByEmail($email);
+            $this->user = $this->usersFacade->findUserByEmail($email);
 
         } catch (\Exceptions\Runtime\UserNotFoundException $u) {
 
@@ -123,7 +123,7 @@ class PasswordPresenter extends BasePresenter
         $currentTime = new \DateTime;
 
         if ($currentTime > $this->user->tokenValidity) {
-            $this->userManager->resetToken($this->user);
+            $this->usersFacade->resetToken($this->user);
             $this->flashMessage('<strong>Chyba!</strong> Čas na změnu hesla vypršel. Pro obnovu hesla využijte formuláře níže.', 'error');
             $this->redirect('Password:reset');
         }
@@ -182,7 +182,7 @@ class PasswordPresenter extends BasePresenter
             $this->user->resetToken();
             $this->user->password = $values['password'];
 
-            $this->userManager->saveUser($this->user);
+            $this->usersFacade->saveUser($this->user);
 
         } catch (\DibiException $e) {
             $this->flashMessage('<strong>Chyba!</strong> Při pokusu o změnu hesla došlo k chybě. Na nápravě se pracuje. Zkuste to prosím později.', 'error');

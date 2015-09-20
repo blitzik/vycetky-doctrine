@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Listeners;
+namespace App\Model\Subscribers;
 
 use App\Model\Domain\Entities\User;
 use Kdyby\Doctrine\EntityManager;
@@ -8,7 +8,7 @@ use Kdyby\Events\Subscriber;
 use Nette\Http\IRequest;
 use Nette\Object;
 
-class AuthenticationListener extends Object implements Subscriber
+class AuthenticationSubscriber extends Object implements Subscriber
 {
     /**
      * @var EntityManager

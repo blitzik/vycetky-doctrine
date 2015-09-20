@@ -2,20 +2,21 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Subscribers\Validation\SubscriberValidationObject;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
-use App\Model\Notifications\EmailNotifier;
 use Exceptions\Runtime\UserAlreadyExistsException;
-use Nette\Application\UI\ITemplate;
-use App\Model\Entities\Invitation;
-use App\Model\Facades\UserManager;
-use Nette\InvalidStateException;
+use App\Model\Facades\UsersFacade;
 use \Nette\Application\UI\Form;
-use Nette\Mail\IMailer;
-use Nette\Mail\Message;
-use Tracy\Debugger;
 
 class ProfilePresenter extends SecurityPresenter
 {
+    /**
+     * @var array
+     */
+    public $onInvitationCreation = [];
+    public $onDatabaseBackupSuccess = [];
+
+
     /**
      * @var \DatabaseBackup
      * @inject
@@ -23,36 +24,14 @@ class ProfilePresenter extends SecurityPresenter
     public $databaseBackup;
 
     /**
-     * @var EmailNotifier
+     * @var UsersFacade
      * @inject
      */
-    public $emailNotifier;
-
-    /**
-     * @var UserManager
-     * @inject
-     */
-    public $userManager;
-
-    /**
-     * @var IMailer
-     * @inject
-     */
-    public $mailer;
-
-    /**
-     * @var array ['admin' => ... , 'system' => ...]
-     */
-    private $emails;
-
-    public function setEmails(array $emails)
-    {
-        $this->emails = $emails;
-    }
+    public $usersFacade;
 
     /*
      * --------------------
-     * ----- OVERVIEW -----
+     * ------ DETAIL ------
      * --------------------
      */
 
@@ -66,7 +45,7 @@ class ProfilePresenter extends SecurityPresenter
 
     public function renderDetail()
     {
-        $result = $this->userManager->getTotalWorkedStatistics($this->user->getIdentity());
+        $result = $this->usersFacade->getTotalWorkedStatistics($this->user->getIdentity());
 
         if (empty($result)) {
             $workedDays = 0;
@@ -112,18 +91,13 @@ class ProfilePresenter extends SecurityPresenter
                 $this->flashMessage($e->getMessage(), 'error');
             }
 
-            $mail = new Message();
-            $mail->setFrom('Výčetkový systém <' .$this->emails['system']. '>')
-                 ->addTo($this->emails['admin'])
-                 ->setSubject('Záloha databáze')
-                 ->addAttachment($file);
-
-            try {
-                $this->mailer->send($mail);
+            $validationObject = new SubscriberValidationObject();
+            $this->onDatabaseBackupSuccess($file, $validationObject);
+            if ($validationObject->isValid()) {
                 $this->flashMessage('Soubor se zálohou byl úspěšně odeslán.', 'success');
-
-            } catch (InvalidStateException $is) {
-                $this->flashMessage('Soubor se zálohou se nepodařilo odeslat.', 'warning');
+            } else {
+                $error = $validationObject->getFirstError();
+                $this->flashMessage($error['message'], $error['type']);
             }
 
         } else {
@@ -143,17 +117,17 @@ class ProfilePresenter extends SecurityPresenter
 
         $form->addSubmit('send', 'Odeslat pozvánku');
 
-        $form->onSuccess[] = [$this, 'processSendKey'];
+        $form->onSuccess[] = [$this, 'processCreateInvitation'];
 
         return $form;
     }
 
-    public function processSendKey(Form $form)
+    public function processCreateInvitation(Form $form)
     {
         $value = $form->getValues();
 
         try {
-            $invitation = $this->userManager->createInvitation($value['email']);
+            $invitation = $this->usersFacade->createInvitation($value['email']);
         } catch (UserAlreadyExistsException $uae) {
             $this->flashMessage(
                 'Pozvánku nelze odeslat. Uživatel s E-Mailem ' . $value['email'] . ' je již zaregistrován.',
@@ -169,31 +143,16 @@ class ProfilePresenter extends SecurityPresenter
             $this->redirect('this');
         }
 
-        try {
-            $this->emailNotifier->send(
-                'Výčetkový systém <' . $this->emails['system']. '>',
-                $invitation->email,
-                function (ITemplate $template, Invitation $invitation, $senderName) {
-                    $template->setFile(__DIR__ . '/../../model/Notifications/templates/invitation.latte');
-                    $template->invitation = $invitation;
-                    $template->username = $senderName;
-
-                },
-                [$invitation, $this->getUser()->getIdentity()->username]
-            );
-
+        $validationObject = new SubscriberValidationObject();
+        $this->onInvitationCreation($invitation, $validationObject);
+        if ($validationObject->isValid()) {
             $this->flashMessage(
                 'Registrační pozvánka byla odeslána',
                 'success'
             );
-
-        } catch (InvalidStateException $e) {
-            $this->userManager->removeInvitation($invitation);
-            Debugger::log($e, Debugger::ERROR);
-            $this->flashMessage(
-                'Registrační pozvánku nebylo možné odeslat. Zkuste to prosím později.',
-                'error'
-            );
+        } else {
+            $error = $validationObject->getFirstError();
+            $this->flashMessage($error['message'], $error['type']);
         }
 
         $this->redirect('this');
@@ -213,10 +172,10 @@ class ProfilePresenter extends SecurityPresenter
 
     public function processSaveWholeName(Form $form, $values)
     {
-        $user = $this->userManager->getUserByID($this->user->id);
+        $user = $this->usersFacade->getUserByID($this->user->id);
         $user->name = $values['name'];
 
-        $this->userManager->saveUser($user);
+        $this->usersFacade->saveUser($user);
         $this->user->getIdentity()->name = $values['name'];
 
         $this->flashMessage('Vaše jméno bylo úspěšně změněno.', 'success');

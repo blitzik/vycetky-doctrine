@@ -85,14 +85,11 @@ class ListingsManager extends Object
         $this->em->persist($newListing);
 
         if ($withItems === true) {
-            $items = $this->listingItemsReader->findListingItems($listing);
-            if (!empty($items)) {
-                foreach ($items as $item) {
-                    /** @var ListingItem $newItem */
-                    $newItem = clone $item;
-                    $newItem->setListing($newListing);
-
-                    $this->em->persist($newItem);
+            $copies = $this->getItemsCopies($listing);
+            if (!empty($copies)) {
+                foreach ($copies as $copy) {
+                    $copy->setListing($newListing);
+                    $this->em->persist($copy);
                 }
             }
         }
@@ -110,11 +107,58 @@ class ListingsManager extends Object
         return $newListing;
     }
 
+    /**
+     * @param Listing $listing
+     * @param array|null $days
+     * @return array
+     */
+    private function getItemsCopies(Listing $listing, array $days = null)
+    {
+        $items = $this->listingItemsReader
+                      ->findListingItems($listing, $days);
+
+        $copies = [];
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $copies[$item->day] = clone $item;
+            }
+        }
+
+        return $copies;
+    }
+
+    /**
+     * @param Listing $listing
+     * @param WorkedHours $newWorkedHours
+     * @param array $daysToChange
+     * @return Listing
+     */
     public function baseListingOn(
         Listing $listing,
-        array $newListingItems
+        WorkedHours $newWorkedHours,
+        array $daysToChange
     ) {
-        // todo
+        $newListing = clone $listing;
+        $this->em->persist($newListing);
+
+        $workedHours = $this->workedHoursProvider
+                            ->setupWorkedHoursEntity($newWorkedHours);
+
+        $itemsCopies = $this->getItemsCopies($listing);
+
+        $daysToChange = array_flip($daysToChange);
+        foreach ($itemsCopies as $itemCopy) {
+            if (array_key_exists($itemCopy->day, $daysToChange)) {
+                /** @var ListingItem $itemCopy */
+                $itemCopy->setWorkedTime($workedHours);
+            }
+            $itemCopy->setListing($newListing);
+            $this->em->persist($itemCopy);
+        }
+
+        $this->em->flush();
+
+        return $newListing;
     }
 
     /**

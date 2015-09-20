@@ -2,8 +2,9 @@
 
 namespace App\Model\Authentication;
 
+use App\Model\Facades\UsersFacade;
+use App\Model\Query\UsersQuery;
 use Nette\Security\AuthenticationException;
-use App\Model\Facades\UserManager;
 use Nette\Security\IAuthenticator;
 use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
@@ -24,16 +25,16 @@ class UserAuthenticator extends Object implements IAuthenticator
 
     /**
      *
-     * @var UserManager
+     * @var UsersFacade
      */
-    private $userManager;
+    private $usersFacade;
 
 
     public function __construct(
-        UserManager $userManager,
+        UsersFacade $usersFacade,
         IRequest $httpRequest
     ) {
-        $this->userManager = $userManager;
+        $this->usersFacade = $usersFacade;
         $this->httpRequest = $httpRequest;
     }
 
@@ -48,7 +49,10 @@ class UserAuthenticator extends Object implements IAuthenticator
         list($email, $password) = $credentials;
 
         try {
-            $user = $this->userManager->findUserByEmail($email);
+            $user = $this->usersFacade
+                         ->fetchUser((new UsersQuery())
+                                     ->byEmail($email)
+                         );
 
         } catch (\Exceptions\Runtime\UserNotFoundException $u) {
             throw new AuthenticationException('Zadali jste špatný email.');
@@ -60,7 +64,7 @@ class UserAuthenticator extends Object implements IAuthenticator
         } elseif (Passwords::needsRehash($user->password)) {
 
             $user->password = Passwords::hash($password);
-            $this->userManager->saveUser($user);
+            $this->usersFacade->saveUser($user);
         }
 
         $this->onLoggedIn($user);

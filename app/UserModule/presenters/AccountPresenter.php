@@ -2,22 +2,21 @@
 
 namespace App\UserModule\Presenters;
 
+use App\Model\Facades\UsersFacade;
 use Exceptions\Runtime\InvitationValidityException;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\User;
-use App\Model\Facades\UserManager;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Application\UI\Form;
 use Nette\Utils\Validators;
-use Rhumsaa\Uuid\Uuid;
 
 class AccountPresenter extends BasePresenter
 {
     /**
-    * @var UserManager
+    * @var UsersFacade
     * @inject
     */
-    public $userManager;
+    public $usersFacade;
 
     /**
      * @var Invitation
@@ -38,7 +37,7 @@ class AccountPresenter extends BasePresenter
 
     public function actionDefault()
     {
-        //$invitation = new Invitation('ales.tichava@gmail.com', new \DateTime('2015-09-30'));
+        //$invitation = new Invitation('septhaiah@gmail.com', new \DateTime('2015-09-30'));
         //$this->em->persist($invitation)->flush();
     }
 
@@ -110,7 +109,7 @@ class AccountPresenter extends BasePresenter
         }
 
         try {
-            $this->invitation = $this->userManager->checkInvitation($email, $token);
+            $this->invitation = $this->usersFacade->checkInvitation($email, $token);
 
         } catch (\Exceptions\Runtime\InvitationValidityException $t) {
             $this->flashMessage('Registrovat se může pouze uživatel s platnou pozvánkou.', 'warning');
@@ -119,7 +118,6 @@ class AccountPresenter extends BasePresenter
 
         $this['registrationForm']['email']->setDefaultValue($this->invitation->email);
     }
-
 
     public function renderRegistration($token)
     {
@@ -184,7 +182,7 @@ class AccountPresenter extends BasePresenter
         );
 
         try {
-            $this->userManager->registerNewUser($user, $this->invitation);
+            $this->usersFacade->registerNewUser($user, $this->invitation);
 
             $this->flashMessage('Váš účet byl vytvořen. Nyní se můžete přihlásit.', 'success');
             $this->redirect('Account:default');

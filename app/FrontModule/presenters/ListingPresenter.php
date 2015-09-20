@@ -14,6 +14,7 @@ use App\Model\Components\IListingFormControlFactory;
 use App\Model\Components\IFilterControlFactory;
 use App\Model\Components\ListingFormFactory;
 use App\Model\Domain\Entities\Listing;
+use App\Model\Facades\UsersFacade;
 use App\Model\Query\ListingsQuery;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\UserManager;
@@ -98,13 +99,13 @@ class ListingPresenter extends SecurityPresenter
      * @var MessagesFacade
      * @inject
      */
-    public $messageFacade;
+    //public $messageFacade;
 
     /**
-     * @var UserManager
+     * @var UsersFacade
      * @inject
      */
-    public $userManager;
+    public $usersFacade;
 
     /**
      * @var ItemsFacade

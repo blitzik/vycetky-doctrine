@@ -1,0 +1,7 @@
+services:
+
+	localityProvider:
+		class: App\Model\Services\Providers\LocalityProvider
+
+	workedHoursProvider:
+		class: App\Model\Services\Providers\WorkedHoursProvider

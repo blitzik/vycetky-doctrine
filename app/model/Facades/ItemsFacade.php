@@ -19,9 +19,10 @@ use App\Model\Query\ListingItemsQuery;
 use Kdyby\Doctrine\EntityRepository;
 use App\Model\Services\ItemsService;
 use Kdyby\Doctrine\EntityManager;
+use Nette\Object;
 use Nette\Security\User;
 
-class ItemsFacade extends BaseFacade
+class ItemsFacade extends Object
 {
     /**
      * @var array
@@ -54,6 +55,11 @@ class ItemsFacade extends BaseFacade
      */
     private $itemsService;
 
+    /**
+     * @var User
+     */
+    private $user;
+
     public function __construct(
         ListingItemsManager $listingItemManager,
         ListingItemsReader $listingItemReader,
@@ -61,8 +67,6 @@ class ItemsFacade extends BaseFacade
         ItemsService $itemService,
         User $user
     ) {
-        parent::__construct($user);
-
         $this->listingItemsManager = $listingItemManager;
         $this->listingItemsReader = $listingItemReader;
         $this->em = $entityManager;
@@ -70,6 +74,7 @@ class ItemsFacade extends BaseFacade
         $this->listingItemRepository = $this->em->getRepository(ListingItem::class);
 
         $this->itemsService = $itemService;
+        $this->user = $user;
     }
 
     /**

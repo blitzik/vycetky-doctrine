@@ -1,0 +1,78 @@
+services:
+
+	listingFormFactory: App\Model\Components\ListingFormFactory
+
+	itemUpdateFormFactory:
+		class: App\Model\Components\ItemUpdateFormFactory(%defaultItemTime%)
+
+	filterControlFactory:
+		implement: App\Model\Components\IFilterControlFactory
+
+	listingCopyFormControlFactory:
+		implement: App\Model\Components\IListingCopyFormControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingRemovalControlFactory:
+		implement: App\Model\Components\IListingRemovalControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingPDFGenerationControlFactory:
+		implement: App\Model\Components\IListingPDFGenerationControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+		setup:
+			- setCompanyParameters(%company%)
+
+	listingActionMenuControlFactory:
+		implement: App\Model\Components\IListingActionsMenuControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	messagesTableControlFactory:
+		implement: App\Model\Components\IMessagesTableControlFactory
+		parameters: [MessagesLoaders\IMessagesLoader loader]
+		arguments: [%loader%]
+
+	itemsTableControlFactory:
+		implement: App\Model\Components\ItemsTable\IItemsTableControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingTableControlFactory:
+		implement: App\Model\Components\ListingTable\IListingTableControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	massItemChangeControlFactory:
+		implement: App\Model\Components\IMassItemsChangeControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	sharingListingControlFactory:
+		implement: App\Model\Components\ISharingListingControlFactory
+		parameters: [App\Model\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingFormControlFactory:
+		implement: App\Model\Components\IListingFormControlFactory
+		parameters: [listing]
+		arguments: [%listing%]
+
+	listingDescriptionControlFactory:
+		implement: App\Model\Components\IListingDescriptionControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing]
+		arguments: [%listing%]
+
+	listingsOverviewControlFactory:
+		implement: App\Model\Components\IListingsOverviewControlFactory
+
+	paginatorFactory: \Components\IPaginatorFactory
+
+	databaseBackupControlFactory:
+		implement: App\Model\Components\IDatabaseBackupControlFactory
+		parameters: [array emails]
+		arguments: [%emails%]
+		setup:
+			- setPasswordForBackup(%backup.database.password%)

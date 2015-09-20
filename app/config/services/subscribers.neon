@@ -1,0 +1,17 @@
+services:
+
+	authenticationSubscriber:
+		class: App\Model\Subscribers\AuthenticationSubscriber
+		tags: [kdyby.subscriber]
+
+	invitationSubscriber:
+		class: App\Model\Subscribers\InvitationSubscriber
+		tags: [kdyby.subscriber]
+		setup:
+			- setSystemEmail(%emails.system%)
+
+	databaseBackupSubscriber:
+		class: App\Model\Subscribers\DatabaseBackupSubscriber
+		tags: [kdyby.subscriber]
+		setup:
+			- setEmails(%emails%)

@@ -9,11 +9,12 @@ use App\Model\Repositories\MessageRepository;
 use App\Model\Repositories\UserRepository;
 use App\Model\Entities\UserMessage;
 use App\Model\Entities\Message;
+use Nette\Object;
 use Nette\Utils\Validators;
 use Nette\Security\User;
 use Tracy\Debugger;
 
-class MessagesFacade extends BaseFacade
+class MessagesFacade extends Object
 {
 
     /**

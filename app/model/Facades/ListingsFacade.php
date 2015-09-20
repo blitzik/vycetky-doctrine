@@ -15,10 +15,11 @@ use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Services\ItemsService;
 use App\Model\Domain\FillingItem;
+use Nette\Object;
 use Nette\Utils\Validators;
 use Tracy\Debugger;
 
-class ListingsFacade extends BaseFacade
+class ListingsFacade extends Object
 {
     /**
      * @var ListingsManager
@@ -40,6 +41,11 @@ class ListingsFacade extends BaseFacade
      */
     private $itemsFacade;
 
+    /**
+     * @var \Nette\Security\User
+     */
+    private $user;
+
     public function __construct(
         ListingsManager $listingsManager,
         ListingsReader $listingsReader,
@@ -47,12 +53,12 @@ class ListingsFacade extends BaseFacade
         ItemsFacade $itemFacade,
         \Nette\Security\User $user
     ) {
-        parent::__construct($user);
         $this->listingsManager = $listingsManager;
         $this->listingsReader = $listingsReader;
 
         $this->itemsService = $itemService;
         $this->itemsFacade = $itemFacade;
+        $this->user = $user;
     }
 
     /**
@@ -113,18 +119,32 @@ class ListingsFacade extends BaseFacade
 
     /**
      * @param Listing $listing
-     * @param WorkedHours $workedHours
+     * @param WorkedHours $newWorkedHours
      * @param array $daysToChange
      * @return ListingItem[] Items that have been updated
      */
     public function changeItems(
         Listing $listing,
-        WorkedHours $workedHours,
-        array $daysToChange,
-        $intoNewListing = false
+        WorkedHours $newWorkedHours,
+        array $daysToChange
     ) {
         return $this->listingsManager
-                    ->changeWorkedHours($listing, $workedHours, $daysToChange);
+                    ->changeWorkedHours($listing, $newWorkedHours, $daysToChange);
+    }
+
+    /**
+     * @param Listing $listing
+     * @param WorkedHours $newWorkedHours
+     * @param array $daysToChange
+     * @return Listing
+     */
+    public function baseListingOn(
+        Listing $listing,
+        WorkedHours $newWorkedHours,
+        array $daysToChange
+    ) {
+        return $this->listingsManager
+                    ->baseListingOn($listing, $newWorkedHours, $daysToChange);
     }
 
     /**

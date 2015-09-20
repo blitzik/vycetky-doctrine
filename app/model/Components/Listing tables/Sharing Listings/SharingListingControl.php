@@ -7,9 +7,9 @@ use App\Model\Notifications\SharedListingNotification;
 use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\ListingsFacade;
-use App\Model\Facades\UserManager;
+use App\Model\Facades\UsersFacade;
 use Nette\Application\UI\Control;
-use App\Model\Entities\Listing;
+use App\Model\Domain\Entities\Listing;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 
@@ -38,9 +38,9 @@ class SharingListingControl extends Control
     private $messagesFacade;
 
     /**
-     * @var UserManager
+     * @var UsersFacade
      */
-    private $userManager;
+    private $usersFacade;
 
     /**
      * @var User
@@ -68,9 +68,9 @@ class SharingListingControl extends Control
         Listing $listing,
         SharedListingNotification $sharedListingNotification,
         IItemsTableControlFactory $itemsTableControlFactory,
-        MessagesFacade $messagesFacade,
+        //MessagesFacade $messagesFacade,
         ListingsFacade $listingFacade,
-        UserManager $userManager,
+        UsersFacade $usersFacade,
         User $user
     ) {
         $this->listing = $listing;
@@ -79,10 +79,10 @@ class SharingListingControl extends Control
         $this->itemsTableControlFactory = $itemsTableControlFactory;
         $this->messagesFacade = $messagesFacade;
         $this->listingFacade = $listingFacade;
-        $this->userManager = $userManager;
+        $this->usersFacade = $usersFacade;
         $this->user = $user;
 
-        $this->users = $this->userManager->findAllUsers([$this->user->id]);
+        $this->users = $this->usersFacade->findAllUsers([$this->user->id]);
     }
 
     protected function createComponentItemsTable()

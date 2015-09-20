@@ -76,7 +76,7 @@ class UsersQuery extends QueryObject
     private function createBasicDql(Kdyby\Persistence\Queryable $repository)
     {
         $qb = (new Kdyby\Doctrine\QueryBuilder($repository->getEntityManager()))
-            ->select('u')
+            ->select('u AS user')
             ->from(User::class, 'u');
 
         foreach ($this->filter as $modifier) {

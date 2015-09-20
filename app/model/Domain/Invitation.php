@@ -24,7 +24,7 @@ class Invitation extends Entity
      * @ORM\Column(name="email", type="string", length=70, nullable=false, unique=true)
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(name="token", type="string", length=32, nullable=false, unique=false, options={"fixed": true})
@@ -36,7 +36,7 @@ class Invitation extends Entity
      * @ORM\Column(name="validity", type="datetime", nullable=false, unique=false)
      * @var DateTime
      */
-    protected $validity;
+    private $validity;
 
     /**
      * @param string $email
@@ -55,13 +55,13 @@ class Invitation extends Entity
 
     private function generateToken()
     {
-        $this->row->token = Random::generate(32);
+        $this->token = Random::generate(32);
     }
 
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    private function setEmail($email)
     {
         $email = trim($email);
         Validators::assert($email, 'email');
@@ -72,7 +72,7 @@ class Invitation extends Entity
     /**
      * @param DateTime $validity
      */
-    public function setValidity(DateTime $validity)
+    private function setValidity(DateTime $validity)
     {
         if ($validity <= (new DateTime())) {
             throw new InvalidArgumentException(
@@ -87,8 +87,24 @@ class Invitation extends Entity
     /**
      * @return string
      */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return string
+     */
     public function getToken()
     {
         return $this->token;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getValidity()
+    {
+        return $this->validity;
     }
 }

@@ -1,0 +1,7 @@
+services:
+
+	listingsWriter:
+		class: App\Model\Services\Writers\ListingsWriter
+
+	listingItemsWriter:
+		class: App\Model\Services\Writers\ListingItemsWriter

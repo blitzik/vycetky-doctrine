@@ -1,0 +1,28 @@
+services:
+
+	backupPresenter:
+		class: App\FrontModule\Presenters\BackupPresenter
+		setup:
+			- setEmails(%emails%)
+
+	helpPresenter:
+		class: App\FrontModule\Presenters\HelpPresenter
+		setup:
+			- setemails(%emails%)
+
+	itemPresenter:
+		class: App\FrontModule\Presenters\ItemPresenter
+
+	listingPresenter:
+		class: App\FrontModule\Presenters\ListingPresenter
+
+	localityPresenter:
+		class: App\FrontModule\Presenters\LocalityPresenter
+
+	# todo mailbox presenter
+
+	mergePresenter:
+		class: App\FrontModule\Presenters\MergePresenter
+
+	profilePresenter:
+		class: App\FrontModule\Presenters\ProfilePresenter
