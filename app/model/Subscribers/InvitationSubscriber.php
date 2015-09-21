@@ -61,7 +61,7 @@ class InvitationSubscriber extends Object implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-            'App\FrontModule\Presenters\ProfilePresenter::onInvitationCreation'
+            'App\Model\Components\InvitationGenerationControl::onInvitationCreation'
         ];
     }
 
@@ -82,12 +82,9 @@ class InvitationSubscriber extends Object implements Subscriber
                 [$invitation, $this->user->getIdentity()->username]
             );
         } catch (InvalidStateException $e) {
-            $this->usersFacade->removeInvitation($invitation);
-
             $validationObject->addError(
-                'Registrační pozvánku nebylo možné odeslat.
-                 Zkuste to prosím později.',
-                'error'
+                'Registrační pozvánku se nepodařilo odeslat.',
+                'warning'
             );
 
             Debugger::log($e);

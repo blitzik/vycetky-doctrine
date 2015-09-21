@@ -178,6 +178,7 @@ class AccountPresenter extends BasePresenter
             $values['password'],
             $values['email'],
             $values['ip'],
+            $this->invitation->getSender(),
             $values['role']
         );
 

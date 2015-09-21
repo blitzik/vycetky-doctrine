@@ -3,6 +3,9 @@ services:
 	usersReader:
 		class: App\Model\Services\Readers\UsersReader
 
+	invitationsReader:
+		class: App\Model\Services\Readers\InvitationsReader
+
 	listingsReader:
 		class: App\Model\Services\Readers\ListingsReader
 

@@ -1,0 +1,7 @@
+
+{if $hasInvitations}
+    {control invitationsDatagrid}
+{else}
+    <p>Nemáte žádné aktivní pozvánky.
+    <a href="{plink Profile:sendInvitation}">Chcete vytvořit novou pozvánku?</a></p>
+{/if}

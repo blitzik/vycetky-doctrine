@@ -4,6 +4,7 @@ namespace App\UserModule\Presenters;
 
 use App\Model\Facades\UsersFacade;
 use App\Model\Notifications\EmailNotifier;
+use App\Model\Query\UsersQuery;
 use Nette\Application\UI\ITemplate;
 use Nette\Application\UI\Form;
 use Tracy\Debugger;
@@ -58,7 +59,8 @@ class PasswordPresenter extends BasePresenter
         $values = $form->getValues();
 
         try {
-            $user = $this->usersFacade->resetPassword($values['email']);
+            $user = $this->usersFacade
+                         ->createPasswordRestoringToken($values['email']);
 
         } catch (\Exceptions\Runtime\UserNotFoundException $u) {
             $form->addError('Nelze obnovit heslo na zadaném E-mailu.');
@@ -84,7 +86,7 @@ class PasswordPresenter extends BasePresenter
             );
 
         } catch (Nette\InvalidStateException $e) {
-            Debugger::log($e, Debugger::ERROR);
+            Debugger::log($e);
             $this->flashMessage(
                 'Při zpracování došlo k chybě. Zkuste prosím akci opakovat později.',
                 'error'
@@ -98,7 +100,8 @@ class PasswordPresenter extends BasePresenter
     public function actionChange($email, $token)
     {
         try {
-            $this->user = $this->usersFacade->findUserByEmail($email);
+            $this->user = $this->usersFacade
+                               ->fetchUser((new UsersQuery())->byEmail($email));
 
         } catch (\Exceptions\Runtime\UserNotFoundException $u) {
 
@@ -123,7 +126,6 @@ class PasswordPresenter extends BasePresenter
         $currentTime = new \DateTime;
 
         if ($currentTime > $this->user->tokenValidity) {
-            $this->usersFacade->resetToken($this->user);
             $this->flashMessage('<strong>Chyba!</strong> Čas na změnu hesla vypršel. Pro obnovu hesla využijte formuláře níže.', 'error');
             $this->redirect('Password:reset');
         }

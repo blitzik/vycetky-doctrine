@@ -4,7 +4,9 @@ namespace App\Model\Domain\Entities;
 
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Exceptions\Logic\InvalidArgumentException;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use Nette\Utils\Validators;
 use Nette\Utils\Random;
 use DateTime;
@@ -13,7 +15,8 @@ use DateTime;
  * @ORM\Entity
  * @ORM\Table(
  *      name="invitation",
- *      options={"collate": "utf8_czech_ci"}
+ *      options={"collate": "utf8_czech_ci"},
+ *      indexes={@Index(name="sender_validity", columns={"sender", "validity"})}
  * )
  */
 class Invitation extends Entity
@@ -27,7 +30,13 @@ class Invitation extends Entity
     private $email;
 
     /**
-     * @ORM\Column(name="token", type="string", length=32, nullable=false, unique=false, options={"fixed": true})
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, unique=false)
+     * @var DateTime
+     */
+    protected $createdAt;
+
+    /**
+     * @ORM\Column(name="token", type="string", length=15, nullable=false, unique=false, options={"fixed": true})
      * @var string
      */
     private $token;
@@ -39,23 +48,34 @@ class Invitation extends Entity
     private $validity;
 
     /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="sender", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @var User
+     */
+    private $sender;
+
+    /**
      * @param string $email
      * @param DateTime $validity
+     * @param User $sender
      * @return Invitation
      */
     public function __construct(
         $email,
-        DateTime $validity
+        DateTime $validity,
+        User $sender
     ) {
         $this->setEmail($email);
         $this->setValidity($validity);
-
+        $this->sender = $sender;
         $this->generateToken();
+
+        $this->createdAt = new DateTime('now');
     }
 
     private function generateToken()
     {
-        $this->token = Random::generate(32);
+        $this->token = Random::generate(15, '0-9a-zA-z');
     }
 
     /**
@@ -85,6 +105,14 @@ class Invitation extends Entity
     }
 
     /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return (new DateTime()) < $this->validity;
+    }
+
+    /**
      * @return string
      */
     public function getEmail()
@@ -107,4 +135,21 @@ class Invitation extends Entity
     {
         return $this->validity;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSender()
+    {
+        return $this->sender;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
 }

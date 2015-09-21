@@ -1,0 +1,21 @@
+<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+
+<div class="invitation-box">
+
+<h3>Registrační pozvánka</h3>
+
+{form sendKeyForm}
+
+    <div class="errors" n:if="$form->hasErrors()">
+        <ul>
+            <li n:foreach="$form->errors as $error">{$error}</li>
+        </ul>
+    </div>
+
+    <table class="invitationTable">
+        <tr><th>{label email /}</th></tr>
+        <tr><td>{input email}</td></tr>
+        <tr><td>{input send}</td></tr>
+    </table>
+{/form sendKeyForm}
+</div>

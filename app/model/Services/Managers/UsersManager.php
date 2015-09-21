@@ -79,12 +79,13 @@ class UsersManager extends Object
      * @return User
      * @throws Runtime\UserNotFoundException
      */
-    public function resetPassword($email)
+    public function createPasswordRestoringToken($email)
     {
         $user = $this->usersReader
                      ->fetchUser((new UsersQuery())
                                  ->byEmail($email)
                      );
+
         $user->createToken();
 
         $this->em->persist($user)->flush();
@@ -107,15 +108,11 @@ class UsersManager extends Object
     ) {
         $this->invitationsManager->checkInvitation($user->email, $invitation->token);
 
+        $this->em->persist($user);
+        $this->em->remove($invitation);
+
         try {
-            $this->em->beginTransaction();
-
-                $this->em->persist($user);
-                $this->em->remove($invitation);
-
-                $this->em->flush();
-
-            $this->em->commit();
+            $this->em->flush();
 
         } catch (UniqueConstraintViolationException $e) {
 

@@ -2,7 +2,10 @@
 
 namespace App\Model\Domain\Entities;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Nette\Security\Passwords;
@@ -82,13 +85,32 @@ class User extends Entity
      * @var DateTime
      */
     private $tokenValidity;
-    
+
+    /**
+     * The one who invited this user
+     *
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="host", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @var User
+     */
+    private $host;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(
+     *      name="friends",
+     *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@JoinColumn(name="friend_user_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
+    private $myFriends;
 
     /**
      * @param string $username
      * @param string $password
      * @param string $email
      * @param string $ip
+     * @param User $host
      * @param string $role
      * @param string|null $name
      * @return User
@@ -98,6 +120,7 @@ class User extends Entity
         $password,
         $email,
         $ip,
+        User $host,
         $role = 'employee',
         $name = null
     ) {
@@ -105,11 +128,16 @@ class User extends Entity
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setIp($ip);
+
+        $this->host = $host;
+
         $this->setRole($role);
         $this->setName($name);
 
         $this->setLastIP($ip);
         $this->setLastLogin(new DateTime());
+
+        $this->myFriends = new ArrayCollection;
     }
 
     /**
@@ -217,4 +245,30 @@ class User extends Entity
         $this->token = null;
         $this->tokenValidity = null;
     }
+
+    /**
+     * @return User
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    public function addFriend(User $newFriend)
+    {
+        if (!$this->myFriends->contains($newFriend)) {
+            $this->myFriends[] = $newFriend;
+        }
+    }
+
+    public function removeFriend(User $friend)
+    {
+
+    }
+
+    public function getAllFriends()
+    {
+
+    }
+
 }

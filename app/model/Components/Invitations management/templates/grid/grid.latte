@@ -1,0 +1,19 @@
+{redefine table-open-tag}
+    <table class="table t-classic t-overview">
+{/redefine}
+
+{define col-createdAt}
+    <td>{$row->createdAt->format('d.m.Y H:i:s')}</td>
+{/define}
+
+{define col-token}
+    <td>{$row->token}</td>
+{/define}
+
+{define col-email}
+    <td>{$row->email}</td>
+{/define}
+
+{define col-validity}
+    <td>{$row->validity->format('d.m.Y H:i:s')}</td>
+{/define}

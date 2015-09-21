@@ -1,6 +1,7 @@
 services:
 
 	#messagesFacade: App\Model\Facades\MessagesFacade # todo
+	invitationsFacade: App\Model\Facades\InvitationsFacade
 	localitiesFacade: App\Model\Facades\LocalitiesFacade
 	listingsFacade: App\Model\Facades\ListingsFacade
 	itemsFacade: App\Model\Facades\ItemsFacade

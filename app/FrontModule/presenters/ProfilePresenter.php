@@ -2,32 +2,52 @@
 
 namespace App\FrontModule\Presenters;
 
-use App\Model\Subscribers\Validation\SubscriberValidationObject;
-use Exceptions\Runtime\InvitationAlreadyExistsException;
-use Exceptions\Runtime\UserAlreadyExistsException;
+use App\Model\Components\IInvitationGenerationControlFactory;
+use App\Model\Components\IInvitationsManagementControlFactory;
+use App\Model\Domain\Entities\Invitation;
+use App\Model\Facades\InvitationsFacade;
 use App\Model\Facades\UsersFacade;
+use App\Model\Query\InvitationsQuery;
 use \Nette\Application\UI\Form;
 
 class ProfilePresenter extends SecurityPresenter
 {
-    /**
-     * @var array
-     */
-    public $onInvitationCreation = [];
-    public $onDatabaseBackupSuccess = [];
+    //public $onDatabaseBackupSuccess = [];
 
+    /**
+     * @var IInvitationGenerationControlFactory
+     * @inject
+     */
+    public $invitationGenerationFactory;
+
+    /**
+     * @var IInvitationsManagementControlFactory
+     * @inject
+     */
+    public $invitationsManagementFactory;
 
     /**
      * @var \DatabaseBackup
      * @inject
      */
-    public $databaseBackup;
+    //public $databaseBackup;
+
+    /**
+     * @var InvitationsFacade
+     * @inject
+     */
+    public $invitationsFacade;
 
     /**
      * @var UsersFacade
      * @inject
      */
     public $usersFacade;
+
+    /**
+     * @var Invitation[]
+     */
+    private $invitations;
 
     /*
      * --------------------
@@ -64,7 +84,34 @@ class ProfilePresenter extends SecurityPresenter
     /**
      * @Actions detail
      */
-    protected function createComponentBackupDatabaseForm()
+    protected function createComponentUserForm()
+    {
+        $form = new Form();
+
+        $form->addText('name', 'Jméno', 13, 70);
+        $form->addSubmit('savename', 'Uložit');
+
+        $form->onSuccess[] = [$this, 'processSaveWholeName'];
+
+        return $form;
+    }
+
+    public function processSaveWholeName(Form $form, $values)
+    {
+        $user = $this->user->getIdentity();
+        $user->name = $values['name'];
+
+        $this->usersFacade->saveUser($user);
+
+        $this->flashMessage('Vaše jméno bylo úspěšně změněno.', 'success');
+        $this->redirect('this');
+    }
+
+    /**
+     * todo - prijde do administrace pozdeji
+     * @Actions detail
+     */
+    /*protected function createComponentBackupDatabaseForm()
     {
         $form = new Form();
 
@@ -105,80 +152,63 @@ class ProfilePresenter extends SecurityPresenter
         }
 
         $this->redirect('this');
-    }
+    }*/
 
-    protected function createComponentSendKeyForm()
+
+    /*
+     * -------------------------
+     * ------ INVITATIONS ------
+     * -------------------------
+     */
+
+    public function actionInvitations()
     {
-        $form = new Form();
 
-        $form->addText('email', 'Odeslat pozvánku na adresu:', 22)
-                ->setRequired('Zadejte prosím E-mail, na který se má pozvánka odeslat.')
-                ->addRule(Form::EMAIL, 'Zadejte platnou E-Mailovou adresu.');
-
-        $form->addSubmit('send', 'Odeslat pozvánku');
-
-        $form->onSuccess[] = [$this, 'processCreateInvitation'];
-
-        return $form;
     }
 
-    public function processCreateInvitation(Form $form)
+    public function renderInvitations()
     {
-        $value = $form->getValues();
 
-        try {
-            $invitation = $this->usersFacade->createInvitation($value['email']);
-        } catch (UserAlreadyExistsException $uae) {
-            $this->flashMessage(
-                'Pozvánku nelze odeslat. Uživatel s E-Mailem ' . $value['email'] . ' je již zaregistrován.',
-                'warning'
-            );
-            $this->redirect('this');
-
-        } catch (InvitationAlreadyExistsException $iae) {
-            $this->flashMessage(
-                'Pozvánka již byla odeslána uživateli s E-mailem ' .$value['email'],
-                'warning'
-            );
-            $this->redirect('this');
-        }
-
-        $validationObject = new SubscriberValidationObject();
-        $this->onInvitationCreation($invitation, $validationObject);
-        if ($validationObject->isValid()) {
-            $this->flashMessage(
-                'Registrační pozvánka byla odeslána',
-                'success'
-            );
-        } else {
-            $error = $validationObject->getFirstError();
-            $this->flashMessage($error['message'], $error['type']);
-        }
-
-        $this->redirect('this');
     }
 
-    protected function createComponentUserForm()
+    /**
+     * @Actions invitations
+     */
+    protected function createComponentInvitationsManager()
     {
-        $form = new Form();
-
-        $form->addText('name', 'Jméno', 13, 70);
-        $form->addSubmit('savename', 'Uložit');
-
-        $form->onSuccess[] = [$this, 'processSaveWholeName'];
-
-        return $form;
+        return $this->invitationsManagementFactory
+                    ->create(
+                        (new InvitationsQuery())
+                        ->bySender($this->user->getIdentity())
+                        ->onlyActive()
+                    );
     }
 
-    public function processSaveWholeName(Form $form, $values)
+    /*
+     * -----------------------------
+     * ------ SEND INVITATION ------
+     * -----------------------------
+     */
+
+
+    public function actionSendInvitation()
     {
-        $user = $this->usersFacade->getUserByID($this->user->id);
-        $user->name = $values['name'];
 
-        $this->usersFacade->saveUser($user);
-        $this->user->getIdentity()->name = $values['name'];
-
-        $this->flashMessage('Vaše jméno bylo úspěšně změněno.', 'success');
-        $this->redirect('this');
     }
+
+    public function renderSendInvitation()
+    {
+
+    }
+
+    /**
+     * @Actions sendInvitation
+     */
+    protected function createComponentSendInvitationForm()
+    {
+        $comp = $this->invitationGenerationFactory->create();
+
+        return $comp;
+    }
+
 }

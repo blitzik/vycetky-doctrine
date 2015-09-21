@@ -76,3 +76,11 @@ services:
 		arguments: [%emails%]
 		setup:
 			- setPasswordForBackup(%backup.database.password%)
+
+	invitationGenerationControlFactory:
+		implement: App\Model\Components\IInvitationGenerationControlFactory
+
+	invitationsManagementControlFactory:
+		implement: App\Model\Components\IInvitationsManagementControlFactory
+		parameters: [App\Model\Query\InvitationsQuery query]
+		arguments: [%query%]

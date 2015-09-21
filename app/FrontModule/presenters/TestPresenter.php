@@ -44,9 +44,7 @@ class TestPresenter extends SecurityPresenter
 
     public function actionDefault()
     {
-        $items = $this->itemsReader->findListingItems($this->em->getReference(Listing::class, 1));
 
-        dump($items);
     }
 
     public function renderDefault()

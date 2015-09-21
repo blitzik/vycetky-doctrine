@@ -75,7 +75,7 @@ class InvitationsManager extends Object
 
         $invitation = $this->getInvitation($email, $token);
 
-        if (!$this->isInvitationTimeValid($invitation)) {
+        if (!$invitation->isActive()) {
             $this->em->remove($invitation)->flush();
             throw new InvitationExpiredException;
         }
@@ -85,11 +85,12 @@ class InvitationsManager extends Object
 
     /**
      * @param string $email
+     * @param User $sender
      * @return Invitation
      * @throws InvitationAlreadyExistsException
      * @throws UserAlreadyExistsException
      */
-    public function createInvitation($email)
+    public function createInvitation($email, User $sender)
     {
         Validators::assert($email, 'email');
 
@@ -102,13 +103,14 @@ class InvitationsManager extends Object
 
         $invitation = new Invitation(
             $email,
-            (new \DateTime)->modify('+1 week')
+            (new \DateTime)->modify('+1 week'),
+            $sender
         );
 
         $inv = $this->em->safePersist($invitation);
         if ($inv === false) {
             $existingInvitation = $this->getInvitation($email);
-            if ($this->isInvitationTimeValid($existingInvitation)) {
+            if ($existingInvitation->isActive()) {
                 throw new InvitationAlreadyExistsException;
             } else {
                 $this->em->remove($existingInvitation);
@@ -128,17 +130,5 @@ class InvitationsManager extends Object
         $this->em->remove($invitation)->flush();
     }
 
-    /**
-     * @param Invitation $invitation
-     * @return boolean TRUE - valid; FALSE - invalid
-     */
-    private function isInvitationTimeValid(Invitation $invitation)
-    {
-        $currentDate = new \DateTime;
-        if ($currentDate > $invitation->validity) {
-            return false;
-        }
 
-        return true;
-    }
 }
