@@ -7,8 +7,6 @@ services:
 	invitationSubscriber:
 		class: App\Model\Subscribers\InvitationSubscriber
 		tags: [kdyby.subscriber]
-		setup:
-			- setSystemEmail(%emails.system%)
 
 	databaseBackupSubscriber:
 		class: App\Model\Subscribers\DatabaseBackupSubscriber

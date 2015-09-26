@@ -31,17 +31,17 @@ class InvitationsReader extends Object
 
     /**
      * @param InvitationsQuery $invitationsQuery
-     * @return mixed
+     * @return Invitation
      * @throws InvitationNotFoundException
      */
     public function fetchInvitation(InvitationsQuery $invitationsQuery)
     {
-        $result = $this->invitationsRepository->fetchOne($invitationsQuery);
-        if ($result['invitation'] === null) {
+        $invitation = $this->invitationsRepository->fetchOne($invitationsQuery);
+        if ($invitation === null) {
             throw new InvitationNotFoundException;
         }
 
-        return $result;
+        return $invitation;
     }
 
     /**

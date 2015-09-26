@@ -2,16 +2,24 @@
 
 namespace App\UserModule\Presenters;
 
+use App\Model\Facades\InvitationsFacade;
 use App\Model\Facades\UsersFacade;
 use Exceptions\Runtime\InvitationValidityException;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\User;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Application\UI\Form;
+use Nette\Application\UI\Presenter;
 use Nette\Utils\Validators;
 
-class AccountPresenter extends BasePresenter
+class AccountPresenter extends Presenter
 {
+    /**
+     * @var InvitationsFacade
+     * @inject
+     */
+    public $invitationsFacade;
+
     /**
     * @var UsersFacade
     * @inject
@@ -30,72 +38,6 @@ class AccountPresenter extends BasePresenter
     public $em;
 
     /*
-     * --------------------
-     * ----- Default -----
-     * --------------------
-     */
-
-    public function actionDefault()
-    {
-        //$invitation = new Invitation('septhaiah@gmail.com', new \DateTime('2015-09-30'));
-        //$this->em->persist($invitation)->flush();
-    }
-
-    public function renderDefault()
-    {
-    }
-
-    protected function createComponentLoginForm()
-    {
-        $form = new Form();
-
-        $form->addText('email', 'E-mailová adresa uživatele:', 25, 70)
-                ->setRequired('Zadejte prosím svůj E-mail.')
-                ->addRule(Form::EMAIL, 'Zadejte prosím E-mailovou adresu ve správném formátu.');
-
-        $form->addPassword('pass', 'Heslo:', 25)
-                ->setRequired('Zadejte prosím své heslo.')
-                ->addRule(Form::FILLED, 'Zadejte vaše heslo prosím.');
-
-        $form->addCheckbox('keepLogin', 'Zůstat přihlášen')
-                ->setDefaultValue(true);
-
-        $form->addSubmit('login', 'Přihlásit')
-                ->setOmitted();
-
-        $form->onSuccess[] = callback($this, 'processLoginForm');
-
-        return $form;
-
-    }
-
-    public function processLoginForm(Form $form)
-    {
-        $values = $form->getValues();
-
-        try{
-           $this->user->login($values['email'], $values['pass']);
-
-           if ($values['keepLogin']) {
-               $this->user->setExpiration('+30 days', false);
-           } else {
-               $this->user->setExpiration('+1 hour', true);
-           }
-
-           $currentDate = new \DateTime('now');
-           $this->redirect(
-               ':Front:Listing:overview',
-               ['year' => $currentDate->format('Y'),
-                'month' => $currentDate->format('n')]
-               );
-
-        } catch (\Nette\Security\AuthenticationException $e) {
-            $form->addError($e->getMessage());
-            return;
-        }
-    }
-
-    /*
      * ------------------------
      * ----- REGISTRATION -----
      * ------------------------
@@ -109,11 +51,11 @@ class AccountPresenter extends BasePresenter
         }
 
         try {
-            $this->invitation = $this->usersFacade->checkInvitation($email, $token);
+            $this->invitation = $this->invitationsFacade->checkInvitation($email, $token);
 
         } catch (\Exceptions\Runtime\InvitationValidityException $t) {
             $this->flashMessage('Registrovat se může pouze uživatel s platnou pozvánkou.', 'warning');
-            $this->redirect('Account:default');
+            $this->redirect('Account:login');
         }
 
         $this['registrationForm']['email']->setDefaultValue($this->invitation->email);
@@ -149,7 +91,7 @@ class AccountPresenter extends BasePresenter
                 /*->setRequired('Vyplňte váš email prosím.')
                 ->addRule(Form::EMAIL, 'Zadejte prosim platný formát E-mailové adresy.');*/
 
-        $form->addSubmit('reg', 'Zaregistrovat uživatele')
+        $form->addSubmit('reg', 'Vytořit účet')
              ->setOmitted()
              ->setHtmlId('password-save-button');
 
@@ -186,11 +128,11 @@ class AccountPresenter extends BasePresenter
             $this->usersFacade->registerNewUser($user, $this->invitation);
 
             $this->flashMessage('Váš účet byl vytvořen. Nyní se můžete přihlásit.', 'success');
-            $this->redirect('Account:default');
+            $this->redirect('Login:default');
 
         } catch (InvitationValidityException $iu) {
             $this->flashMessage('Registrovat se může pouze uživatel s platnou pozvánkou.', 'warning');
-            $this->redirect('Account:default');
+            $this->redirect('Login:default');
 
         } catch (\Exceptions\Runtime\DuplicateUsernameException $du) {
             $form->addError('Vámi zvolené jméno vužívá již někdo jiný. Vyberte si prosím jiné jméno.');

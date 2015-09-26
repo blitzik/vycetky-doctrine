@@ -2,10 +2,10 @@
 
 namespace App\Model\Components;
 
+use App\Model\Facades\InvitationsFacade;
 use App\Model\Subscribers\Validation\SubscriberValidationObject;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\UserAlreadyExistsException;
-use App\Model\Facades\UsersFacade;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
@@ -18,9 +18,9 @@ class InvitationGenerationControl extends Control
     public $onInvitationCreation = [];
 
     /**
-     * @var UsersFacade
+     * @var InvitationsFacade
      */
-    private $usersFacade;
+    private $invitationsFacade;
 
     /**
      * @var User
@@ -29,10 +29,10 @@ class InvitationGenerationControl extends Control
 
 
     public function __construct(
-        UsersFacade $usersFacade,
+        InvitationsFacade $invitationsFacade,
         User $user
     ) {
-        $this->usersFacade = $usersFacade;
+        $this->invitationsFacade = $invitationsFacade;
         $this->user = $user;
     }
 
@@ -40,13 +40,15 @@ class InvitationGenerationControl extends Control
     {
         $form = new Form();
 
-        $form->addText('email', 'Odeslat pozvánku na adresu:', 22)
+        $form->addText('email', 'E-mailová adresa příjemce', 22)
             ->setRequired('Zadejte prosím E-mail, na který se má pozvánka odeslat.')
             ->addRule(Form::EMAIL, 'Zadejte platnou E-Mailovou adresu.');
 
         $form->addSubmit('send', 'Odeslat pozvánku');
 
         $form->onSuccess[] = [$this, 'processCreateInvitation'];
+
+        $form->addProtection();
 
         return $form;
     }
@@ -56,7 +58,7 @@ class InvitationGenerationControl extends Control
         $value = $form->getValues();
 
         try {
-            $invitation = $this->usersFacade
+            $invitation = $this->invitationsFacade
                                ->createInvitation(
                                    $value['email'],
                                    $this->user->getIdentity()
@@ -96,7 +98,6 @@ class InvitationGenerationControl extends Control
             $this->flashMessage($error['message'], $error['type']);
         }
 
-        $this->redirect('this');
     }
 
     public function render()

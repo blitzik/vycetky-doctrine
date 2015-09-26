@@ -1,0 +1,10 @@
+
+{snippet userState}
+    {if array_key_exists($userBeingBlockedId, $blockedUsersIDs)}
+    <a href="{link unblockUser!, id => $userBeingBlockedId}"
+       class="ajax btn-green">Zrušit blokaci uživatele</a>
+    {else}
+    <a href="{link blockUser!, id => $userBeingBlockedId}"
+       class="ajax btn-red">Blokovat uživatele</a>
+    {/if}
+{/snippet}

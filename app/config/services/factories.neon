@@ -84,3 +84,18 @@ services:
 		implement: App\Model\Components\IInvitationsManagementControlFactory
 		parameters: [App\Model\Query\InvitationsQuery query]
 		arguments: [%query%]
+
+	userBlockingControlFactory:
+		implement: App\Model\Components\IUserBlockingControlFactory
+		parameters: [userBeingBlockedId, App\Model\Domain\Entities\User user]
+		arguments: [%userBeingBlockedId%, %user%]
+
+	usersOverviewControlFactory:
+		implement: App\Model\Components\IUsersOverviewControlFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]
+
+	usersBlockingManagementControlFactory:
+		implement: App\Model\Components\IUsersBlockingManagementControlFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]

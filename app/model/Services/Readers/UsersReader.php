@@ -31,17 +31,11 @@ class UsersReader extends Object
 
     /**
      * @param UsersQuery $usersQuery
-     * @return User
-     * @throws UserNotFoundException
+     * @return User|null
      */
     public function fetchUser(UsersQuery $usersQuery)
     {
-        $result = $this->usersRepository->fetchOne($usersQuery);
-        if ($result['user'] === null) {
-            throw new UserNotFoundException;
-        }
-
-        return $result['user'];
+        return $this->usersRepository->fetchOne($usersQuery);
     }
 
     /**

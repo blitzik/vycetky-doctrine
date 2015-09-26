@@ -9,9 +9,7 @@
 
 	<title>{ifset #title}{include title|striptags}{/ifset}</title>
 
-	<link rel="stylesheet" media="screen" href="{$basePath}/css/screen.css">
-	<link rel="stylesheet" media="screen" href="{$basePath}/css/dashboard.css">
-	<link rel="stylesheet" href="{$basePath}/css/paginator.css">
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/front.min.css">
 	{block head}{/block}
 </head>
 
@@ -37,13 +35,14 @@
 					<li><a href="{link Locality:itemAutocomplete}" class="list-of-listing">Správa napovídání pracovišť</a></li>
 				</ul>
 			</li>
-			<li><a href="{link MailBox:receivedUnread}">Schránka</a></li>
 			<li><a class="parent">Pomoc</a>
 				<ul>
 					<li><a href="{link Help:doc}" class="system-doc">Dokumentace</a></li>
 					<li><a href="{link Help:contact}" class="admin-contact">Kontaktní formulář</a></li>
 				</ul>
 			</li>
+			<li><a href="{link MailBox:receivedUnread}">Schránka</a></li>
+			<li><a href="{link Users:overview}">Uživatelé</a></li>
 			<li class="logout"><a n:href="logout!">Odhlásit</a></li>
 		</ul>
 	</nav>

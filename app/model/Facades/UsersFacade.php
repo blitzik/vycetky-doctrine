@@ -7,20 +7,11 @@ use App\Model\Domain\Entities\User;
 use App\Model\Query\UsersQuery;
 use App\Model\Services\Managers\UsersManager;
 use App\Model\Services\Readers\UsersReader;
-use Exceptions\Runtime\InvitationAlreadyExistsException;
-use Exceptions\Runtime\InvitationExpiredException;
-use Exceptions\Runtime\InvitationNotFoundException;
-use Exceptions\Runtime\UserAlreadyExistsException;
 use Exceptions\Runtime\UserNotFoundException;
 use Nette\Object;
 
 class UsersFacade extends Object
 {
-    /**
-     * @var InvitationsFacade
-     */
-    private $invitationsFacade;
-
     /**
      * @var UsersManager
      */
@@ -32,11 +23,9 @@ class UsersFacade extends Object
     private $usersReader;
 
     public function __construct(
-        InvitationsFacade $invitationsFacade,
         UsersManager $usersManager,
         UsersReader $usersReader
     ) {
-        $this->invitationsFacade = $invitationsFacade;
         $this->usersManager = $usersManager;
         $this->usersReader = $usersReader;
     }
@@ -52,8 +41,7 @@ class UsersFacade extends Object
 
     /**
      * @param UsersQuery $usersQuery
-     * @return mixed
-     * @throws UserNotFoundException
+     * @return User|null
      */
     public function fetchUser(UsersQuery $usersQuery)
     {
@@ -70,38 +58,6 @@ class UsersFacade extends Object
     }
 
     /**
-     * @param string $email
-     * @param User $sender
-     * @return Invitation
-     * @throws InvitationAlreadyExistsException
-     * @throws UserAlreadyExistsException
-     */
-    public function createInvitation($email, User $sender)
-    {
-        return $this->invitationsFacade->createInvitation($email, $sender);
-    }
-
-    /**
-     * @param string $email
-     * @param string $token
-     * @return \App\Model\Domain\Entities\Invitation
-     * @throws InvitationNotFoundException
-     * @throws InvitationExpiredException
-     */
-    public function checkInvitation($email, $token)
-    {
-        return $this->invitationsFacade->checkInvitation($email, $token);
-    }
-
-    /**
-     * @param Invitation $invitation
-     */
-    public function removeInvitation(Invitation $invitation)
-    {
-        $this->invitationsFacade->removeInvitation($invitation);
-    }
-
-    /**
      * @param User $user
      * @param Invitation $invitation
      * @return User
@@ -110,7 +66,7 @@ class UsersFacade extends Object
     {
         return $this->usersManager->registerNewUser($user, $invitation);
     }
-
+    
     /**
      * @param $email
      * @return User

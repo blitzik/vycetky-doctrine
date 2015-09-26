@@ -1,5 +1,6 @@
 
 {if $hasInvitations}
+    <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
     {control invitationsDatagrid}
 {else}
     <p>Nemáte žádné aktivní pozvánky.

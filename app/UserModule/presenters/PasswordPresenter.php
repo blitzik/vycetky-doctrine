@@ -10,7 +10,7 @@ use Nette\Application\UI\Form;
 use Tracy\Debugger;
 use Nette;
 
-class PasswordPresenter extends BasePresenter
+class PasswordPresenter extends Nette\Application\UI\Presenter
 {
     /**
      * @var EmailNotifier
@@ -72,7 +72,7 @@ class PasswordPresenter extends BasePresenter
                 'Výčetkový systém <' .$this->systemEmail. '>',
                 $user->email,
                 function (ITemplate $template, $email, $token) {
-                    $template->setFile(__DIR__ . '/../../model/Notifications/templates/resetEmail.latte');
+                    $template->setFile(__DIR__ . '/../../model/Notifications/templates/resetPassword.latte');
                     $template->email = $email;
                     $template->token = $token;
 
@@ -93,40 +93,26 @@ class PasswordPresenter extends BasePresenter
             );
         }
 
-        $this->redirect('Account:default');
+        $this->redirect('Account:login');
     }
 
 
     public function actionChange($email, $token)
     {
-        try {
-            $this->user = $this->usersFacade
-                               ->fetchUser((new UsersQuery())->byEmail($email));
+        $this->user = $this->usersFacade
+                           ->fetchUser((new UsersQuery())->byEmail($email));
 
-        } catch (\Exceptions\Runtime\UserNotFoundException $u) {
-
-            $this->flashMessage('<strong>Chyba!</strong> Uživatel s E-mailem <strong>' . $email . '</strong> se v
-                                 systému nenachází a proto není možné změnit heslo spojené s tímto E-mailem. V případě,
-                                 že jste si jisti tím, že se v systému tento E-mail nacházel, zkuste pro více informací
-                                 kontaktovat správce na adrese <strong>'.$this->systemEmail.'</strong>.', 'error');
-            $this->redirect('Password:reset');
-        }
-
-        if ($this->user->token == NULL) {
-            $this->flashMessage('<strong>Chyba!</strong> Nelze změnit heslo účtu spojeného s E-mailem <strong>' .$email. '</strong>.
-                                 Zkuste si heslo znovu obnovit.', 'error');
-            $this->redirect('Password:reset');
-        }
-
-        if ($this->user->token != $token) {
-            $this->flashMessage('<strong>Chyba!</strong> Neoprávněný pokus o změnu hesla!', 'error');
+        if ($this->user === null or
+            $this->user->token === null or
+            $this->user->token !== $token)
+        {
+            $this->flashMessage('Nelze změnit heslo účtu spojeného s E-mailem ' .$email, 'warning');
             $this->redirect('Password:reset');
         }
 
         $currentTime = new \DateTime;
-
         if ($currentTime > $this->user->tokenValidity) {
-            $this->flashMessage('<strong>Chyba!</strong> Čas na změnu hesla vypršel. Pro obnovu hesla využijte formuláře níže.', 'error');
+            $this->flashMessage('Čas na změnu hesla vypršel. Pro obnovu hesla využijte formuláře níže.', 'warning');
             $this->redirect('Password:reset');
         }
 
@@ -176,7 +162,7 @@ class PasswordPresenter extends BasePresenter
         $values = $form->getValues();
 
         if ($this->user->email != $values['email']) {
-            $this->flashMessage('<strong>Chyba!</strong> Vámi zadaný E-mail nesouhlasí s E-mailem, na který byl zaslán požadavek o změnu hesla!', 'error');
+            $this->flashMessage('Vámi zadaný E-mail nesouhlasí s E-mailem, na který byl zaslán požadavek o změnu hesla!', 'warning');
             $this->redirect('this');
         }
 
@@ -186,13 +172,13 @@ class PasswordPresenter extends BasePresenter
 
             $this->usersFacade->saveUser($this->user);
 
-        } catch (\DibiException $e) {
-            $this->flashMessage('<strong>Chyba!</strong> Při pokusu o změnu hesla došlo k chybě. Na nápravě se pracuje. Zkuste to prosím později.', 'error');
+        } catch (\Exception $e) {
+            $this->flashMessage('Při pokusu o změnu hesla došlo k chybě. Na nápravě se pracuje. Zkuste to prosím později.', 'warning');
             $this->redirect('this');
         }
 
-        $this->flashMessage('<strong>Úspěch!</strong> Heslo bylo změněno. Nyní se můžete přihlásit.', 'success');
-        $this->redirect('Account:default');
+        $this->flashMessage('Heslo bylo změněno. Nyní se můžete přihlásit.', 'success');
+        $this->redirect('Account:login');
     }
 
 }

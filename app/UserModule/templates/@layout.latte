@@ -5,8 +5,7 @@
 
 	<title>{ifset #title}{include title|striptags}{/ifset}</title>
 
-	<link rel="stylesheet" media="screen" href="{$basePath}/css/screen.css">
-	<link rel="stylesheet" media="screen" href="{$basePath}/css/user.css">
+	<link rel="stylesheet" media="screen" href="{$basePath}/css/user_front.min.css">
 	{block scripts}
         <script src="{$basePath}/js/jquery.js"></script>
         <script src="{$basePath}/js/netteForms.js"></script>
@@ -17,10 +16,12 @@
 </head>
 
 <body>
-      <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{!$flash->message}</div>
+    <div id="container">
+    <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
 
-      <div id="content">
-          {include content}
-      </div>
+        <div id="content">
+            {include content}
+        </div>
+    </div>
 </body>
 </html>

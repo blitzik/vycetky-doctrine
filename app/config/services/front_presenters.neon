@@ -26,3 +26,6 @@ services:
 
 	profilePresenter:
 		class: App\FrontModule\Presenters\ProfilePresenter
+
+	usersPresenter:
+		class: App\FrontModule\Presenters\UsersPresenter

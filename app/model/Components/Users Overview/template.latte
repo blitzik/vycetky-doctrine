@@ -1,0 +1,17 @@
+
+{snippet list}
+{if !empty($users)}
+<table class="table t-classic">
+<tr><th>Uživatelské jméno</th><th></th></tr>
+{foreach $users as $id => $username}
+    <tr>
+        <td>{$username}</td>
+        <td>{control userBlocking-$id}</td>
+    </tr>
+{/foreach}
+</table>
+
+{else}
+    <p>Nebyli nalezeni žádní uživatelé.</p>
+{/if}
+{/snippet}

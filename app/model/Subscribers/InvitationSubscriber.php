@@ -2,55 +2,25 @@
 
 namespace App\Model\Subscribers;
 
-use App\Model\Domain\Entities\Invitation;
-use App\Model\Facades\UsersFacade;
-use App\Model\Notifications\EmailNotifier;
 use App\Model\Subscribers\Validation\SubscriberValidationObject;
+use App\Model\Domain\Entities\Invitation;
+use App\Model\Facades\InvitationsFacade;
 use Kdyby\Events\Subscriber;
-use Nette\Application\UI\ITemplate;
 use Nette\InvalidStateException;
 use Nette\Object;
-use Nette\Security\User;
 use Tracy\Debugger;
 
 class InvitationSubscriber extends Object implements Subscriber
 {
     /**
-     * @var string
+     * @var InvitationsFacade
      */
-    private $systemEmail;
-
-    /**
-     * @var EmailNotifier
-     */
-    private $emailNotifier;
-
-    /**
-     * @var UsersFacade
-     */
-    private $usersFacade;
-
-    /**
-     * @var User
-     */
-    private $user;
+    private $invitationsFacade;
 
     public function __construct(
-        EmailNotifier $emailNotifier,
-        UsersFacade $usersFacade,
-        User $user
+        InvitationsFacade $invitationsFacade
     ) {
-        $this->emailNotifier = $emailNotifier;
-        $this->usersFacade = $usersFacade;
-        $this->user = $user;
-    }
-
-    /**
-     * @param string $systemEmail
-     */
-    public function setSystemEmail($systemEmail)
-    {
-        $this->systemEmail = $systemEmail;
+        $this->invitationsFacade = $invitationsFacade;
     }
 
     /**
@@ -70,17 +40,7 @@ class InvitationSubscriber extends Object implements Subscriber
         SubscriberValidationObject $validationObject
     ) {
         try {
-            $this->emailNotifier->send(
-                'Výčetkový systém <' . $this->systemEmail . '>',
-                $invitation->email,
-                function (ITemplate $template, Invitation $invitation, $senderName) {
-                    $template->setFile(__DIR__ . '/../../model/Notifications/templates/invitation.latte');
-                    $template->invitation = $invitation;
-                    $template->username = $senderName;
-
-                },
-                [$invitation, $this->user->getIdentity()->username]
-            );
+            $this->invitationsFacade->sendInvitation($invitation);
         } catch (InvalidStateException $e) {
             $validationObject->addError(
                 'Registrační pozvánku se nepodařilo odeslat.',

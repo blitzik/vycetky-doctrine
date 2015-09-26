@@ -22,6 +22,11 @@ use DateTime;
 class Invitation extends Entity
 {
     use Identifier;
+
+    const TOKEN_LENGTH = 15;
+
+    const DURATION = '+1 week';
+    const NEXT_DISPATCH = '+1 day';
     
     /**
      * @ORM\Column(name="email", type="string", length=70, nullable=false, unique=true)
@@ -30,10 +35,10 @@ class Invitation extends Entity
     private $email;
 
     /**
-     * @ORM\Column(name="created_at", type="datetime", nullable=false, unique=false)
+     * @ORM\Column(name="last_sending", type="date", nullable=false, unique=false)
      * @var DateTime
      */
-    protected $createdAt;
+    protected $lastSending;
 
     /**
      * @ORM\Column(name="token", type="string", length=15, nullable=false, unique=false, options={"fixed": true})
@@ -42,7 +47,7 @@ class Invitation extends Entity
     private $token;
 
     /**
-     * @ORM\Column(name="validity", type="datetime", nullable=false, unique=false)
+     * @ORM\Column(name="validity", type="date", nullable=false, unique=false)
      * @var DateTime
      */
     private $validity;
@@ -56,26 +61,30 @@ class Invitation extends Entity
 
     /**
      * @param string $email
-     * @param DateTime $validity
      * @param User $sender
-     * @return Invitation
      */
     public function __construct(
         $email,
-        DateTime $validity,
         User $sender
     ) {
         $this->setEmail($email);
-        $this->setValidity($validity);
         $this->sender = $sender;
         $this->generateToken();
 
-        $this->createdAt = new DateTime('now');
+        $startDate = \Nette\Utils\DateTime::createFromFormat('!Y-m-d', date('Y-m-d'));
+        $this->setValidity($startDate);
+
+        $this->lastSending = $startDate;
     }
 
     private function generateToken()
     {
-        $this->token = Random::generate(15, '0-9a-zA-z');
+        $this->token = Random::generate(self::TOKEN_LENGTH, '0-9a-zA-z');
+    }
+
+    private function setValidity(\DateTime $date)
+    {
+        $this->validity = $date->modifyClone(self::DURATION);
     }
 
     /**
@@ -83,25 +92,28 @@ class Invitation extends Entity
      */
     private function setEmail($email)
     {
-        $email = trim($email);
         Validators::assert($email, 'email');
 
         $this->email = $email;
     }
 
-    /**
-     * @param DateTime $validity
-     */
-    private function setValidity(DateTime $validity)
+    public function setLastSendingTime()
     {
-        if ($validity <= (new DateTime())) {
-            throw new InvalidArgumentException(
-                'You cannot set $validity to the past time. Check your
-                 DateTime value.'
-            );
-        }
+        $this->lastSending = new DateTime('now');
+    }
 
-        $this->validity = $validity;
+    public function canBeSend()
+    {
+        return (new DateTime('now')) >= $this->getNextTimeOfDispatch();
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    private function getNextTimeOfDispatch()
+    {
+        return \DateTimeImmutable::createFromMutable($this->lastSending)
+               ->modify(self::NEXT_DISPATCH);
     }
 
     /**
@@ -147,9 +159,9 @@ class Invitation extends Entity
     /**
      * @return DateTime
      */
-    public function getCreatedAt()
+    public function getLastSending()
     {
-        return $this->createdAt;
+        return $this->lastSending;
     }
 
 }

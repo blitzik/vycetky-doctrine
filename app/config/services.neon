@@ -21,6 +21,11 @@ services:
 	#Profile
 	emailNotifier: App\Model\Notifications\EmailNotifier
 
+	invitationsSender:
+		class: App\Model\Services\InvitationsSender
+		setup:
+			- setSystemEmail(%emails.system%)
+
 	sharedListingNotification: App\Model\Notifications\SharedListingNotification
 
 	# Database Backup

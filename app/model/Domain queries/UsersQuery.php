@@ -3,6 +3,7 @@
 namespace App\Model\Query;
 
 use App\Model\Domain\Entities\User;
+use Exceptions\Logic\InvalidArgumentException;
 use Kdyby\Doctrine\QueryObject;
 use Nette\Utils\Validators;
 use Kdyby;
@@ -18,6 +19,44 @@ class UsersQuery extends QueryObject
      * @var array|\Closure[]
      */
     private $select = [];
+
+    public function onlyWithFields(array $fields)
+    {
+        if (empty($fields)) {
+            throw new InvalidArgumentException('Argument $fields must NOT be empty array!');
+        }
+
+        $this->select[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($fields) {
+            $qb->resetDQLPart('select');
+            foreach ($fields as $fieldName) {
+                $qb->addSelect('u.'.$fieldName);
+            }
+        };
+
+        return $this;
+    }
+
+    public function findUsersBlockedByMe(User $user)
+    {
+        $this->select[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($user) {
+            $qb->join('u.usersBlockingMe', 'f');
+            $qb->andWhere('f.id = :id')
+               ->setParameter('id', $user->getId());
+        };
+
+        return $this;
+    }
+
+    public function likeUsername($username)
+    {
+        Validators::assert($username, 'unicode');
+
+        $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($username){
+            $qb->andWhere('u.username LIKE :username')->setParameter('username', $username.'%');
+        };
+
+        return $this;
+    }
 
     public function byUsername($username)
     {
@@ -36,6 +75,15 @@ class UsersQuery extends QueryObject
 
         $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($email) {
             $qb->andWhere('u.email = :email')->setParameter('email', $email);
+        };
+
+        return $this;
+    }
+
+    public function byId($id)
+    {
+        $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($id) {
+            $qb->andWhere('u.id = :id')->setParameter('id', $id);
         };
 
         return $this;
@@ -76,8 +124,8 @@ class UsersQuery extends QueryObject
     private function createBasicDql(Kdyby\Persistence\Queryable $repository)
     {
         $qb = (new Kdyby\Doctrine\QueryBuilder($repository->getEntityManager()))
-            ->select('u AS user')
-            ->from(User::class, 'u');
+             ->select('u')
+             ->from(User::class, 'u');
 
         foreach ($this->filter as $modifier) {
             $modifier($qb);

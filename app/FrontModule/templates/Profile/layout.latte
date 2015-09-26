@@ -1,13 +1,16 @@
 {layout '../@layout.latte'}
 
 {block content}
-<h2>Profil uživatele</h2>
-
 <nav class="listing-sub-nav">
 <ul>
 <li>
     <a href="{link Profile:detail}"
        {ifCurrent Profile:detail}class="selected"{/ifCurrent}>O uživateli</a>
+</li>
+
+<li>
+    <a href="{link Profile:blockedUsers}"
+       {ifCurrent Profile:blockedUsers}class="selected"{/ifCurrent}>Správa ignorovaných uživatelů</a>
 </li>
 
 <li>

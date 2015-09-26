@@ -1,0 +1,27 @@
+{block title}Přihlášení do systému{/block}
+{block content}
+
+<div class="wrapperBox">
+<h1>Přihlášení</h1>
+
+{form loginForm}
+    <ul class="form-errors" n:if="$form->hasErrors()">
+        <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
+    </ul>
+
+	<div class="box">
+    <table>
+        <tr><td>{label email /} {input email}</td></tr>
+        <tr><td>{label pass /} {input pass}</td></tr>
+        <tr><td>{input keepLogin}</td></tr>
+        <tr><td>{input login}</td></tr>
+    </table>
+	<div class="links">
+	    <a href="{link Password:reset}">Nepamatuji si heslo</a>
+	    <!--<a href="{link Invitation:application}">Registrace</a>-->
+	</div>
+	</div>
+{/form loginForm}
+</div>
+        
+{/block}

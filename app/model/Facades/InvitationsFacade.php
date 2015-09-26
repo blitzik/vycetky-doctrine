@@ -11,6 +11,7 @@ use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationExpiredException;
 use Exceptions\Runtime\InvitationNotFoundException;
 use Exceptions\Runtime\UserAlreadyExistsException;
+use Nette\InvalidStateException;
 use Nette\Object;
 
 class InvitationsFacade extends Object
@@ -35,7 +36,7 @@ class InvitationsFacade extends Object
 
     /**
      * @param InvitationsQuery $invitationsQuery
-     * @return mixed
+     * @return Invitation
      * @throws InvitationNotFoundException
      */
     public function fetchInvitation(InvitationsQuery $invitationsQuery)
@@ -77,11 +78,21 @@ class InvitationsFacade extends Object
     }
 
     /**
-     * @param Invitation $invitation
+     * @param int $id
      */
-    public function removeInvitation(Invitation $invitation)
+    public function removeInvitation($id)
     {
-        $this->invitationsManager->removeInvitation($invitation);
+        $this->invitationsManager->removeInvitation($id);
+    }
+
+    /**
+     * @param Invitation $invitation
+     * @throws InvitationExpiredException
+     * @throws InvalidStateException
+     */
+    public function sendInvitation(Invitation $invitation)
+    {
+        $this->invitationsManager->sendInvitation($invitation);
     }
 
 }

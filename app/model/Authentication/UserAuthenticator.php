@@ -2,8 +2,11 @@
 
 namespace App\Model\Authentication;
 
+use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
 use App\Model\Query\UsersQuery;
+use Doctrine\ORM\NoResultException;
+use Kdyby\Doctrine\EntityManager;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
 use Nette\Security\IIdentity;
@@ -19,23 +22,21 @@ class UserAuthenticator extends Object implements IAuthenticator
     public $onLoggedIn = [];
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var IRequest
      */
     private $httpRequest;
 
-    /**
-     *
-     * @var UsersFacade
-     */
-    private $usersFacade;
-
-
     public function __construct(
-        UsersFacade $usersFacade,
+        EntityManager $entityManager,
         IRequest $httpRequest
     ) {
-        $this->usersFacade = $usersFacade;
         $this->httpRequest = $httpRequest;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -48,13 +49,11 @@ class UserAuthenticator extends Object implements IAuthenticator
     {
         list($email, $password) = $credentials;
 
-        try {
-            $user = $this->usersFacade
-                         ->fetchUser((new UsersQuery())
-                                     ->byEmail($email)
-                         );
+        $user = $this->entityManager
+                     ->getRepository(User::class)
+                     ->fetchOne((new UsersQuery())->byEmail($email));
 
-        } catch (\Exceptions\Runtime\UserNotFoundException $u) {
+        if ($user === null) {
             throw new AuthenticationException('Zadali jste špatný email.');
         }
 
@@ -64,7 +63,6 @@ class UserAuthenticator extends Object implements IAuthenticator
         } elseif (Passwords::needsRehash($user->password)) {
 
             $user->password = Passwords::hash($password);
-            $this->usersFacade->saveUser($user);
         }
 
         $this->onLoggedIn($user);

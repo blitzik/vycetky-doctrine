@@ -2,17 +2,28 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IBlockedUsersManagementControlFactory;
+use App\Model\Components\IFriendsManagementControlFactory;
 use App\Model\Components\IInvitationGenerationControlFactory;
 use App\Model\Components\IInvitationsManagementControlFactory;
+use App\Model\Components\InvitationGenerationControl;
+use App\Model\Components\IUsersBlockingManagementControlFactory;
 use App\Model\Domain\Entities\Invitation;
-use App\Model\Facades\InvitationsFacade;
+use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
 use App\Model\Query\InvitationsQuery;
+use App\Model\Query\UsersQuery;
 use \Nette\Application\UI\Form;
 
 class ProfilePresenter extends SecurityPresenter
 {
     //public $onDatabaseBackupSuccess = [];
+
+    /**
+     * @var IUsersBlockingManagementControlFactory
+     * @inject
+     */
+    public $usersBlockingManagementFactory;
 
     /**
      * @var IInvitationGenerationControlFactory
@@ -33,21 +44,10 @@ class ProfilePresenter extends SecurityPresenter
     //public $databaseBackup;
 
     /**
-     * @var InvitationsFacade
-     * @inject
-     */
-    public $invitationsFacade;
-
-    /**
      * @var UsersFacade
      * @inject
      */
     public $usersFacade;
-
-    /**
-     * @var Invitation[]
-     */
-    private $invitations;
 
     /*
      * --------------------
@@ -153,6 +153,34 @@ class ProfilePresenter extends SecurityPresenter
 
         $this->redirect('this');
     }*/
+
+
+    /*
+     * ---------------------
+     * ------ FRIENDS ------
+     * ---------------------
+     */
+
+    public function actionBlockedUsers()
+    {
+
+    }
+
+    public function renderBlockedUsers()
+    {
+
+    }
+
+    /**
+     * @Actions blockedUsers
+     */
+    protected function createComponentUsersList()
+    {
+        $comp = $this->usersBlockingManagementFactory
+                     ->create($this->user->getIdentity());
+
+        return $comp;
+    }
 
 
     /*

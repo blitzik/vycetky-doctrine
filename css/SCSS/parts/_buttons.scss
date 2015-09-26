@@ -1,0 +1,92 @@
+%btn{
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #FFF;
+  @include border-radius(6px);
+}
+
+.btn-large{
+  padding: 12px 18px;
+}
+
+.btn-small{
+  padding: 3px 9px;
+}
+
+// SPECIFIC BUTTONS
+
+.btn-red {
+  @extend %btn;
+
+  background-color: #E74C3C;
+  &:hover{background-color: #C0392B;}
+}
+
+
+$btn-delete: #363b45;
+.btn-delete{
+  @extend %btn;
+
+  background-color: $btn-delete;
+  &:hover{background-color: darken($btn-delete, 8%);}
+}
+
+
+.btn-green{
+  @extend  %btn;
+
+  background-color: #2ECC71;
+  &:hover{background-color: #27AE60;}
+}
+
+.btn-blue{
+  @extend %btn;
+
+  background-color: #3498DB;
+  &:hover{background-color: #2980B9;}
+}
+
+
+$btn-brown: #9E6B52;
+.btn-brown{
+  @extend %btn;
+
+  background-color: $btn-brown;
+  &:hover{ background-color: darken($btn-brown, 10%)}
+}
+
+
+$btn-green: #1ABC9C;
+.btn-copy{
+  @extend %btn;
+
+  background-color: $btn-green;
+  &:hover{background-color: #16A085;}
+}
+
+
+$btn-L-blue: #5bc0de;
+.btn-primary{
+  @extend %btn;
+
+  color: #FFF;
+  background-color: $btn-L-blue;
+  &:hover{background-color: darken($btn-L-blue, 8%);}
+}
+
+
+$btn-violet: #9e50a3;
+.btn-violet {
+  @extend %btn;
+
+  color: #FFF;
+  background-color: $btn-violet;
+  &:hover{background-color: darken($btn-violet, 8%);}
+}
+
+.wide-button{
+  width: 100%;
+}

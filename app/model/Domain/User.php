@@ -96,14 +96,19 @@ class User extends Entity
     private $host;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="usersBlockingMe", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(
-     *      name="friends",
+     *      name="blocked_users",
      *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@JoinColumn(name="friend_user_id", referencedColumnName="id", onDelete="CASCADE")}
+     *      inverseJoinColumns={@JoinColumn(name="blocked_user_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
-    private $myFriends;
+    private $usersBlockedByMe;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="usersBlockedByMe")
+     */
+    private $usersBlockingMe;
 
     /**
      * @param string $username
@@ -128,16 +133,15 @@ class User extends Entity
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setIp($ip);
-
-        $this->host = $host;
-
         $this->setRole($role);
         $this->setName($name);
-
         $this->setLastIP($ip);
         $this->setLastLogin(new DateTime());
 
-        $this->myFriends = new ArrayCollection;
+        $this->usersBlockedByMe = new ArrayCollection;
+        $this->usersBlockingMe = new ArrayCollection;
+
+        $this->host = $host;
     }
 
     /**
@@ -247,6 +251,22 @@ class User extends Entity
     }
 
     /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getTokenValidity()
+    {
+        return $this->tokenValidity;
+    }
+
+    /**
      * @return User
      */
     public function getHost()
@@ -254,21 +274,31 @@ class User extends Entity
         return $this->host;
     }
 
-    public function addFriend(User $newFriend)
+    public function blockUser(User $user)
     {
-        if (!$this->myFriends->contains($newFriend)) {
-            $this->myFriends[] = $newFriend;
+        if (!$this->usersBlockedByMe->contains($user)) {
+            $this->usersBlockedByMe[] = $user;
         }
     }
 
-    public function removeFriend(User $friend)
+    public function unblockUser(User $user)
     {
-
+        if ($this->usersBlockedByMe->contains($user)) {
+            $this->usersBlockedByMe->removeElement($user);
+        }
     }
 
-    public function getAllFriends()
+    /**
+     * @return array
+     */
+    public function getAllUsersBlockedByMe()
     {
+        return $this->usersBlockedByMe->toArray();
+    }
 
+    public function getAllUsersBlockingMe()
+    {
+        return $this->usersBlockingMe->toArray();
     }
 
 }

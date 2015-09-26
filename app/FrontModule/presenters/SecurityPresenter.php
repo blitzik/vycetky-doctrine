@@ -25,7 +25,7 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
                     'Byl jste odhlášen z důvodu neaktivity. Přihlašte se prosím znovu.'
                 );
             }
-            $this->redirect(':User:Account:default');
+            $this->redirect(':User:Login:default');
         }
 
         $this->currentDate = new \DateTime();
@@ -66,6 +66,6 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
     public function handleLogout()
     {
         $this->user->logout();
-        $this->redirect(':User:Account:default');
+        $this->redirect(':User:Login:default');
     }
 }

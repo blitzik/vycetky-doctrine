@@ -1,0 +1,22 @@
+
+<h2 n:tag-if="$heading">{$heading}</h2>
+
+{if $numberOfListings > 0}
+{foreach $listings as $month => $entities}
+    <h3>{$month|monthNameByNumber}</h3>
+    {control dataGrid-$month}
+{/foreach}
+{else}
+
+    {if isset($date)}
+        <p>Váš účet neobsahuje žádné výčetky pro <b>{$date|listingMonthYear}</b>.</p>
+        <p><a href="{plink Listing:add, 'year'=>$date->format('Y'),
+                                        'month'=>$date->format('n')}"
+              class="btn-primary">
+              Založte si první výčetku pro <b>{$date|listingMonthYear}</b>
+           </a>
+        </p>
+    {else}
+        <p>Váš účet neobsahuje žádné výčetky za <b>rok {$presenter->getParameter('year')}</b></p>
+    {/if}
+{/if}

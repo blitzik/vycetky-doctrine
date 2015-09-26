@@ -21,6 +21,15 @@ class InvitationsQuery extends QueryObject
      */
     private $select = [];
 
+    public function byId($id)
+    {
+        $this->filter[] = function (QueryBuilder $qb) use ($id) {
+            $qb->andWhere('i.id = :id')->setParameter('id', $id);
+        };
+
+        return $this;
+    }
+
     public function byEmail($email)
     {
         Validators::assert($email, 'email');
@@ -73,7 +82,7 @@ class InvitationsQuery extends QueryObject
     private function createBasicDql(Kdyby\Persistence\Queryable $repository)
     {
         $qb = (new QueryBuilder($repository->getEntityManager()))
-              ->select('i AS invitation')
+              ->select('i')
               ->from(Invitation::class, 'i');
 
         foreach ($this->filter as $modifier) {

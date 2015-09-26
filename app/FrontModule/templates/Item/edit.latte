@@ -18,9 +18,9 @@
 
 {form itemForm}
 {var $day = $presenter->getParameter('day')}
-<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
-    {$error}
-</div>
+<ul class="form-errors" n:if="$form->hasErrors()">
+    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
+</ul>
 
 <table class="table t-classic">
 	<tr><td colspan="5"><b>{$itemDate|dayName} {$day}</b>. {control listingDescription}</td></tr>
@@ -54,7 +54,7 @@
     <tr><td colspan="4">
     <ul class="item-action-menu">
             <li><input type="button" value="Vynulovat čas"
-                       id="btn-reset-time" class="btn btn-blue"></li>
+                       id="btn-reset-time" class="btn-blue"></li>
     </ul>
     </td><td>{input save}</td></tr>
 </table>

@@ -5,12 +5,9 @@
 <h3>Registrační pozvánka</h3>
 
 {form sendKeyForm}
-
-    <div class="errors" n:if="$form->hasErrors()">
-        <ul>
-            <li n:foreach="$form->errors as $error">{$error}</li>
-        </ul>
-    </div>
+<ul class="form-errors" n:if="$form->hasErrors()">
+    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
+</ul>
 
     <table class="invitationTable">
         <tr><th>{label email /}</th></tr>
