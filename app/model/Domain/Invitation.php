@@ -23,7 +23,7 @@ class Invitation extends Entity
 {
     use Identifier;
 
-    const TOKEN_LENGTH = 15;
+    const TOKEN_LENGTH = 8;
 
     const DURATION = '+1 week';
     const NEXT_DISPATCH = '+1 day';
@@ -41,7 +41,7 @@ class Invitation extends Entity
     protected $lastSending;
 
     /**
-     * @ORM\Column(name="token", type="string", length=15, nullable=false, unique=false, options={"fixed": true})
+     * @ORM\Column(name="token", type="string", length=8, nullable=false, unique=false, options={"fixed": true})
      * @var string
      */
     private $token;
@@ -79,7 +79,7 @@ class Invitation extends Entity
 
     private function generateToken()
     {
-        $this->token = Random::generate(self::TOKEN_LENGTH, '0-9a-zA-z');
+        $this->token = Random::generate(self::TOKEN_LENGTH);
     }
 
     private function setValidity(\DateTime $date)
