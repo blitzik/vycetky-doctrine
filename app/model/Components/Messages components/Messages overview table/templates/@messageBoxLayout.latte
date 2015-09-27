@@ -1,0 +1,40 @@
+<div class="box box-messages">
+
+{snippet all}
+<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+{if $messages}
+
+{form messagesActions}
+{control paginator}
+
+{input delete}
+<table class="table t-classic overview-message-table">
+
+<caption>Celkový počet zpráv: {$numberOfMessages}</caption>
+
+<thead>
+<tr>
+    <th>{input checkAll}</th>
+    {block userTypeLabel}{/block}
+    {block messageTimeLabel}{/block}
+    <th>Předmět zprávy</th>
+    <th colspan="2">Akce</th>
+</tr>
+</thead>
+
+{block messagesList}{/block}
+
+</table>
+{/form messagesActions}
+
+<script>
+$(function (){
+    checkAllFunc();
+});
+</script>
+
+{else}
+    Žádné zprávy k zobrazení
+{/if}
+{/snippet}
+</div>

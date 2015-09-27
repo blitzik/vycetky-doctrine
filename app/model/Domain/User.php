@@ -126,7 +126,7 @@ class User extends Entity
         $email,
         $ip,
         User $host,
-        $role = 'employee',
+        $role = 'Zaměstnanec',
         $name = null
     ) {
         $this->setUsername($username);
@@ -142,6 +142,13 @@ class User extends Entity
         $this->usersBlockingMe = new ArrayCollection;
 
         $this->host = $host;
+
+        $this->myMessages = new ArrayCollection;
+    }
+
+    public function getAllMessages()
+    {
+        return $this->myMessages->toArray();
     }
 
     /**

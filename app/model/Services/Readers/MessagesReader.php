@@ -1,33 +1,38 @@
 <?php
 
-namespace App\Model\Facades;
+namespace App\Model\Services\Readers;
 
 use App\Model\Domain\Entities\Message;
 use App\Model\Domain\Entities\MessageReference;
 use App\Model\Query\MessageReferencesQuery;
 use App\Model\Query\MessagesQuery;
-use App\Model\Services\Managers\MessagesManager;
-use App\Model\Services\Readers\MessagesReader;
+use \Kdyby\Doctrine\EntityRepository;
+use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 
-class MessagesFacade extends Object
+class MessagesReader extends Object
 {
     /**
-     * @var MessagesManager
+     * @var EntityManager
      */
-    private $messagesManager;
+    private $em;
 
     /**
-     * @var MessagesReader
+     * @var EntityRepository
      */
-    private $messagesReader;
+    private $messageRepository;
 
-    public function __construct(
-        MessagesManager $messagesManager,
-        MessagesReader $messagesReader
-    ) {
-        $this->messagesManager = $messagesManager;
-        $this->messagesReader = $messagesReader;
+    /**
+     * @var EntityRepository
+     */
+    private $messageReferenceRepository;
+
+    public function __construct(EntityManager $entityManager)
+    {
+        $this->em = $entityManager;
+
+        $this->messageRepository = $this->em->getRepository(Message::class);
+        $this->messageReferenceRepository = $this->em->getRepository(MessageReference::class);
     }
 
     /**
@@ -36,7 +41,7 @@ class MessagesFacade extends Object
      */
     public function fetchMessage(MessagesQuery $query)
     {
-        return $this->messagesReader->fetchMessage($query);
+        return $this->messageRepository->fetchOne($query);
     }
 
     /**
@@ -45,7 +50,7 @@ class MessagesFacade extends Object
      */
     public function fetchMessages(MessagesQuery $query)
     {
-        return $this->messagesReader->fetchMessages($query);
+        return $this->messageRepository->fetch($query);
     }
 
     /**
@@ -54,7 +59,7 @@ class MessagesFacade extends Object
      */
     public function fetchMessageReference(MessageReferencesQuery $query)
     {
-        return $this->messagesReader->fetchMessageReference($query);
+        return $this->messageReferenceRepository->fetchOne($query);
     }
 
     /**
@@ -63,6 +68,7 @@ class MessagesFacade extends Object
      */
     public function fetchMessagesReferences(MessageReferencesQuery $query)
     {
-        return $this->messagesReader->fetchMessagesReferences($query);
+        return $this->messageReferenceRepository->fetch($query);
     }
+
 }

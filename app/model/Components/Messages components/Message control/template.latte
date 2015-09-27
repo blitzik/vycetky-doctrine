@@ -1,0 +1,20 @@
+{var $isReceived = $message->author->getId() !== $user->getIdentity()->getId()}
+
+<table class="table t-message">
+{if $isReceived}
+<tr><th>Odesílatel</th>
+    <td>{if isset($message->author)}{$message->author->username}{else}
+        <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">{/if}</td>
+</tr>
+{/if}
+
+<tr><th>{$isReceived ? 'Přijato' : 'Odesláno'}</th>
+    <td>{$message->sent|date:'j.n.Y v H:i'}</td></tr>
+
+<tr><th>Předmět</th><td>{$message->subject}</td></tr>
+<tr><th>Text zprávy</th><td>{$message->text}</td></tr>
+</table>
+
+{if !$isReceived}
+    {control recipientsList}
+{/if}

@@ -1,0 +1,7 @@
+
+<table class='table t-recipients'>
+<tr><th>{count($referenceMessagesRecipients) > 1 ? 'Příjemci' : 'Příjemce'}</th></tr>
+{foreach $referenceMessagesRecipients as $referenceMessage}
+<tr><td>{$referenceMessage['recipient']['username']}</td></tr>
+{/foreach}
+</table>

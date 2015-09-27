@@ -612,7 +612,9 @@ h3 {
       background-color: #E4DED5; }
 
 .t-message {
-  max-width: 650px; }
+  max-width: 650px;
+  float: left;
+  margin-right: 20px; }
 
 .t-recipients {
   float: left;

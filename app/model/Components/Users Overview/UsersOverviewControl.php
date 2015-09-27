@@ -5,6 +5,7 @@ namespace App\Model\Components;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
 use App\Model\Query\UsersQuery;
+use Doctrine\ORM\AbstractQuery;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Multiplier;
 use Nette\Utils\Arrays;
@@ -93,7 +94,7 @@ class UsersOverviewControl extends Control
         if (empty($this->users)) {
             $this->users = Arrays::associate($this->usersFacade
                 ->fetchUsers($this->usersQuery)
-                ->toArray(), 'id=username');
+                ->toArray(AbstractQuery::HYDRATE_ARRAY), 'id=username');
 
             unset($this->users[$this->user->getId()]);
         }
@@ -103,9 +104,9 @@ class UsersOverviewControl extends Control
         if (empty($this->alreadyBlockedUsers)) {
             $alreadyBlockedUsers = Arrays::associate($this->usersFacade->fetchUsers(
                 (new UsersQuery())
-                    ->onlyWithFields(['id'])
-                    ->findUsersBlockedByMe($this->user)
-            )->toArray(), 'id');
+                ->onlyWithFields(['id'])
+                ->findUsersBlockedByMe($this->user)
+            )->toArray(AbstractQuery::HYDRATE_ARRAY), 'id');
             $this->alreadyBlockedUsers = $alreadyBlockedUsers;
         }
 

@@ -11,3 +11,6 @@ services:
 
 	listingItemsReader:
 		class: App\Model\Services\Readers\ListingItemsReader
+
+	messagesReader:
+		class: App\Model\Services\Readers\MessagesReader

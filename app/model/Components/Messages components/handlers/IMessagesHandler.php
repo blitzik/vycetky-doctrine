@@ -1,8 +1,8 @@
 <?php
 
-namespace MessagesLoaders;
+namespace App\Model\MessagesHandlers;
 
-interface IMessagesLoader
+interface IMessagesHandler
 {
     /**
      * @return string
@@ -10,16 +10,9 @@ interface IMessagesLoader
     public function getMessagesType();
 
     /**
-     * @return int
+     * @return array|\Kdyby\Doctrine\ResultSet
      */
-    public function getNumberOfMessages();
-
-    /**
-     * @param $offset
-     * @param $length
-     * @return array Array of MessagesUser Entities or empty array
-     */
-    public function findMessages($offset, $length);
+    public function getResultSet();
 
     /**
      * @param $messageID

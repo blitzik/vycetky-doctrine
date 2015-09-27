@@ -2,14 +2,18 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\User;
+use App\Model\MessagesHandlers\IMessagesHandler;
+use App\Model\MessagesHandlers\SentMessagesHandler;
+use Doctrine\ORM\AbstractQuery;
+use Kdyby\Doctrine\ResultSet;
+use Nette\Application\UI\ITemplate;
 use Nextras\Application\UI\SecuredLinksControlTrait;
 use Nette\Forms\Controls\SubmitButton;
-use MessagesLoaders\IMessagesLoader;
 use Nette\Application\UI\Control;
 use Components\IPaginatorFactory;
-use App\Model\Entities\Message;
+use App\Model\Domain\Entities\Message;
 use Nette\Application\UI\Form;
-use Nette\Security\User;
 
 class MessagesTableControl extends Control
 {
@@ -26,19 +30,22 @@ class MessagesTableControl extends Control
     private $user;
 
     /**
-     * @var IMessagesLoader
+     * @var IMessagesHandler
      */
-    private $loader;
+    private $messagesHandler;
 
+    /**
+     * @var ResultSet
+     */
+    private $resultSet;
 
     public function __construct(
-        IMessagesLoader $loader,
-        IPaginatorFactory $pf,
-        User $user
+        IMessagesHandler $handler,
+        IPaginatorFactory $pf
     ) {
         $this->paginatorFactory = $pf;
-        $this->loader = $loader;
-        $this->user = $user;
+        $this->messagesHandler = $handler;
+        $this->user = $handler->getUser();
     }
 
     protected function createComponentPaginator()
@@ -52,29 +59,33 @@ class MessagesTableControl extends Control
     public function render()
     {
         $template = $this->getTemplate();
-        switch ($this->loader->getMessagesType()) {
+        $this->switchTemplateByMessagesType($template);
+
+        $this->resultSet = $this->messagesHandler->getResultSet();
+
+        $paginator = $this['paginator']->getPaginator();
+        $this->resultSet->applyPaginator($paginator, 20);
+
+        $messages = $this->resultSet->toArray(AbstractQuery::HYDRATE_ARRAY);
+
+        $template->messages = $messages;
+
+        $template->numberOfMessages = $paginator->getItemCount();
+
+        $template->render();
+    }
+
+    private function switchTemplateByMessagesType(ITemplate $template)
+    {
+        switch ($this->messagesHandler->getMessagesType()) {
             case Message::RECEIVED:
                 $template->setFile(__DIR__ . '/templates/receivedMessagesTable.latte');
                 break;
 
             case Message::SENT:
-                $this->template->setFile(__DIR__ . '/templates/sentMessagesTable.latte');
+                $template->setFile(__DIR__ . '/templates/sentMessagesTable.latte');
                 break;
         }
-
-        $paginator = $this['paginator']->getPaginator();
-        $numberOfMessages = $this->loader->getNumberOfMessages();
-        $paginator->setItemCount($numberOfMessages);
-
-        $template->messages = $this->loader
-                                   ->findMessages(
-                                       $paginator->getOffset(),
-                                       $paginator->getLength()
-                                   );
-
-        $template->numberOfMessages = $numberOfMessages;
-
-        $template->render();
     }
 
     protected function createComponentMessagesActions()
@@ -102,7 +113,7 @@ class MessagesTableControl extends Control
 
         if (!empty($messagesIDs)) {
             try {
-                $this->loader->removeMessages($messagesIDs);
+                $this->messagesHandler->removeMessages($messagesIDs);
                 $this->flashMessage('Vybrané zprávy byli úspěšně smazány.', 'success');
 
             } catch (\DibiException $e) {
@@ -127,7 +138,7 @@ class MessagesTableControl extends Control
      */
     public function handleDeleteMessage($id)
     {
-        $this->loader->removeMessage($id);
+        $this->messagesHandler->removeMessage($id);
 
         if ($this->presenter->isAjax()) {
             $this->redrawControl();

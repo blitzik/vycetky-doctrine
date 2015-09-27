@@ -1,0 +1,29 @@
+{layout '@messageBoxLayout.latte'}
+
+{block userTypeLabel}{/block}
+{block messageTimeLabel}<th>Odesláno</th>{/block}
+
+{block messagesList}
+    {foreach $messages as $message}
+    <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
+        <td>
+            <input type="checkbox" name="msg[]"
+                   value="{$message['id']}"
+                   class="itemToCheck">
+        </td>
+
+        <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
+        <td>
+            <a href="{plink MailBox:message, 'id' => $message['id'],
+                                             'type' => App\Model\Domain\Entities\Message::SENT}"
+               title="{$message['subject']}">
+                {$message['subject']|truncate:60}
+            </a>
+        </td>
+        <td><a href="{plink MailBox:message, 'id' => $message['id'],
+                                             'type' => App\Model\Domain\Entities\Message::SENT}">Prohlédnout</a></td>
+        <td><a href="{link deleteMessage!, 'id' => $message['id']}"
+               class="ajax item">Odstranit</a></td>
+    </tr>
+    {/foreach}
+{/block}

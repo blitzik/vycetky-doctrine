@@ -12,9 +12,9 @@
 </td>
 {/define}
 
-{*define col-token}
-    <td>{$row->token}</td>
-{/define*}
+{define col-token}
+    <td>{$row->token|upper}</td>
+{/define}
 
 {define col-email}
     <td>{$row->email}</td>

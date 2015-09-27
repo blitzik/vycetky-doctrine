@@ -1,0 +1,44 @@
+{layout '@messageBoxLayout.latte'}
+
+{block userTypeLabel}<th>Odesílatel</th>{/block}
+{block messageTimeLabel}<th>Přijato</th>{/block}
+
+{define username}
+{if $message['isSystemMessage'] == true}
+    {$message['author']['role']}
+{else}
+    {if isset($message['author'])}
+        {$message['author']['username']}
+    {else}
+        <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">
+    {/if}
+{/if}
+{/define}
+
+{block messagesList}
+    {foreach $messages as $messageReference}
+    {var $message = $messageReference['message']}
+    <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
+        <td>
+            <input type="checkbox" name="msg[]"
+                   value="{$messageReference['id']}"
+                   class="itemToCheck">
+        </td>
+
+        <td>{include #username}</td>
+
+        <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
+        <td>
+            <a href="{plink MailBox:message, 'id' => $message['id'],
+                                             'type' => App\Model\Domain\Entities\Message::RECEIVED}"
+               title="{$message['subject']}">
+                {$message['subject']|truncate:60}
+            </a>
+        </td>
+        <td><a href="{plink MailBox:message, 'id' => $message['id'],
+                                             'type' => App\Model\Domain\Entities\Message::RECEIVED}">Prohlédnout</a></td>
+        <td><a href="{link deleteMessage!, 'id' => $messageReference['id']}"
+               class="ajax item">Odstranit</a></td>
+    </tr>
+    {/foreach}
+{/block}

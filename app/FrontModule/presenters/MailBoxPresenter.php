@@ -2,76 +2,80 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IMessageDetailControlFactory;
 use App\Model\Components\IMessagesTableControlFactory;
-use App\Model\Facades\UsersFacade;
-use MessagesLoaders\ReceivedUnreadMessagesLoader;
-use Exceptions\Runtime\MessageNotFoundException;
-use MessagesLoaders\ReceivedReadMessagesLoader;
-use Exceptions\Runtime\MessageLengthException;
-use MessagesLoaders\SentMessagesLoader;
+use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\MessageReference;
 use App\Model\Facades\MessagesFacade;
-use MessagesLoaders\IMessagesLoader;
-use App\Model\Entities\UserMessage;
-use App\Model\Facades\UserManager;
-use App\Model\Entities\Message;
+use App\Model\MessagesHandlers\IMessagesHandler;
+use App\Model\MessagesHandlers\IReceivedReadMessagesHandlerFactory;
+use App\Model\MessagesHandlers\IReceivedUnreadMessagesHandlerFactory;
+use App\Model\MessagesHandlers\ISentMessagesHandlerFactory;
+use App\Model\Query\MessageReferencesQuery;
+use App\Model\Query\MessagesQuery;
+use Exceptions\Runtime\MessageLengthException;
 use Nette\Application\UI\Form;
 
 class MailBoxPresenter extends SecurityPresenter
 {
     /**
-     * @var ReceivedUnreadMessagesLoader
+     * @var IReceivedUnreadMessagesHandlerFactory
      * @inject
      */
-    //public $receivedUnreadMessagesLoader;
+    public $receivedUnreadMessagesHandlerFactory;
 
     /**
-     * @var ReceivedReadMessagesLoader
+     * @var IReceivedReadMessagesHandlerFactory
      * @inject
      */
-    //public $receivedReadMessagesLoader;
+    public $receivedReadMessagesHandlerFactory;
 
     /**
-     * @var SentMessagesLoader
+     * @var ISentMessagesHandlerFactory
      * @inject
      */
-    //public $sentMessagesLoader;
+    public $sentMessagesHandlerFactory;
 
     /**
      * @var IMessagesTableControlFactory
      * @inject
      */
-    //public $messagesTableControlFactory;
+    public $messagesTableControlFactory;
 
     /**
-     * @var UsersFacade
+     * @var IMessageDetailControlFactory
      * @inject
      */
-    public $usersFacade;
+    public $messageDetailFactory;
 
     /**
      * @var MessagesFacade
      * @inject
      */
-    //public $messagesFacade;
+    public $messagesFacade;
 
     /**
-     * @var UserMessage
+     * @var IMessagesHandler
      */
-    //private $message;
+    private $messagesHandler;
 
     /**
-     * @var IMessagesLoader
+     * @var Message
      */
-    private $loader;
+    private $message;
 
 
-    /**
-     * 		RECEIVED MESSAGES
+    /*
+     * -----------------------------
+     * ----- RECEIVED MESSAGES -----
+     * -----------------------------
      */
+
 
     public function actionReceivedUnread()
     {
-        $this->loader = $this->receivedUnreadMessagesLoader;
+        $this->messagesHandler = $this->receivedUnreadMessagesHandlerFactory
+                                      ->create($this->user->getIdentity());
     }
 
     public function renderReceivedUnread()
@@ -81,7 +85,8 @@ class MailBoxPresenter extends SecurityPresenter
 
     public function actionReceivedRead()
     {
-        $this->loader = $this->receivedReadMessagesLoader;
+        $this->messagesHandler = $this->receivedReadMessagesHandlerFactory
+                                      ->create($this->user->getIdentity());
     }
 
     public function renderReceivedRead()
@@ -89,13 +94,17 @@ class MailBoxPresenter extends SecurityPresenter
 
     }
 
-    /**
-     * 		SENT MESSAGES
+    /*
+     * -------------------------
+     * ----- SENT MESSAGES -----
+     * -------------------------
      */
+
 
     public function actionSent()
     {
-        $this->loader = $this->sentMessagesLoader;
+        $this->messagesHandler = $this->sentMessagesHandlerFactory
+                                      ->create($this->user->getIdentity());
     }
 
     public function renderSent()
@@ -109,40 +118,74 @@ class MailBoxPresenter extends SecurityPresenter
     public function createComponentMessagesTable()
     {
         $comp = $this->messagesTableControlFactory
-                     ->create($this->loader);
+                     ->create($this->messagesHandler);
 
         return $comp;
     }
 
-    /**
-     * 		MESSAGE
+
+    /*
+     * --------------------------
+     * ----- MESSAGE DETAIL -----
+     * --------------------------
      */
+
+
     public function actionMessage($id, $type)
     {
-        if ($type === Message::SENT) $t = Message::SENT;
-        elseif ($type === Message::RECEIVED) $t = Message::RECEIVED;
-        else $this->redirect('MailBox:receivedUnread');
+        $user = $this->user->getIdentity();
 
-        try {
+        if ($type === Message::SENT) {
             $this->message = $this->messagesFacade
-                                  ->getMessage($id, $this->user->id, $t);
+                                  ->fetchMessage(
+                                      (new MessagesQuery())
+                                      ->byId($id)
+                                      ->byAuthor($user)
+                                  );
+        } else if ($type === Message::RECEIVED) {
+            $reference = $this->messagesFacade
+                                  ->fetchMessageReference(
+                                      (new MessageReferencesQuery())
+                                      ->includingMessage()
+                                      ->includingMessageAuthor(['id', 'username'])
+                                      ->byMessage($id)
+                                      ->byRecipient($user)
+                                  );
 
-        } catch (MessageNotFoundException $me){
-            $this->flashMessage('Zpráva nebyla nalezena.', 'error');
+            $this->message = $reference === null ? null : $reference->getMessage();
+        } else {
+            $this->redirect('MailBox:receivedUnread');
+        }
+
+        if ($this->message === null) {
+            $this->flashMessage('Zpráva nebyla nalezena.', 'warning');
             $this->redirect('MailBox:receivedUnread');
         }
     }
-
 
     public function renderMessage($id)
     {
         $this->template->message = $this->message;
     }
 
-
     /**
-     * 		MESSAGE
+     * @Actions message
      */
+    protected function createComponentMessageDetail()
+    {
+        $comp = $this->messageDetailFactory->create($this->message);
+
+        return $comp;
+    }
+
+
+    /*
+     * -----------------------
+     * ----- NEW MESSAGE -----
+     * -----------------------
+     */
+
+
     public function actionNewMessage()
     {
 

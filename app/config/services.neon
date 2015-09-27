@@ -13,11 +13,6 @@ services:
 	localitiesService: App\Model\Services\LocalitiesService
 	itemsService: App\Model\Services\ItemsService
 
-	# Messages Loaders todo
-	#receivedUnreadMessagesLoader: MessagesLoaders\ReceivedUnreadMessagesLoader
-	#receivedReadMessagesLoader: MessagesLoaders\ReceivedReadMessagesLoader
-	#sentMessagesLoader: MessagesLoaders\SentMessagesLoader
-
 	#Profile
 	emailNotifier: App\Model\Notifications\EmailNotifier
 

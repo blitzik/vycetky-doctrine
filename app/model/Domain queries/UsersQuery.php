@@ -28,9 +28,9 @@ class UsersQuery extends QueryObject
 
         $this->select[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($fields) {
             $qb->resetDQLPart('select');
-            foreach ($fields as $fieldName) {
-                $qb->addSelect('u.'.$fieldName);
-            }
+
+            $parts = implode(',', $fields);
+            $qb->addSelect('partial u.{' .$parts. '}');
         };
 
         return $this;
@@ -95,7 +95,7 @@ class UsersQuery extends QueryObject
      */
     protected function doCreateCountQuery(Kdyby\Persistence\Queryable $repository)
     {
-        $qb = new Kdyby\Doctrine\QueryBuilder($repository);
+        $qb = new Kdyby\Doctrine\QueryBuilder($repository->getEntityManager());
         $qb->select('COUNT(u.id) as total_count')
            ->from(User::class, 'u');
 

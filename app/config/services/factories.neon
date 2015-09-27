@@ -30,11 +30,6 @@ services:
 		parameters: [App\Model\Domain\Entities\Listing listing]
 		arguments: [%listing%]
 
-	messagesTableControlFactory:
-		implement: App\Model\Components\IMessagesTableControlFactory
-		parameters: [MessagesLoaders\IMessagesLoader loader]
-		arguments: [%loader%]
-
 	itemsTableControlFactory:
 		implement: App\Model\Components\ItemsTable\IItemsTableControlFactory
 		parameters: [App\Model\Domain\Entities\Listing listing]
@@ -99,3 +94,38 @@ services:
 		implement: App\Model\Components\IUsersBlockingManagementControlFactory
 		parameters: [App\Model\Domain\Entities\User user]
 		arguments: [%user%]
+
+	# Messages
+
+	# handlers
+	receivedUnreadMessagesHandlerFactory:
+		implement: App\Model\MessagesHandlers\IReceivedUnreadMessagesHandlerFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]
+
+	receivedReadMessagesHandlerFactory:
+		implement: App\Model\MessagesHandlers\IReceivedReadMessagesHandlerFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]
+
+	sentMessagesHandlerFactory:
+		implement: App\Model\MessagesHandlers\ISentMessagesHandlerFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]
+
+	# components
+
+	messagesTableControlFactory:
+		implement: App\Model\Components\IMessagesTableControlFactory
+		parameters: [App\Model\MessagesHandlers\IMessagesHandler handler]
+		arguments: [%handler%]
+
+	messageDetailControlFactory:
+		implement: App\Model\Components\IMessageDetailControlFactory
+		parameters: [App\Model\Domain\Entities\Message message]
+		arguments: [%message%]
+
+	messageRecipientsControlFactory:
+		implement: App\Model\Components\IMessageRecipientsControlFactory
+		parameters: [App\Model\Domain\Entities\Message message]
+		arguments: [%message%]
