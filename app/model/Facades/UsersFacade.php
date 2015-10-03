@@ -4,30 +4,51 @@ namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\User;
-use App\Model\Query\UsersQuery;
-use App\Model\Services\Managers\UsersManager;
+use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Readers\UsersReader;
+use App\Model\Services\Users\UserSystemCreator;
+use App\Model\Services\Writers\UsersWriter;
+use Exceptions\Runtime\DuplicateEmailException;
+use Exceptions\Runtime\DuplicateUsernameException;
+use Exceptions\Runtime\InvalidUserInvitationEmailException;
+use Exceptions\Runtime\InvitationExpiredException;
+use Exceptions\Runtime\InvitationNotFoundException;
 use Exceptions\Runtime\UserNotFoundException;
+use Kdyby\Persistence\Query;
 use Nette\Object;
 
 class UsersFacade extends Object
 {
     /**
-     * @var UsersManager
-     */
-    private $usersManager;
-
-    /**
      * @var UsersReader
      */
     private $usersReader;
 
+    /**
+     * @var UsersWriter
+     */
+    private $usersWriter;
+
+    /**
+     * @var InvitationsReader
+     */
+    private $invitationsReader;
+
+    /**
+     * @var UserSystemCreator
+     */
+    private $userSystemCreator;
+
     public function __construct(
-        UsersManager $usersManager,
-        UsersReader $usersReader
+        UsersReader $usersReader,
+        UsersWriter $usersWriter,
+        InvitationsReader $invitationsReader,
+        UserSystemCreator $userSystemCreator
     ) {
-        $this->usersManager = $usersManager;
         $this->usersReader = $usersReader;
+        $this->usersWriter = $usersWriter;
+        $this->invitationsReader = $invitationsReader;
+        $this->userSystemCreator = $userSystemCreator;
     }
 
     /**
@@ -36,35 +57,63 @@ class UsersFacade extends Object
      */
     public function saveUser(User $user)
     {
-        return $this->usersManager->saveUser($user);
+        return $this->usersWriter->saveUser($user);
     }
 
     /**
-     * @param UsersQuery $usersQuery
-     * @return User|null
-     */
-    public function fetchUser(UsersQuery $usersQuery)
-    {
-        return $this->usersReader->fetchUser($usersQuery);
-    }
-
-    /**
-     * @param UsersQuery $usersQuery
+     * @param Query $usersQuery
      * @return array|\Kdyby\Doctrine\ResultSet
      */
-    public function fetchUsers(UsersQuery $usersQuery)
+    public function fetchUsers(Query $usersQuery)
     {
         return $this->usersReader->fetchUsers($usersQuery);
+    }
+
+    /**
+     * @param $id
+     * @return User|null
+     */
+    public function getUserByID($id)
+    {
+        return $this->usersReader->getUserByID($id);
+    }
+
+    /**
+     * @param $email
+     * @return User|null
+     */
+    public function getUserByEmail($email)
+    {
+        return $this->usersReader->getUserByEmail($email);
     }
 
     /**
      * @param User $user
      * @param Invitation $invitation
      * @return User
+     * @throws InvalidUserInvitationEmailException
+     * @throws InvitationNotFoundException
+     * @throws InvitationExpiredException
+     * @throws DuplicateEmailException
+     * @throws DuplicateUsernameException
      */
     public function registerNewUser(User $user, Invitation $invitation)
     {
-        return $this->usersManager->registerNewUser($user, $invitation);
+        if ($user->email !== $invitation->email) {
+            throw new InvalidUserInvitationEmailException;
+        }
+
+        $inv = $this->invitationsReader
+                    ->getInvitation($user->email, $invitation->token);
+        if ($inv === null) {
+            throw new InvitationNotFoundException;
+        }
+
+        if (!$inv->isActive()) {
+            throw new InvitationExpiredException;
+        }
+
+        return $this->userSystemCreator->registerUser($user, $invitation);
     }
     
     /**
@@ -74,7 +123,13 @@ class UsersFacade extends Object
      */
     public function createPasswordRestoringToken($email)
     {
-        return $this->usersManager->createPasswordRestoringToken($email);
+        $user = $this->usersReader->getUserByEmail($email);
+        if ($user === null) {
+            throw new UserNotFoundException;
+        }
+
+        $user->createToken();
+        return $this->saveUser($user);
     }
 
     /**
@@ -83,6 +138,6 @@ class UsersFacade extends Object
      */
     public function getTotalWorkedStatistics(User $user)
     {
-        return $this->usersManager->getTotalWorkedStatistics($user);
+        return $this->usersReader->getTotalWorkedStatistics($user);
     }
 }

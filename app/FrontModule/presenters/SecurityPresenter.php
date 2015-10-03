@@ -59,7 +59,6 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
     public function beforeRender() {
         parent::beforeRender();
 
-        $this->template->username = $this->getUser()->getIdentity()->username;
         $this->template->currentDate = $this->currentDate;
     }
 

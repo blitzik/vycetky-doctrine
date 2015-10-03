@@ -3,7 +3,7 @@
 namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\ListingItem;
-use App\Model\Query\ListingsQuery;
+use App\Model\ResultObjects\ListingResult;
 use App\Model\Services\Managers\ListingsManager;
 use App\Model\Services\Readers\ListingsReader;
 use Doctrine\ORM\ORMException;
@@ -15,6 +15,7 @@ use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Services\ItemsService;
 use App\Model\Domain\FillingItem;
+use Kdyby\Doctrine\QueryObject;
 use Nette\Object;
 use Nette\Utils\Validators;
 use Tracy\Debugger;
@@ -71,22 +72,43 @@ class ListingsFacade extends Object
     }
 
     /**
-     * @param ListingsQuery $listingsQuery
-     * @return mixed
+     * @param QueryObject $listingsQuery
+     * @return Listing|null
      * @throws ListingNotFoundException
      */
-    public function fetchListing(ListingsQuery $listingsQuery)
+    public function fetchListing(QueryObject $listingsQuery)
     {
         return $this->listingsReader->fetchListing($listingsQuery);
     }
 
     /**
-     * @param ListingsQuery $listingsQuery
+     * @param QueryObject $listingsQuery
      * @return array|\Kdyby\Doctrine\ResultSet
      */
-    public function fetchListings(ListingsQuery $listingsQuery)
+    public function fetchListings(QueryObject $listingsQuery)
     {
         return $this->listingsReader->fetchListings($listingsQuery);
+    }
+
+    /**
+     * @param int $id
+     * @param bool $withWorkedTime
+     * @return ListingResult
+     */
+    public function getListingByID($id, $withWorkedTime = false)
+    {
+        $result = $this->listingsReader->getByID($id, $withWorkedTime);
+
+        return new ListingResult($result);
+    }
+
+    /**
+     * @param $listingID
+     * @return array
+     */
+    public function getWorkedDaysAndTime($listingID)
+    {
+        return $this->listingsReader->getWorkedDaysAndTime($listingID);
     }
 
     /**

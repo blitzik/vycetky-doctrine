@@ -2,9 +2,9 @@
 
 namespace App\Model\Subscribers;
 
-use App\Model\Subscribers\Validation\SubscriberValidationObject;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
+use App\Model\Subscribers\Validation\InvitationResultObject;
 use Kdyby\Events\Subscriber;
 use Nette\InvalidStateException;
 use Nette\Object;
@@ -31,13 +31,13 @@ class InvitationSubscriber extends Object implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-            'App\Model\Components\InvitationGenerationControl::onInvitationCreation'
+            'App\Model\Services\InvitationHandler::onInvitationCreation'
         ];
     }
 
     public function onInvitationCreation(
         Invitation $invitation,
-        SubscriberValidationObject $validationObject
+        InvitationResultObject $validationObject
     ) {
         try {
             $this->invitationsFacade->sendInvitation($invitation);

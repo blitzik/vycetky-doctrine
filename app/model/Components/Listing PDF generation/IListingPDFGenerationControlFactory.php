@@ -2,13 +2,13 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
 
 interface IListingPDFGenerationControlFactory
 {
     /**
-     * @param Listing $listing
+     * @param ListingResult $listingResult
      * @return ListingPDFGenerationControl
      */
-    public function create(Listing $listing);
+    public function create(ListingResult $listingResult);
 }

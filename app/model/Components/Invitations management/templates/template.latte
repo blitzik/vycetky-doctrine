@@ -1,8 +1,35 @@
+{snippet list}
+    {if $hasInvitations}
+        <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+        {control paginator}
+        {include #invitationsList}
+    {else}
+        <p>Nemáte žádné aktivní pozvánky.
+        <a href="{plink Account:sendInvitation}">Chcete vytvořit novou pozvánku?</a></p>
+    {/if}
+{/snippet}
 
-{if $hasInvitations}
-    <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
-    {control invitationsDatagrid}
-{else}
-    <p>Nemáte žádné aktivní pozvánky.
-    <a href="{plink Profile:sendInvitation}">Chcete vytvořit novou pozvánku?</a></p>
-{/if}
+{define invitationsList}
+
+<table class="table t-classic">
+    <tr><th>Registrační kód</th><th>Příjemce</th>
+        <th>Platnost do</th><th>Lze odeslat znovu</th><th>&nbsp;</th></tr>
+
+    {foreach $invitations as $invitation}
+    <tr>
+        <td>{$invitation->token|upper}</td>
+        <td>{$invitation->email}</td>
+        <td>{$invitation->validity->format('j.n.Y')}</td>
+        <td>{if $invitation->canBeSend()}Hned{else}Zítra{/if}</td>
+        <td>
+            <a href="{link removeInvitation!, 'id' => $invitation->id}" class="ajax btn-red">Zrušit</a>
+
+            {if $invitation->canBeSend()}
+                <a href="{link resendInvitation!, 'id' => $invitation->id}" class="btn-blue">Odeslat znovu</a>
+            {/if}
+        </td>
+    </tr>
+    {/foreach}
+</table>
+
+{/define}

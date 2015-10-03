@@ -2,12 +2,18 @@
 
 namespace App\Model\Services\Writers;
 
+use App\Model\Domain\Entities\Listing;
+use App\Model\Domain\Entities\Locality;
+use App\Model\Domain\Entities\WorkedHours;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\ORMException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\ListingItemNotFoundException;
 use App\Model\Services\Readers\ListingItemsReader;
 use Exceptions\Logic\InvalidArgumentException;
+use Exceptions\Runtime\NegativeResultOfTimeCalcException;
+use Exceptions\Runtime\OtherHoursZeroTimeException;
+use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\Entities\ListingItem;
@@ -51,10 +57,9 @@ class ListingItemsWriter extends Object
 
         } catch (UniqueConstraintViolationException $u) {
             $this->em->close();
-
             throw new ListingItemDayAlreadyExistsException;
 
-        } catch (\Exception $e) {
+        } catch (DBALException $e) {
             $this->em->close();
 
             Debugger::log($e, Debugger::ERROR);
@@ -65,12 +70,23 @@ class ListingItemsWriter extends Object
     }
 
     /**
+     * @param $day
+     * @param Listing $listing
+     */
+    public function removeListingItem($day, Listing $listing)
+    {
+        $this->em->createQuery(
+            'DELETE ' .ListingItem::class. ' l
+             WHERE l.listing = :listing AND l.day = :day'
+        )->execute(['listing' => $listing, 'day' => $day]);
+    }
+
+    /**
      * @param ListingItem $listingItem
      * @param string $direction
      * @return ListingItem New or Updated ListingItem
      * @throws ShiftItemUpException
      * @throws ShiftItemDownException
-     * @throws \Exception
      */
     public function copyListingItem(
         ListingItem $listingItem,
@@ -129,7 +145,11 @@ class ListingItemsWriter extends Object
             throw new ShiftItemDownException;
         }
 
-        return $this->listingItemReader->getNextItem($listingItem);
+        return $this->listingItemReader
+                    ->getAdjacentItem(
+                        $listingItem,
+                        ListingItemsReader::ITEM_LOWER
+                    );
     }
 
     /**
@@ -144,6 +164,10 @@ class ListingItemsWriter extends Object
             throw new ShiftItemUpException;
         }
 
-        return $this->listingItemReader->getPreviousItem($listingItem);
+        return $this->listingItemReader
+                    ->getAdjacentItem(
+                        $listingItem,
+                        ListingItemsReader::ITEM_UPPER
+                    );
     }
 }

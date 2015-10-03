@@ -1,5 +1,11 @@
 services:
 
+	usersWriter:
+		class: App\Model\Services\Writers\UsersWriter
+
+	invitationsWriter:
+		class: App\Model\Services\Writers\InvitationsWriter
+
 	listingsWriter:
 		class: App\Model\Services\Writers\ListingsWriter
 

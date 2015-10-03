@@ -1,6 +1,8 @@
 
 {snippet list}
 {if !empty($users)}
+
+{control paginator}
 <table class="table t-classic">
 <tr><th>Uživatelské jméno</th><th></th></tr>
 {foreach $users as $id => $username}

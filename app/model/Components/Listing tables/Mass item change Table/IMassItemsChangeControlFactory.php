@@ -2,12 +2,13 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
 
 interface IMassItemsChangeControlFactory
 {
     /**
+     * @param ListingResult $listingResult
      * @return MassItemsChangeControl
      */
-    public function create(Listing $listing);
+    public function create(ListingResult $listingResult);
 }

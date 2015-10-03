@@ -24,8 +24,8 @@ services:
 	mergePresenter:
 		class: App\FrontModule\Presenters\MergePresenter
 
-	profilePresenter:
-		class: App\FrontModule\Presenters\ProfilePresenter
+	accountPresenter:
+		class: App\FrontModule\Presenters\AccountPresenter
 
 	usersPresenter:
 		class: App\FrontModule\Presenters\UsersPresenter

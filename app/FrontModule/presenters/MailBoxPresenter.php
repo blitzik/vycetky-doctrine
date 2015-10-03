@@ -2,19 +2,17 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\MessagesHandlers\IReceivedUnreadMessagesHandlerFactory;
+use App\Model\MessagesHandlers\IReceivedReadMessagesHandlerFactory;
+use App\Model\MessagesHandlers\ISentMessagesHandlerFactory;
 use App\Model\Components\IMessageDetailControlFactory;
 use App\Model\Components\IMessagesTableControlFactory;
-use App\Model\Domain\Entities\Message;
-use App\Model\Domain\Entities\MessageReference;
-use App\Model\Facades\MessagesFacade;
+use App\Model\Components\INewMessageControlFactory;
 use App\Model\MessagesHandlers\IMessagesHandler;
-use App\Model\MessagesHandlers\IReceivedReadMessagesHandlerFactory;
-use App\Model\MessagesHandlers\IReceivedUnreadMessagesHandlerFactory;
-use App\Model\MessagesHandlers\ISentMessagesHandlerFactory;
 use App\Model\Query\MessageReferencesQuery;
+use App\Model\Domain\Entities\Message;
+use App\Model\Facades\MessagesFacade;
 use App\Model\Query\MessagesQuery;
-use Exceptions\Runtime\MessageLengthException;
-use Nette\Application\UI\Form;
 
 class MailBoxPresenter extends SecurityPresenter
 {
@@ -41,6 +39,12 @@ class MailBoxPresenter extends SecurityPresenter
      * @inject
      */
     public $messagesTableControlFactory;
+
+    /**
+     * @var INewMessageControlFactory
+     * @inject
+     */
+    public $newMessageControlFactory;
 
     /**
      * @var IMessageDetailControlFactory
@@ -199,92 +203,9 @@ class MailBoxPresenter extends SecurityPresenter
     /**
      * @Actions newMessage
      */
-    protected function createComponentNewMessageForm()
+    protected function createComponentNewMessage()
     {
-        $form = new Form();
-
-        $form->addText('subject', 'Předmět', 35, 80)
-                ->setRequired('Vyplňte prosím předmět zprávy.');
-
-        $form->addTextArea('message', 'Zpráva', 50, 12)
-                ->setRequired('Vyplňte prosím text zprávy.')
-                ->addRule(Form::MAX_LENGTH, 'Zpráva může obsahovat maximálně %d znaků.', 2000);
-
-        $form->addMultiSelect('receivers', 'Příjemci',
-                              $this->usersFacade
-                                   ->findAllUsers([$this->user->id]), 13)
-                ->setRequired('Vyberte alespoň jednoho příjemce.');
-
-        $form->addCheckbox('isSystemMessage', 'Odeslat jako systémovou zprávu');
-
-        $form->addSubmit('send', 'Odeslat');
-
-        $form->getElementPrototype()->id = 'new-message-form';
-
-        $form->onSuccess[] = $this->processNewMessageForm;
-
-        return $form;
-    }
-
-    public function processNewMessageForm(Form $form)
-    {
-        $values = $form->getValues();
-
-        $texy = new \Texy();
-        $texy->setOutputMode(\Texy::HTML4_TRANSITIONAL);
-        $texy->encoding = 'utf-8';
-        $texy->allowedTags = \Texy::ALL;
-
-        $text = $texy->process($values->message);
-
-        // 0 == system account
-        $author = $values['isSystemMessage'] == true ? 0 : $this->user->id;
-        try {
-            $this->messagesFacade
-                 ->sendMessage(
-                     $values->subject,
-                     $text,
-                     $author,
-                     $values->receivers
-                 );
-
-        } catch (MessageLengthException $ml) {
-            $form->addError('Zprávu nelze uložit, protože je příliš dlouhá.');
-            return;
-
-        } catch (\DibiException $e) {
-            $this->flashMessage('Zpráva nemohla být odeslána. Zkuste akci opakovat později.', 'errror');
-            $this->redirect('this');
-        }
-
-        $this->flashMessage('Zpráva byla úspěšně odeslána', 'success');
-        $this->redirect('MailBox:sent');
-    }
-
-
-    protected function createTemplate()
-    {
-        $template = parent::createTemplate();
-
-        $template->registerHelper('texy', function($text) {
-
-            $texy = new \Texy();
-            $texy->setOutputMode(\Texy::HTML4_TRANSITIONAL);
-            $texy->encoding = 'utf-8';
-            $texy->allowedTags = array(
-                'strong' => \Texy::NONE,
-                'b' => \Texy::NONE,
-                'a' => array('href'),
-                'em' => \Texy::NONE,
-                'p' => \Texy::NONE,
-            );
-            //$texy->allowedTags = \Texy::NONE;
-
-            return $texy->process($text);
-
-        });
-
-        return $template;
+        return $this->newMessageControlFactory->create($this->user->getIdentity());
     }
 
 }

@@ -4,18 +4,25 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
+use Components\IPaginatorFactory;
 
 class UsersBlockingManagementControl extends UsersOverviewControl
 {
     public function __construct(
         User $user,
         UsersFacade $usersFacade,
-        IUserBlockingControlFactory $userBlockingControlFactory
+        IUserBlockingControlFactory $userBlockingControlFactory,
+        IPaginatorFactory $paginatorFactory
     ) {
-        parent::__construct($user, $usersFacade, $userBlockingControlFactory);
+        parent::__construct(
+            $user,
+            $usersFacade,
+            $userBlockingControlFactory,
+            $paginatorFactory
+        );
 
         // slightly modified query
-        $this->usersQuery->findUsersBlockedByMe($user);
+        $this->usersQuery->findUsersBlockedBy($user);
     }
 
     public function onUnblockUser(UserBlockingControl $control, User $user = null)

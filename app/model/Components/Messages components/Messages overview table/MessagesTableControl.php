@@ -4,7 +4,7 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\User;
 use App\Model\MessagesHandlers\IMessagesHandler;
-use App\Model\MessagesHandlers\SentMessagesHandler;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\AbstractQuery;
 use Kdyby\Doctrine\ResultSet;
 use Nette\Application\UI\ITemplate;
@@ -51,7 +51,6 @@ class MessagesTableControl extends Control
     protected function createComponentPaginator()
     {
         $vp = $this->paginatorFactory->create();
-        $vp->getPaginator()->setItemsPerPage(15);
 
         return $vp;
     }
@@ -116,7 +115,7 @@ class MessagesTableControl extends Control
                 $this->messagesHandler->removeMessages($messagesIDs);
                 $this->flashMessage('Vybrané zprávy byli úspěšně smazány.', 'success');
 
-            } catch (\DibiException $e) {
+            } catch (DBALException $e) {
                 $this->flashMessage(
                     'Při pokusu o hromadné smazání zpráv došlo k chybě.
                      Zkuste akci opakovat později.',

@@ -2,8 +2,7 @@
 
 namespace App\Model\Components;
 
-use Exceptions\Runtime\InvitationExpiredException;
-use Exceptions\Runtime\InvitationNotFoundException;
+use Components\IPaginatorFactory;
 use Exceptions\Runtime\InvitationValidityException;
 use Nette\InvalidStateException;
 use Nette\Utils\Html;
@@ -11,13 +10,16 @@ use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
 use App\Model\Query\InvitationsQuery;
-use Doctrine\ORM\AbstractQuery;
 use Nette\Application\UI\Control;
-use Nextras\Datagrid\Datagrid;
 
 class InvitationsManagementControl extends Control
 {
     use SecuredLinksControlTrait;
+
+    /**
+     * @var IPaginatorFactory
+     */
+    private $paginatorFactory;
 
     /**
      * @var InvitationsFacade
@@ -34,32 +36,25 @@ class InvitationsManagementControl extends Control
      */
     private $invitations;
 
+
     public function __construct(
         InvitationsQuery $invitationsQuery,
-        InvitationsFacade $invitationsFacade
+        InvitationsFacade $invitationsFacade,
+        IPaginatorFactory $paginatorFactory
     ) {
         $this->invitationsQuery = $invitationsQuery;
         $this->invitationsFacade = $invitationsFacade;
+        $this->paginatorFactory = $paginatorFactory;
     }
 
-    protected function createComponentInvitationsDatagrid()
+    protected function createComponentPaginator()
     {
-        $grid = new Datagrid();
+        $comp = $this->paginatorFactory->create();
+        $comp->onPaginate[] = function () {
+            $this->redrawControl();
+        };
 
-        $grid->addColumn('token', 'Registrační kód');
-        $grid->addColumn('email', 'Příjemce');
-        $grid->addColumn('validity', 'Platnost do');
-        $grid->addColumn('lastSending', 'Lze odeslat znovu');
-
-        $grid->setRowPrimaryKey('token');
-
-        $grid->setDataSourceCallback(function ($filter, $order) {
-            return $this->invitations;
-        });
-
-        $grid->addCellsTemplate(__DIR__ . '/templates/grid/grid.latte');
-
-        return $grid;
+        return $comp;
     }
 
     public function render()
@@ -67,9 +62,14 @@ class InvitationsManagementControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/templates/template.latte');
 
-        $this->invitations = $this->invitationsFacade
-                                  ->fetchInvitations($this->invitationsQuery)
-                                  ->toArray(AbstractQuery::HYDRATE_SIMPLEOBJECT);
+        $resultSet = $this->invitationsFacade
+                          ->fetchInvitations($this->invitationsQuery);
+
+        $paginator = $this['paginator']->getPaginator();
+        $resultSet->applyPaginator($paginator, 15);
+
+        $this->invitations = $resultSet->toArray();
+        $template->invitations = $this->invitations;
 
         $template->hasInvitations = !empty($this->invitations);
 
@@ -82,17 +82,8 @@ class InvitationsManagementControl extends Control
     public function handleResendInvitation($id)
     {
         try {
-            $invitation = $this->invitationsFacade
-                               ->fetchInvitation(
-                                   (new InvitationsQuery())
-                                   ->byId($id)
-                                   ->onlyActive()
-                               );
-
-            $this->invitationsFacade->sendInvitation($invitation);
-
+            $this->invitationsFacade->sendInvitation($id);
             $this->flashMessage('Pozvánka byla úspěšně odeslána.', 'success');
-            $this->redirect('this');
 
         } catch (InvitationValidityException $v) {
             $el = Html::el();
@@ -107,8 +98,6 @@ class InvitationsManagementControl extends Control
 
             $this->flashMessage($el, 'warning');
 
-            $this->redirect('this');
-
         } catch (InvalidStateException $e) {
             $this->flashMessage('Pozvánku se nepodařilo odeslat.', 'warning');
             $this->flashMessage(
@@ -117,8 +106,9 @@ class InvitationsManagementControl extends Control
                  který tento kód poté uplatní v registrační části přihlašovací
                  stránky.'
             );
-            $this->redirect('this');
         }
+
+        $this->refreshTable();
     }
 
     /**
@@ -127,8 +117,17 @@ class InvitationsManagementControl extends Control
     public function handleRemoveInvitation($id)
     {
         $this->invitationsFacade->removeInvitation($id);
-
         $this->flashMessage('Pozvánka byla úspěšně deaktivována.', 'success');
-        $this->redirect('this');
+
+        $this->refreshTable();
+    }
+
+    private function refreshTable()
+    {
+        if ($this->presenter->isAjax()) {
+            $this->redrawControl();
+        } else {
+            $this->redirect('this');
+        }
     }
 }

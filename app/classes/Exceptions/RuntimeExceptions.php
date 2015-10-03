@@ -39,7 +39,10 @@ namespace Exceptions\Runtime;
             class InvitationTokenMatchException extends InvitationValidityException {}
 
         class InvalidUserInvitationEmailException extends RuntimeException {}
-        
+
+        class InvitationCreationAttemptException extends RuntimeException{}
+
+
         class InvalidStateException extends RuntimeException {}
 
         // Listings

@@ -8,6 +8,11 @@ services:
 		setup:
 			- addFilter(null, [Filters\FilterLoader(), 'loader'])
 
+	invitationHandler:
+		class: App\Model\Services\InvitationHandler
+
+	userSystemCreator:
+		class: App\Model\Services\Users\UserSystemCreator
 
 	# Service layers
 	localitiesService: App\Model\Services\LocalitiesService

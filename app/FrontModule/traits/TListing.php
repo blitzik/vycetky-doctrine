@@ -3,10 +3,8 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Components\IListingDescriptionControlFactory;
-use App\Model\Query\ListingsQuery;
-use Exceptions\Runtime\ListingNotFoundException;
 use App\Model\Facades\ListingsFacade;
-use Nette\InvalidArgumentException;
+use App\Model\ResultObjects\ListingResult;
 
 trait TListing
 {
@@ -22,20 +20,26 @@ trait TListing
      */
     public $listingDescriptionFactory;
 
-    private function getListingByID($listingID)
-    {
-        try {
-            return $this->listingsFacade->fetchListing(
-                (new ListingsQuery())
-                ->byId($listingID)
-                ->byUser($this->user->getIdentity())
-            )['listing'];
+    /**
+     * @var ListingResult
+     */
+    private $listingResult;
 
-        } catch (ListingNotFoundException $e) {
-            $this->flashMessage('Výčetka nebyla nalezena.', 'error');
+    /**
+     * @param $listingID
+     * @param $withTime
+     * @return ListingResult
+     */
+    private function getListingByID($listingID, $withTime = false)
+    {
+        $result = $this->listingsFacade->getListingByID($listingID, $withTime);
+        if ($result->getListing() === null or
+            $result->getListing()->getUser()->getId() !== $this->user->getIdentity()->getId()) {
+            $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
             $this->redirect('Listing:overview');
         }
 
+        return $result;
     }
 
     protected function createComponentListingDescription()
@@ -49,32 +53,5 @@ trait TListing
         );
 
         return $desc;
-    }
-
-    public function setPeriodParametersForFilter($year, $month)
-    {
-        if ($year === null) {
-            $this->redirect(
-                'Listing:overview',
-                ['year'  => $this->currentDate->format('Y'),
-                 'month' => $this->currentDate->format('n')]
-            );
-        } else {
-            try {
-                $this['filter']['form']['year']->setDefaultValue($year);
-                $this['filter']['form']['month']->setDefaultValue($month);
-
-            } catch (InvalidArgumentException $e) {
-                $this->flashMessage(
-                    'Lze vybírat pouze z hodnot, které nabízí formulář.',
-                    'warning'
-                );
-                $this->redirect(
-                    'Listing:overview',
-                    ['year'=>$this->currentDate->format('Y'),
-                     'month'=>$this->currentDate->format('n')]
-                );
-            }
-        }
     }
 }

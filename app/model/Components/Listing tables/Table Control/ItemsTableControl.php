@@ -7,7 +7,7 @@ use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\FillingItem;
 use App\Model\Domain\IDisplayableItem;
 use App\Model\Facades\ListingsFacade;
-use App\Model\Query\ListingsQuery;
+use App\Model\ResultObjects\ListingResult;
 use Exceptions\Logic\InvalidArgumentException;
 use Nette\Application\UI\Control;
 use App\Model\Facades\ItemsFacade;
@@ -29,6 +29,11 @@ class ItemsTableControl extends Control
      * @var ItemsFacade
      */
     private $itemFacade;
+
+    /**
+     * @var ListingResult
+     */
+    private $listingResult;
 
     /**
      * @var Listing
@@ -53,12 +58,14 @@ class ItemsTableControl extends Control
     private $totalWorkedHours;
 
     public function __construct(
-        Listing $listing,
+        ListingResult $listingResult,
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
         ListingsFacade $listingsFacade,
         ItemsFacade $itemFacade
     ) {
-        $this->listing = $listing;
+        $this->listingResult = $listingResult;
+        $this->listing = $listingResult->getListing();
+
         $this->listingDescriptionControlFactory = $listingDescriptionControlFactory;
         $this->listingsFacade = $listingsFacade;
         $this->itemFacade = $itemFacade;
@@ -100,16 +107,10 @@ class ItemsTableControl extends Control
         }
 
         $listingData = $this->listingsFacade
-                            ->fetchListings(
-                                (new ListingsQuery())
-                                ->resetSelect()
-                                ->withNumberOfWorkedDays()
-                                ->withTotalWorkedHours()
-                                ->byId($this->listing->getId())
-                            )->toArray()[0];
+                            ->getWorkedDaysAndTime($this->listing->getId());
 
         $this->workedDays = $listingData['worked_days'];
-        $this->totalWorkedHours = new \InvoiceTime((int)$listingData['total_worked_hours']);
+        $this->totalWorkedHours = new \InvoiceTime((int)$listingData['total_worked_hours_in_sec']);
 
         $this->isTableCaptionVisible = true;
     }

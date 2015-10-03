@@ -142,8 +142,6 @@ class User extends Entity
         $this->usersBlockingMe = new ArrayCollection;
 
         $this->host = $host;
-
-        $this->myMessages = new ArrayCollection;
     }
 
     public function getAllMessages()

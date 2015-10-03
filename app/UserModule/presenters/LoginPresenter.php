@@ -36,7 +36,7 @@ class LoginPresenter extends Presenter
         $form->addSubmit('login', 'Přihlásit')
             ->setOmitted();
 
-        $form->onSuccess[] = callback($this, 'processLoginForm');
+        $form->onSuccess[] = [$this, 'processLoginForm'];
 
         return $form;
 

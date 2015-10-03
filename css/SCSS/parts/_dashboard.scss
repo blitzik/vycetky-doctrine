@@ -436,6 +436,14 @@ $baseListing-color: #ffdfda;
   background-color: $baseListing-color;
 }
 
+.listing-removal-info{
+  margin-bottom: 20px;
+  border-bottom: 1px solid #000;
+  h3{
+    margin-top: 0;
+  }
+}
+
 /* ------------------------------
    ----- LISTING ADD/UPDATE -----
    ------------------------------ */

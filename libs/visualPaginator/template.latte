@@ -1,10 +1,11 @@
+{snippet pagination}
 {if $paginator->pageCount > 1}
 	<p class="__paginator">
 	{if !$paginator->isFirst()}
 		{if $borderPages}
-			<a href="{link this, 'page' => $paginator->getFirstPage()}" class="p-btn" title="První stránka">«</a>
+			<a href="{link paginate!, 'page' => $paginator->getFirstPage()}" class="ajax p-btn" title="První stránka">«</a>
 		{/if}
-		<a href="{link this, 'page' => $paginator->page - 1}" class="p-btn">« Předchozí</a>
+		<a href="{link paginate!, 'page' => $paginator->page - 1}" class="ajax p-btn">« Předchozí</a>
 	{else}
 		<span class="p-btn inactive">« Předchozí</span>
 	{/if}
@@ -14,9 +15,9 @@
 	{/if}
 
 	{if !$paginator->isLast()}
-		<a href="{link this, 'page' => $paginator->page + 1}" class="p-btn">Další »</a>
+		<a href="{link paginate!, 'page' => $paginator->page + 1}" class="ajax p-btn">Další »</a>
 		{if $borderPages}
-			<a href="{link this, 'page' => $paginator->getLastPage()}" class="p-btn" title="Poslední stránka">»</a>
+			<a href="{link paginate!, 'page' => $paginator->getLastPage()}" class="ajax p-btn" title="Poslední stránka">»</a>
 		{/if}
 	{else}
 		<span class="p-btn inactive">Další »</span>
@@ -24,3 +25,4 @@
 	</p>
 
 {/if}
+{/snippet}

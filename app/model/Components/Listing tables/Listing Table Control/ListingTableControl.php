@@ -3,10 +3,12 @@
 namespace App\Model\Components\ListingTable;
 
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
+use App\Model\Domain\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
+use Doctrine\DBAL\DBALException;
 use Nextras\Application\UI\SecuredLinksControlTrait;
 use Exceptions\Runtime\ListingNotFoundException;
 use Exceptions\Runtime\ShiftItemDownException;
-use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Facades\ItemsFacade;
 use Nette\Application\UI\Control;
@@ -33,18 +35,24 @@ class ListingTableControl extends Control
     private $itemFacade;
 
     /**
+     * @var ListingResult
+     */
+    private $listingResult;
+
+    /**
      * @var Listing
      */
     private $listing;
 
 
     public function __construct(
-        Listing $listing,
+        ListingResult $listingResult,
         IItemsTableControlFactory $itemsTableControlFactory,
         ListingsFacade $listingFacade,
         ItemsFacade $itemFacade
     ) {
-        $this->listing = $listing;
+        $this->listingResult = $listingResult;
+        $this->listing = $listingResult->getListing();
 
         $this->itemsTableControlFactory = $itemsTableControlFactory;
         $this->listingFacade = $listingFacade;
@@ -54,7 +62,8 @@ class ListingTableControl extends Control
 
     protected function createComponentItemsTable()
     {
-        $comp = $this->itemsTableControlFactory->create($this->listing);
+        $comp = $this->itemsTableControlFactory->create($this->listingResult);
+
         $comp->showActions(
             __DIR__ . '/templates/actions.latte',
             ['listingID' => $this->listing->getId()]
@@ -73,14 +82,20 @@ class ListingTableControl extends Control
         $template->render();
     }
 
+    private function checkDayValue($day)
+    {
+        $noDays = $this->listing->getNumberOfDaysInMonth();
+        if (!is_numeric($day) or !($day >= 1 and $day <= $noDays)) {
+            $this->redirect('this');
+        }
+    }
+
     /**
      * @secured
      */
     public function handleRemoveItem($day)
     {
-        $noDays = $this->listing->getNumberOfDaysInMonth();
-        if (!is_numeric($day) or !($day >= 1 and $day <= $noDays))
-            $this->redirect('this');
+        $this->checkDayValue($day);
 
         try {
             $this->itemFacade->removeListingItem($day, $this->listing);
@@ -110,9 +125,7 @@ class ListingTableControl extends Control
      */
     public function handleCopyItem($day)
     {
-        $noDays = $this->listing->getNumberOfDaysInMonth();
-        if (!is_numeric($day) or !($day >= 1 and $day <= $noDays))
-            $this->redirect('this');
+        $this->checkDayValue($day);
 
         $err = 0;
         try {
@@ -129,7 +142,7 @@ class ListingTableControl extends Control
             );
             $err++;
 
-        } catch (\Exception $e) {
+        } catch (DBALException $e) {
             $this->presenter->flashMessage(
                 'Kopie položky nemohla být založena.
                  Zkuste akci opakovat později.',

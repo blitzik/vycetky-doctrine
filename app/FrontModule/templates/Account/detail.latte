@@ -1,0 +1,27 @@
+{layout 'layout.latte'}
+
+{block title}O uživateli{/block}
+{block account-content}
+
+<h2>O uživateli</h2>
+
+<table class="table t-profile">
+
+    <tr><th>Přezdívka:</th><td>{$user->identity->username}</td></tr>
+    <tr><th>Jméno:</th><td>{form userForm}
+    {input name} {input savename}
+    {/form}</td></tr>
+    <tr><th>Registrační E-Mail:</th><td>{$user->identity->email}</td></tr>
+	<tr><th>Odprac. dní:</th><td>{$totalWorkedDays}</td></tr>
+    <tr><th>Odprac. hodin:</th><td>{$totalWorkedHours|toTimeWithComma:true}</td></tr>
+</table>
+
+<div class="box-hint">
+    <h3>Skutečné jméno uživatele</h3>
+
+    <p>Skutečné jméno bude použito pouze pro předvyplnění pole
+       jména při generování výčetky, aby nemuselo být zadáváno stále dokola.</p>
+
+    <p><strong>Vaše skutečné jméno neuvidí nikdo jiný.</strong></p>
+</div>
+{/block}

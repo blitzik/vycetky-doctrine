@@ -1,16 +1,10 @@
 services:
 
-	usersManager:
-		class: App\Model\Services\Managers\UsersManager
-
 	listingsManager:
 		class: App\Model\Services\Managers\ListingsManager
 
 	listingItemsManager:
 		class: App\Model\Services\Managers\ListingItemsManager
-
-	invitationsManager:
-		class: App\Model\Services\Managers\InvitationsManager
 
 	messagesManager:
 		class: App\Model\Services\Managers\MessagesManager

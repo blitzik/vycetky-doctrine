@@ -4,7 +4,6 @@ namespace App\Model\Facades;
 
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\ListingItemNotFoundException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
 use App\Model\Services\Managers\ListingItemsManager;
@@ -15,7 +14,6 @@ use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Listing;
-use App\Model\Query\ListingItemsQuery;
 use Kdyby\Doctrine\EntityRepository;
 use App\Model\Services\ItemsService;
 use Kdyby\Doctrine\EntityManager;
@@ -41,6 +39,11 @@ class ItemsFacade extends Object
     private $listingItemsManager;
 
     /**
+     * @var ListingItemsWriter
+     */
+    private $listingItemsWriter;
+
+    /**
      * @var ListingItemsReader
      */
     private $listingItemsReader;
@@ -62,12 +65,14 @@ class ItemsFacade extends Object
 
     public function __construct(
         ListingItemsManager $listingItemManager,
+        ListingItemsWriter $listingItemsWriter,
         ListingItemsReader $listingItemReader,
         EntityManager $entityManager,
         ItemsService $itemService,
         User $user
     ) {
         $this->listingItemsManager = $listingItemManager;
+        $this->listingItemsWriter = $listingItemsWriter;
         $this->listingItemsReader = $listingItemReader;
         $this->em = $entityManager;
 
@@ -89,28 +94,20 @@ class ItemsFacade extends Object
      */
     public function saveListingItem(array $newValues, ListingItem $listingItem = null)
     {
-        $item = $this->listingItemsManager->prepareListingItemByFormsData($newValues, $listingItem);
+        $item = $this->listingItemsManager
+                     ->prepareListingItemByFormsData($newValues, $listingItem);
 
-        return $this->listingItemsManager->saveListingItem($item);
+        return $this->listingItemsWriter->saveListingItem($item);
     }
 
     /**
-     * @param ListingItemsQuery $listingItemsQuery
-     * @return mixed
-     * @throws ListingItemNotFoundException
+     * @param $day
+     * @param Listing $listing
+     * @return ListingItem|null
      */
-    public function fetchListingItem(ListingItemsQuery $listingItemsQuery)
+    public function getByDay($day, Listing $listing)
     {
-        return $this->listingItemsReader->fetchListingItem($listingItemsQuery);
-    }
-
-    /**
-     * @param ListingItemsQuery $listingItemsQuery
-     * @return mixed
-     */
-    public function fetchListingItems(ListingItemsQuery $listingItemsQuery)
-    {
-        return $this->listingItemsReader->fetchListingItems($listingItemsQuery);
+        return $this->listingItemsReader->getByDay($day, $listing);
     }
 
     /**
@@ -119,7 +116,7 @@ class ItemsFacade extends Object
      */
     public function removeListingItem($day, Listing $listing)
     {
-        $this->listingItemsManager->removeListingItem($day, $listing);
+        $this->listingItemsWriter->removeListingItem($day, $listing);
     }
 
     /**
@@ -127,16 +124,16 @@ class ItemsFacade extends Object
      * @param Listing $listing
      * @return mixed
      * @throws ShiftItemDownException
-     * @throws \Exception
      */
     public function copyListingItemDown(
         $day,
         Listing $listing
     ) {
-        return $this->listingItemsManager
+        $currentItem = $this->listingItemsReader->getByDay($day, $listing);
+
+        return $this->listingItemsWriter
                     ->copyListingItem(
-                        $day,
-                        $listing,
+                        $currentItem,
                         ListingItemsWriter::WRITE_DOWN
                     );
     }
@@ -146,16 +143,16 @@ class ItemsFacade extends Object
      * @param Listing $listing
      * @return mixed
      * @throws ShiftItemUpException
-     * @throws \Exception
      */
     public function copyListingItemUp(
         $day,
         Listing $listing
     ) {
-        return $this->listingItemsManager
+        $currentItem = $this->listingItemsReader->getByDay($day, $listing);
+
+        return $this->listingItemsWriter
                     ->copyListingItem(
-                        $day,
-                        $listing,
+                        $currentItem,
                         ListingItemsWriter::WRITE_UP
                     );
     }

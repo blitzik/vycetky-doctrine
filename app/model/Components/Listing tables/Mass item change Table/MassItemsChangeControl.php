@@ -4,6 +4,7 @@ namespace App\Model\Components;
 
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\ResultObjects\ListingResult;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use App\Model\Facades\ListingsFacade;
@@ -34,26 +35,25 @@ class MassItemsChangeControl extends Control
      */
     private $listingsFacade;
 
+    /**
+     * @var ListingResult
+     */
+    private $listingResult;
 
     /**
      * @var Listing
      */
     private $listing;
 
-    /**
-     * @var ListingItem[]
-     */
-    private $itemsCollection;
-
-
     public function __construct(
-        Listing $listing,
+        ListingResult $listingResult,
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
         IItemsTableControlFactory $itemsTableControlFactory,
         ItemUpdateFormFactory $itemUpdateFormFactory,
         ListingsFacade $listingsFacade
     ) {
-        $this->listing = $listing;
+        $this->listingResult = $listingResult;
+        $this->listing = $listingResult->getListing();
 
         $this->listingDescriptionControlFactory = $listingDescriptionControlFactory;
         $this->itemsTableControlFactory = $itemsTableControlFactory;
@@ -76,7 +76,7 @@ class MassItemsChangeControl extends Control
 
     protected function createComponentItemsTable()
     {
-        $comp = $this->itemsTableControlFactory->create($this->listing);
+        $comp = $this->itemsTableControlFactory->create($this->listingResult);
 
         $comp->showCheckBoxes();
         $comp->showTableCaption();

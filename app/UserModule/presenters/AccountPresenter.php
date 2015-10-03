@@ -4,6 +4,8 @@ namespace App\UserModule\Presenters;
 
 use App\Model\Facades\InvitationsFacade;
 use App\Model\Facades\UsersFacade;
+use Doctrine\DBAL\DBALException;
+use Exceptions\Runtime\InvalidUserInvitationEmailException;
 use Exceptions\Runtime\InvitationValidityException;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\User;
@@ -47,7 +49,7 @@ class AccountPresenter extends Presenter
     {
         if (!Validators::is($email, 'email')) {
             $this->flashMessage('E-mailová adresa nemá platný formát.', 'warning');
-            $this->redirect('Account:default');
+            $this->redirect('Login:default');
         }
 
         try {
@@ -55,7 +57,7 @@ class AccountPresenter extends Presenter
 
         } catch (\Exceptions\Runtime\InvitationValidityException $t) {
             $this->flashMessage('Registrovat se může pouze uživatel s platnou pozvánkou.', 'warning');
-            $this->redirect('Account:login');
+            $this->redirect('Login:default');
         }
 
         $this['registrationForm']['email']->setDefaultValue($this->invitation->email);
@@ -95,7 +97,7 @@ class AccountPresenter extends Presenter
              ->setOmitted()
              ->setHtmlId('password-save-button');
 
-        $form->onSuccess[] = callback($this, 'processUserRegistration');
+        $form->onSuccess[] = [$this, 'processUserRegistration'];
 
         return $form;
 
@@ -134,13 +136,19 @@ class AccountPresenter extends Presenter
             $this->flashMessage('Registrovat se může pouze uživatel s platnou pozvánkou.', 'warning');
             $this->redirect('Login:default');
 
+        } catch (InvalidUserInvitationEmailException $iue) {
+            $form->addError('Nesouhlasí Vámi zadaný E-mail a E-mail vázaný na pozvánku.');
+
         } catch (\Exceptions\Runtime\DuplicateUsernameException $du) {
-            $form->addError('Vámi zvolené jméno vužívá již někdo jiný. Vyberte si prosím jiné jméno.');
+            $form->addError('Vámi zvolené jméno využívá již někdo jiný. Vyberte si prosím jiné jméno.');
 
         } catch (\Exceptions\Runtime\DuplicateEmailException $de) {
-            $form->addError("Zadejte prosím jiný E-mail.");
+            $this->flashMessage(
+                'E-mail svázaný s pozvánkou využívá již jeden z registrovaných
+                 uživatelů. Nechte si zaslat novou pozvánku s jinou E-mailovou adresou.', 'warning');
+            $this->redirect('Login:default');
 
-        } catch (\DibiException $d) {
+        } catch (DBALException $d) {
             $form->addError('Registraci nelze dokončit. Zkuste to prosím později.');
         }
 

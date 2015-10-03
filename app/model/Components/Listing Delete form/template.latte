@@ -6,20 +6,27 @@
 </ul>
 
 <div class="box box-red">
-<p>Skutečně si přejete <b>odstranit</b> vámi zvolenou výčetku?</p>
-<p>
-    <b>{$listing->period|listingMonthYear}</b> |
+<div class="listing-removal-info">
+<a href="{plink Listing:detail, id => $listing->getId(), backlink => null}"><h3>
+    {$listing->period|listingMonthYear} |
         {if $listing->description}
             {$listing->description}
         {else}
             Bez popisu
         {/if}
-</p>
+</h3></a>
+
+{if $workedDays > 0}
+<p>Počet záznamů ve výčetce: {$workedDays}</p>
+{/if}
+</div>
+
+<p>Skutečně si přejete <b>odstranit</b> vámi zvolenou výčetku?</p>
 
 <table>
-        <tr><th colspan="2">{label check /}</th></tr>
-        <tr><td colspan="2">{input check}</td></tr>
-        <tr><td>{input delete}</td><td>{input cancel}</td></tr>
+        <tr><th>{label check /}</th></tr>
+        <tr><td>{input check}</td></tr>
+        <tr><td>{input delete} {input cancel}</td></tr>
 </table>
 </div>
 {/form deleteListingForm}

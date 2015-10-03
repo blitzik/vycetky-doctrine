@@ -3,15 +3,19 @@
 namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\Invitation;
-use App\Model\Domain\Entities\User;
 use App\Model\Query\InvitationsQuery;
-use App\Model\Services\Managers\InvitationsManager;
+use App\Model\Services\InvitationHandler;
+use App\Model\Services\InvitationsSender;
 use App\Model\Services\Readers\InvitationsReader;
+use App\Model\Services\Readers\UsersReader;
+use App\Model\Services\Writers\InvitationsWriter;
+use App\Model\Subscribers\Validation\InvitationResultObject;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationExpiredException;
 use Exceptions\Runtime\InvitationNotFoundException;
 use Exceptions\Runtime\UserAlreadyExistsException;
 use Nette\InvalidStateException;
+use Nette\Utils\Validators;
 use Nette\Object;
 
 class InvitationsFacade extends Object
@@ -22,26 +26,37 @@ class InvitationsFacade extends Object
     private $invitationsReader;
 
     /**
-     * @var InvitationsManager
+     * @var InvitationsSender
      */
-    private $invitationsManager;
+    private $invitationsSender;
+
+    /**
+     * @var InvitationHandler
+     */
+    private $invitationsHandler;
+
+    /**
+     * @var InvitationsWriter
+     */
+    private $invitationsWriter;
+
+    /**
+     * @var UsersReader
+     */
+    private $usersReader;
 
     public function __construct(
         InvitationsReader $invitationsReader,
-        InvitationsManager $invitationsManager
+        InvitationsWriter $invitationsWriter,
+        InvitationsSender $invitationsSender,
+        InvitationHandler $invitationsHandler,
+        UsersReader $usersReader
     ) {
         $this->invitationsReader = $invitationsReader;
-        $this->invitationsManager = $invitationsManager;
-    }
-
-    /**
-     * @param InvitationsQuery $invitationsQuery
-     * @return Invitation
-     * @throws InvitationNotFoundException
-     */
-    public function fetchInvitation(InvitationsQuery $invitationsQuery)
-    {
-        return $this->invitationsReader->fetchInvitation($invitationsQuery);
+        $this->invitationsWriter = $invitationsWriter;
+        $this->invitationsSender = $invitationsSender;
+        $this->usersReader = $usersReader;
+        $this->invitationsHandler = $invitationsHandler;
     }
 
     /**
@@ -62,19 +77,60 @@ class InvitationsFacade extends Object
      */
     public function checkInvitation($email, $token)
     {
-        return $this->invitationsManager->checkInvitation($email, $token);
+        $inv = $this->getInvitation($email, $token);
+        try {
+            $this->checkInvitationState($inv);
+        } catch (InvitationExpiredException $e) {
+            $this->invitationsWriter->removeInvitation($inv);
+            throw $e;
+        }
+
+        return $inv;
     }
 
     /**
      * @param string $email
-     * @param User $sender
-     * @return Invitation
+     * @param string $token
+     * @return Invitation|null
+     * @throws InvitationNotFoundException
+     */
+    public function getInvitation($email, $token)
+    {
+        Validators::assert($email, 'email');
+
+        $invitation = $this->invitationsReader->getInvitation($email, $token);
+        if ($invitation === null) {
+            throw new InvitationNotFoundException;
+        }
+
+        return $invitation;
+    }
+
+    /**
+     * @param Invitation $invitation
+     */
+    private function checkInvitationState(Invitation $invitation)
+    {
+        if (!$invitation->isActive()) {
+            throw new InvitationExpiredException;
+        }
+    }
+
+    /**
+     * @param Invitation $invitation
+     * @return InvitationResultObject
      * @throws InvitationAlreadyExistsException
      * @throws UserAlreadyExistsException
      */
-    public function createInvitation($email, User $sender)
+    public function createInvitation(Invitation $invitation)
     {
-        return $this->invitationsManager->createInvitation($email, $sender);
+        $isEmailRegistered = $this->usersReader
+                                  ->isEmailRegistered($invitation->email);
+        if ($isEmailRegistered === true) {
+            throw new UserAlreadyExistsException;
+        }
+
+        return $this->invitationsHandler->process($invitation);
     }
 
     /**
@@ -82,17 +138,27 @@ class InvitationsFacade extends Object
      */
     public function removeInvitation($id)
     {
-        $this->invitationsManager->removeInvitation($id);
+        $this->invitationsWriter->removeInvitation($id);
     }
 
     /**
-     * @param Invitation $invitation
+     * @param Invitation|int $invitation
+     * @throws InvitationNotFoundException
      * @throws InvitationExpiredException
      * @throws InvalidStateException
+     * @return void
      */
-    public function sendInvitation(Invitation $invitation)
+    public function sendInvitation($invitation)
     {
-        $this->invitationsManager->sendInvitation($invitation);
+        if (Validators::is($invitation, 'numericint')) {
+            $invitation = $this->invitationsReader->getInvitationByID($invitation);
+        }
+        $this->checkInvitationState($invitation);
+
+        $invitation->setLastSendingTime();
+        $this->invitationsWriter->saveInvitation($invitation);
+
+        $this->invitationsSender->sendInvitation($invitation);
     }
 
 }

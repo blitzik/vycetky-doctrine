@@ -2,6 +2,7 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\ListingItem;
 use Nette\Application\UI\Form;
 use Nette\Utils\Json;
 
@@ -34,7 +35,7 @@ class ItemUpdateFormFactory
         return $this->defaultItemTime[$name];
     }
 
-    public function create()
+    public function create(ListingItem $listingItem = null)
     {
         $form = new Form();
 
@@ -207,6 +208,35 @@ class ItemUpdateFormFactory
 
         $form->getElementPrototype()->id = 'update-form';
 
+
+        if ($listingItem !== null) {
+            $this->fillForm($form, $listingItem);
+        }
+
         return $form;
+    }
+
+    private function fillForm(Form $form, ListingItem $listingItem)
+    {
+        $form->setDefaults(
+            [
+                'lunch' => $listingItem->workedHours
+                                       ->lunch
+                                       ->toTimeWithComma(),
+                'workEnd' => $listingItem->workedHours
+                                         ->workEnd
+                                         ->toHoursAndMinutes(true),
+                'workStart' => $listingItem->workedHours
+                                           ->workStart
+                                           ->toHoursAndMinutes(true),
+                'otherHours' => $listingItem->workedHours
+                                            ->otherHours
+                                            ->toTimeWithComma(),
+
+                'locality' => $listingItem->locality->name,
+                'description' => $listingItem->description,
+                'descOtherHours' => $listingItem->descOtherHours
+            ]
+        );
     }
 }

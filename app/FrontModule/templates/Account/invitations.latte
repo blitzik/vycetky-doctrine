@@ -1,0 +1,26 @@
+{layout 'layout.latte'}
+
+{block title}Správa pozvánek do systému{/block}
+
+{block account-content}
+<div class="left-side">
+<h2>Správa pozvánek do systému <small>[zobrazeny pouze aktivní pozvánky]</small></h2>
+
+{control invitationsManager}
+</div>
+
+<div class="box-hint">
+    <h3>Pozvánky</h3>
+
+    <p>Zobrazeny jsou aktivní, Vámi vytvořené pozvánky.</p>
+
+    <p>Pokud se systému nepodařilo vytvořenou pozvánku odeslat,
+       můžete se pokusit danou pozvánku odeslat znovu. Možný čas dalšího
+       odeslání uvidíte v tabulce u dané pozvánky.</p>
+
+    <p>Pokud se pozvánku stále nedaří odeslat přes systém, můžete
+       svému kolegovy sdělit sami registrační kód pozvánky, např. E-mailem, či
+       si ho opsat na papír. Tento registrační kód poté uživatel uplatní na hlavní
+       stránce v registrační části.</p>
+</div>
+{/block}

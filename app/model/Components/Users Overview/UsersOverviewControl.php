@@ -2,14 +2,15 @@
 
 namespace App\Model\Components;
 
+use Nextras\Application\UI\SecuredLinksControlTrait;
+use App\Model\Queries\Users\UsersOverviewQuery;
+use Nette\Application\UI\Multiplier;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
-use App\Model\Query\UsersQuery;
-use Doctrine\ORM\AbstractQuery;
+use Components\IPaginatorFactory;
 use Nette\Application\UI\Control;
-use Nette\Application\UI\Multiplier;
+use Doctrine\ORM\AbstractQuery;
 use Nette\Utils\Arrays;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 
 class UsersOverviewControl extends Control
 {
@@ -19,6 +20,11 @@ class UsersOverviewControl extends Control
      * @var IUserBlockingControlFactory
      */
     protected $userBlockingControlFactory;
+
+    /**
+     * @var IPaginatorFactory
+     */
+    private $paginatorFactory;
 
     /**
      * @var User
@@ -31,7 +37,7 @@ class UsersOverviewControl extends Control
     protected $usersFacade;
 
     /**
-     * @var UsersQuery
+     * @var UsersOverviewQuery
      */
     protected $usersQuery;
 
@@ -48,13 +54,28 @@ class UsersOverviewControl extends Control
     public function __construct(
         User $user,
         UsersFacade $usersFacade,
-        IUserBlockingControlFactory $userBlockingControlFactory
+        IUserBlockingControlFactory $userBlockingControlFactory,
+        IPaginatorFactory $paginatorFactory
     ) {
         $this->user = $user;
         $this->usersFacade = $usersFacade;
         $this->userBlockingControlFactory = $userBlockingControlFactory;
 
-        $this->usersQuery = (new UsersQuery())->onlyWithFields(['id', 'username']);
+        $this->usersQuery = (new UsersOverviewQuery())
+                            ->onlyWithFields(['id', 'username'])
+                            ->withoutUser($user);
+
+        $this->paginatorFactory = $paginatorFactory;
+    }
+
+    protected function createComponentPaginator()
+    {
+        $paginator = $this->paginatorFactory->create();
+        $paginator->onPaginate[] = function () {
+            $this->redrawControl();
+        };
+
+        return $paginator;
     }
 
     protected function createComponentUserBlocking()
@@ -91,22 +112,33 @@ class UsersOverviewControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        if (empty($this->users)) {
-            $this->users = Arrays::associate($this->usersFacade
-                ->fetchUsers($this->usersQuery)
-                ->toArray(AbstractQuery::HYDRATE_ARRAY), 'id=username');
+        $paginator = $this['paginator']->getPaginator();
 
-            unset($this->users[$this->user->getId()]);
+        if (empty($this->users)) {
+            $usersResultSet = $this->usersFacade
+                                   ->fetchUsers($this->usersQuery);
+
+            $usersResultSet->applyPaginator($paginator, 10);
+
+            $this->users = Arrays::associate(
+                $usersResultSet->toArray(AbstractQuery::HYDRATE_ARRAY),
+                'id=username'
+            );
+            //unset($this->users[$this->user->getId()]);
         }
 
         $template->users = $this->users;
 
         if (empty($this->alreadyBlockedUsers)) {
-            $alreadyBlockedUsers = Arrays::associate($this->usersFacade->fetchUsers(
-                (new UsersQuery())
-                ->onlyWithFields(['id'])
-                ->findUsersBlockedByMe($this->user)
-            )->toArray(AbstractQuery::HYDRATE_ARRAY), 'id');
+            $alreadyBlockedUsers = Arrays::associate(
+                $this->usersFacade
+                     ->fetchUsers(
+                         (new UsersOverviewQuery())
+                         ->onlyWithFields(['id'])
+                         ->findUsersBlockedBy($this->user)
+                )->toArray(AbstractQuery::HYDRATE_ARRAY),
+                'id'
+            );
             $this->alreadyBlockedUsers = $alreadyBlockedUsers;
         }
 

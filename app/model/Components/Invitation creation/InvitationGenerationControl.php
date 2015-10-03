@@ -2,9 +2,12 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
-use App\Model\Subscribers\Validation\SubscriberValidationObject;
+use App\Model\Subscribers\Validation\InvitationResultObject;
+use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
+use Exceptions\Runtime\InvitationCreationAttemptException;
 use Exceptions\Runtime\UserAlreadyExistsException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
@@ -57,55 +60,57 @@ class InvitationGenerationControl extends Control
     {
         $value = $form->getValues();
 
+        $invitation = new Invitation(
+            $value['email'],
+            $this->user->getIdentity()
+        );
         try {
-            $invitation = $this->invitationsFacade
-                               ->createInvitation(
-                                   $value['email'],
-                                   $this->user->getIdentity()
-                               );
+            /** @var InvitationResultObject $resultObject */
+            $resultObject = $this->invitationsFacade
+                                 ->createInvitation($invitation);
 
             $this->flashMessage(
                 'Registrační pozvánka byla vytvořena.',
                 'success'
             );
 
-        } catch (UserAlreadyExistsException $uae) {
+            if (!$resultObject->isValid()) {
+                $error = $resultObject->getFirstError();
+                $this->flashMessage($error['message'], $error['type']);
+            }
+
+        } catch (InvitationCreationAttemptException $ca) {
             $this->flashMessage(
-                'Pozvánku nelze odeslat. Uživatel s E-Mailem ' . $value['email'] . ' je již zaregistrován.',
-                'warning'
+                'Pozvánku nebyla vytvořena. Zkuste akci opakovat později.',
+                'error'
             );
-            $this->redirect('this');
+
+        } catch (UserAlreadyExistsException $uae) {
+            $form->addError(
+                'Pozvánku nelze odeslat. Uživatel s E-Mailem ' . $value['email'] . ' je již zaregistrován.'
+            );
+            return;
 
         } catch (InvitationAlreadyExistsException $iae) {
-            $this->flashMessage(
-                'Někdo jiný již odeslal pozvánku uživateli s E-mailem ' .$value['email'],
-                'warning'
+            $form->addError(
+                'Někdo jiný již odeslal pozvánku uživateli s E-mailem ' .$value['email']
             );
-            $this->redirect('this');
+            return;
 
-        } catch (\Exception $e) {
+        } catch (DBALException $e) {
             $this->flashMessage(
-                'Pozvánku se nepodařilo vytvořit. Zkuste akci opakovat později.',
-                'warning'
+                'Při vytváření pozvánky došlo k chybě. Zkuste akci opakovat později.',
+                'error'
             );
-            $this->redirect('this');
         }
 
-        $validationObject = new SubscriberValidationObject();
-        $this->onInvitationCreation($invitation, $validationObject);
-        if (!$validationObject->isValid()) {
-            $error = $validationObject->getFirstError();
-            $this->flashMessage($error['message'], $error['type']);
-        }
-
+        $this->redirect('this');
     }
 
     public function render()
     {
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
-
-
 
         $template->render();
     }

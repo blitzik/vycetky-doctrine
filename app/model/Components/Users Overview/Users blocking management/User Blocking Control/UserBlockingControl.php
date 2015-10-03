@@ -2,11 +2,10 @@
 
 namespace App\Model\Components;
 
+use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
-use App\Model\Query\UsersQuery;
 use Nette\Application\UI\Control;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 
 class UserBlockingControl extends Control
 {
@@ -66,12 +65,14 @@ class UserBlockingControl extends Control
         $template->render();
     }
 
+    /**
+     * @param $id
+     * @return User|null
+     */
     private function getUser($id)
     {
         return $this->usersFacade
-                    ->fetchUser(
-                        (new UsersQuery())->byId($id)
-                    );
+                    ->getUserByID($id);
     }
 
     /**
@@ -83,6 +84,7 @@ class UserBlockingControl extends Control
         if ($user !== null) {
             $this->user->blockUser($user);
             $this->usersFacade->saveUser($this->user);
+            // add item with null value into array to toggle block button
             $this->blockedUsersIDs[$user->getId()] = null;
         }
 

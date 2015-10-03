@@ -176,7 +176,7 @@ class ListingItem extends Entity
     {
         $this->locality = $locality;
 
-        $user = $this->listing->getOwner();
+        $user = $this->listing->getUser();
         $locality->addUser($user);
     }
 

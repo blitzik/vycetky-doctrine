@@ -2,11 +2,7 @@
 
 namespace App\Model\Authentication;
 
-use App\Model\Domain\Entities\User;
-use App\Model\Facades\UsersFacade;
-use App\Model\Query\UsersQuery;
-use Doctrine\ORM\NoResultException;
-use Kdyby\Doctrine\EntityManager;
+use App\Model\Services\Readers\UsersReader;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
 use Nette\Security\IIdentity;
@@ -22,9 +18,9 @@ class UserAuthenticator extends Object implements IAuthenticator
     public $onLoggedIn = [];
 
     /**
-     * @var EntityManager
+     * @var UsersReader
      */
-    private $entityManager;
+    private $usersReader;
 
     /**
      * @var IRequest
@@ -32,11 +28,11 @@ class UserAuthenticator extends Object implements IAuthenticator
     private $httpRequest;
 
     public function __construct(
-        EntityManager $entityManager,
+        UsersReader $usersReader,
         IRequest $httpRequest
     ) {
         $this->httpRequest = $httpRequest;
-        $this->entityManager = $entityManager;
+        $this->usersReader = $usersReader;
     }
 
     /**
@@ -49,9 +45,8 @@ class UserAuthenticator extends Object implements IAuthenticator
     {
         list($email, $password) = $credentials;
 
-        $user = $this->entityManager
-                     ->getRepository(User::class)
-                     ->fetchOne((new UsersQuery())->byEmail($email));
+        $user = $this->usersReader
+                     ->getUserByEmail($email);
 
         if ($user === null) {
             throw new AuthenticationException('Zadali jste špatný email.');

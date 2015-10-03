@@ -4,6 +4,8 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ListingsFacade;
+use App\Model\ResultObjects\ListingResult;
+use Doctrine\DBAL\DBALException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
@@ -21,15 +23,22 @@ class ListingRemovalControl extends Control
     private $listingsFacade;
 
     /**
+     * @var ListingResult
+     */
+    private $listingResult;
+
+    /**
      * @var Listing
      */
     private $listing;
 
     public function __construct(
-        Listing $listing,
+        ListingResult $listingResult,
         ListingsFacade $listingsFacade
     ) {
-        $this->listing = $listing;
+        $this->listingResult = $listingResult;
+        $this->listing = $listingResult->getListing();
+
         $this->listingsFacade = $listingsFacade;
     }
 
@@ -59,7 +68,7 @@ class ListingRemovalControl extends Control
     {
         try {
             $this->listingsFacade->removeListing($this->listing);
-        } catch (\Exception $e) {
+        } catch (DBALException $e) {
             $this->flashMessage(
                 'Výčetka nemohla být odstraněna. Zkuste akci opakovat později.',
                 'warning'
@@ -81,6 +90,8 @@ class ListingRemovalControl extends Control
         $template->setFile(__DIR__ . '/template.latte');
 
         $template->listing = $this->listing;
+
+        $template->workedDays = $this->listingResult->getWorkedDays();
 
         $template->render();
     }

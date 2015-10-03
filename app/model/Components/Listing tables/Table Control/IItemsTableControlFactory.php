@@ -2,12 +2,13 @@
 
 namespace App\Model\Components\ItemsTable;
 
-use App\Model\Domain\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
 
 interface IItemsTableControlFactory
 {
     /**
+     * @param ListingResult $listingResult
      * @return ItemsTableControl
      */
-    public function create(Listing $listing);
+    public function create(ListingResult $listingResult);
 }

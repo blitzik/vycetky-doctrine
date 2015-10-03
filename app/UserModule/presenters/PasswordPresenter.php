@@ -4,7 +4,6 @@ namespace App\UserModule\Presenters;
 
 use App\Model\Facades\UsersFacade;
 use App\Model\Notifications\EmailNotifier;
-use App\Model\Query\UsersQuery;
 use Nette\Application\UI\ITemplate;
 use Nette\Application\UI\Form;
 use Tracy\Debugger;
@@ -45,11 +44,11 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
 
         $form->addText('email', 'E-mail:')
                 ->setRequired('Zadejte Vaši E-mailovou adresu.')
-                    ->addRule(Form::EMAIL, 'Vložte E-mailovou adresu ve správném tvaru.');
+                ->addRule(Form::EMAIL, 'Vložte E-mailovou adresu ve správném tvaru.');
 
         $form->addSubmit('reset', 'Resetovat heslo');
 
-        $form->onSuccess[] = callback($this, 'processPasswordReset');
+        $form->onSuccess[] = [$this, 'processPasswordReset'];
 
         return $form;
     }
@@ -99,8 +98,7 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
 
     public function actionChange($email, $token)
     {
-        $this->user = $this->usersFacade
-                           ->fetchUser((new UsersQuery())->byEmail($email));
+        $this->user = $this->usersFacade->getUserByEmail($email);
 
         if ($this->user === null or
             $this->user->token === null or

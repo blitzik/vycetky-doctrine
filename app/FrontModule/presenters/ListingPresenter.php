@@ -14,13 +14,13 @@ use App\Model\Components\IListingFormControlFactory;
 use App\Model\Components\IFilterControlFactory;
 use App\Model\Components\ListingFormFactory;
 use App\Model\Domain\Entities\Listing;
-use App\Model\Facades\UsersFacade;
-use App\Model\Query\ListingsQuery;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Facades\UserManager;
 use App\Model\Facades\ItemsFacade;
+use App\Model\Queries\Listings\ListingsForOverviewQuery;
+use App\Model\ResultObjects\ListingResult;
 use Exceptions\Runtime;
 use App\Model\Entities;
+use Nette\InvalidArgumentException;
 
 class ListingPresenter extends SecurityPresenter
 {
@@ -102,21 +102,10 @@ class ListingPresenter extends SecurityPresenter
     //public $messageFacade;
 
     /**
-     * @var UsersFacade
-     * @inject
-     */
-    public $usersFacade;
-
-    /**
      * @var ItemsFacade
      * @inject
      */
     public $itemsFacade;
-
-    /**
-     * @var Listing
-     */
-    private $listing;
 
     private $numberOfMessages;
 
@@ -125,7 +114,7 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingActionsMenu()
     {
-        $comp = $this->listingActionsMenuControlFactory->create($this->listing);
+        $comp = $this->listingActionsMenuControlFactory->create($this->listingResult->getListing());
         return $comp;
     }
 
@@ -138,17 +127,6 @@ class ListingPresenter extends SecurityPresenter
     public function actionOverview($month, $year)
     {
         $this->setPeriodParametersForFilter($year, $month);
-
-        $listingsData = $this->listingsFacade->fetchListings(
-            (new ListingsQuery())
-                ->forOverviewDatagrid()
-                ->withNumberOfWorkedDays()
-                ->withTotalWorkedHours()
-                ->byUser($this->user->getIdentity())
-                ->byPeriod($year, $month)
-        )->toArray();
-
-        $this['listingsOverview']->setListings($listingsData);
     }
 
     public function renderOverview($month, $year)
@@ -164,7 +142,17 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingsOverview()
     {
-        $comp = $this->listingsOverviewFactory->create();
+        $comp = $this->listingsOverviewFactory
+                     ->create(
+                         (new ListingsForOverviewQuery())
+                         ->withNumberOfWorkedDays()
+                         ->withTotalWorkedHours()
+                         ->byUser($this->user->getIdentity())
+                         ->byPeriod(
+                             $this->getParameter('year'),
+                             $this->getParameter('month')
+                         )
+                     );
 
         $comp->setHeading('Mé výčetky');
 
@@ -195,7 +183,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionEdit($id)
     {
-        $this->listing = $this->getListingByID($id);
+        $this->listingResult = $this->getListingByID($id);
     }
 
     public function renderEdit($id)
@@ -207,7 +195,11 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingForm()
     {
-        return $this->listingFormControlFactory->create($this->listing);
+        $l = $this->listingResult !== null ?
+             $this->listingResult->getListing() :
+             null;
+
+        return $this->listingFormControlFactory->create($l);
     }
 
     /*
@@ -218,7 +210,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionRemove($id)
     {
-        $this->listing = $this->getListingById($id);
+        $this->listingResult = $this->getListingById($id, true);
     }
 
     public function renderRemove($id)
@@ -231,7 +223,8 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingRemovalForm()
     {
-        $comp = $this->listingRemovalControlFactory->create($this->listing);
+        $comp = $this->listingRemovalControlFactory
+                     ->create($this->listingResult);
 
         $comp->onRemoveSuccess[] = [$this, 'onListingRemoveSuccess'];
         $comp->onCancelClick[]   = [$this, 'onListingRemovalCancelClick'];
@@ -269,12 +262,12 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionDetail($id)
     {
-        $this->listing = $this->getListingById($id);
+        $this->listingResult = $this->getListingById($id);
     }
 
     public function renderDetail($id)
     {
-        $this->template->listing = $this->listing;
+        $this->template->listing = $this->listingResult->getListing();
     }
 
     /**
@@ -282,7 +275,7 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingItemsTable()
     {
-        $comp = $this->listingTableControlFactory->create($this->listing);
+        $comp = $this->listingTableControlFactory->create($this->listingResult);
 
         return $comp;
     }
@@ -295,7 +288,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionCopy($id)
     {
-        $this->listing = $this->getListingByID($id);
+        $this->listingResult = $this->getListingByID($id);
     }
 
     public function renderCopy($id)
@@ -307,7 +300,8 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentSimpleCopyForm()
     {
-        $comp = $this->listingCopyFormControlFactory->create($this->listing);
+        $comp = $this->listingCopyFormControlFactory
+                     ->create($this->listingResult->getListing());
 
         $comp->onListingCopySuccess[] = [$this, 'onListingCopySuccess'];
 
@@ -332,21 +326,11 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionMassItemsChange($id)
     {
-        try {
-            $listingData = $this->listingsFacade
-                                ->fetchListing((new ListingsQuery())
-                                                ->withNumberOfWorkedDays());
+        $this->listingResult = $this->getListingByID($id, true);
 
-            if ($listingData['worked_days'] == 0) {
-                $this->flashMessage('Nelze upravovat prázdnou výčetku.', 'warning');
-                $this->redirect('Listing:detail', ['id' => $id]);
-            }
-
-            $this->listing = $listingData['listing'];
-
-        } catch (Runtime\ListingNotFoundException $e) {
-            $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
-            $this->redirect('Listing:overview');
+        if ($this->listingResult->getWorkedDays() == 0) {
+            $this->flashMessage('Nelze upravovat prázdnou výčetku.', 'warning');
+            $this->redirect('Listing:detail', ['id' => $id]);
         }
     }
 
@@ -360,7 +344,8 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentMassItemChangeTable()
     {
-        $comp = $this->massItemChangeControlFactory->create($this->listing);
+        $comp = $this->massItemChangeControlFactory
+                     ->create($this->listingResult);
 
         return $comp;
     }
@@ -401,7 +386,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionPdfGeneration($id)
     {
-        $this->listing = $this->getListingById($id);
+        $this->listingResult = $this->getListingById($id, true);
     }
 
     public function renderPdfGeneration($id)
@@ -414,7 +399,36 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingPDFGeneration()
     {
-        return $this->listingPDFGenerationControlFactory->create($this->listing);
+        return $this->listingPDFGenerationControlFactory
+                    ->create($this->listingResult);
+    }
+
+
+    private function setPeriodParametersForFilter($year, $month)
+    {
+        if ($year === null) {
+            $this->redirect(
+                'Listing:overview',
+                ['year'  => $this->currentDate->format('Y'),
+                 'month' => $this->currentDate->format('n')]
+            );
+        } else {
+            try {
+                $this['filter']['form']['year']->setDefaultValue($year);
+                $this['filter']['form']['month']->setDefaultValue($month);
+
+            } catch (InvalidArgumentException $e) {
+                $this->flashMessage(
+                    'Lze vybírat pouze z hodnot, které nabízí formulář.',
+                    'warning'
+                );
+                $this->redirect(
+                    'Listing:overview',
+                    ['year'=>$this->currentDate->format('Y'),
+                     'month'=>$this->currentDate->format('n')]
+                );
+            }
+        }
     }
 
 }

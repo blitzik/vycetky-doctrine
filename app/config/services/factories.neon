@@ -5,6 +5,11 @@ services:
 	itemUpdateFormFactory:
 		class: App\Model\Components\ItemUpdateFormFactory(%defaultItemTime%)
 
+	itemFormControlFactory:
+		implement: App\Model\Components\IItemFormControlFactory
+		parameters: [App\Model\Domain\Entities\Listing listing, day]
+		arguments: [%listing%, %day%]
+
 	filterControlFactory:
 		implement: App\Model\Components\IFilterControlFactory
 
@@ -15,13 +20,13 @@ services:
 
 	listingRemovalControlFactory:
 		implement: App\Model\Components\IListingRemovalControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 
 	listingPDFGenerationControlFactory:
 		implement: App\Model\Components\IListingPDFGenerationControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 		setup:
 			- setCompanyParameters(%company%)
 
@@ -32,18 +37,18 @@ services:
 
 	itemsTableControlFactory:
 		implement: App\Model\Components\ItemsTable\IItemsTableControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 
 	listingTableControlFactory:
 		implement: App\Model\Components\ListingTable\IListingTableControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 
 	massItemChangeControlFactory:
 		implement: App\Model\Components\IMassItemsChangeControlFactory
-		parameters: [App\Model\Domain\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 
 	sharingListingControlFactory:
 		implement: App\Model\Components\ISharingListingControlFactory
@@ -62,6 +67,8 @@ services:
 
 	listingsOverviewControlFactory:
 		implement: App\Model\Components\IListingsOverviewControlFactory
+		parameters: [App\Model\Queries\Listings\ListingsForOverviewQuery listingsQuery]
+		arguments: [%listingsQuery%]
 
 	paginatorFactory: \Components\IPaginatorFactory
 
@@ -129,3 +136,8 @@ services:
 		implement: App\Model\Components\IMessageRecipientsControlFactory
 		parameters: [App\Model\Domain\Entities\Message message]
 		arguments: [%message%]
+
+	newMessageControlFactory:
+		implement: App\Model\Components\INewMessageControlFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]

@@ -1,0 +1,31 @@
+{layout '../@layout.latte'}
+
+{block content}
+<nav class="listing-sub-nav">
+<ul>
+<li>
+    <a href="{link Account:detail}"
+       {ifCurrent Account:detail}class="selected"{/ifCurrent}>O uživateli</a>
+</li>
+
+<li>
+    <a href="{link Account:blockedUsers}"
+       {ifCurrent Account:blockedUsers}class="selected"{/ifCurrent}>Správa ignorovaných uživatelů</a>
+</li>
+
+<li>
+    <a href="{link Account:invitations}"
+    {ifCurrent Account:invitations}class="selected"{/ifCurrent}>Správa pozvánek</a>
+</li>
+
+<li>
+    <a href="{link Account:sendInvitation}"
+    {ifCurrent Account:sendInvitation}class="selected"{/ifCurrent}>Odeslat novou pozvánku</a>
+</li>
+</ul>
+</nav>
+
+{block account-content}
+{/block}
+
+{/block}

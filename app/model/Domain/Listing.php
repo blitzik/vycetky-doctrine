@@ -173,7 +173,7 @@ class Listing extends Entity
     /**
      * @return User
      */
-    public function getOwner()
+    public function getUser()
     {
         return $this->user;
     }

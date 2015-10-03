@@ -7,6 +7,8 @@ use Nette\Application\UI\Control,
 
     class VisualPaginator extends Control
     {
+        public $onPaginate = [];
+
 
         /** @var Paginator */
         private $paginator = NULL;
@@ -63,6 +65,17 @@ use Nette\Application\UI\Control,
 
             $this->template->setFile(dirname(__FILE__) . '/template.latte');
             $this->template->render();
+        }
+
+        public function handlePaginate()
+        {
+            if ($this->presenter->isAjax()) {
+                $this->redrawControl();
+            } else {
+                $this->redirect('this');
+            }
+
+            $this->onPaginate($this);
         }
 
         public function loadState(array $params)

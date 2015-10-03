@@ -3,9 +3,6 @@
 namespace App\Model\Services\Providers;
 
 use App\Model\Domain\Entities\WorkedHours;
-use blitzik\Arrays\Arrays;
-use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 
