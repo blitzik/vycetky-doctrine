@@ -15,13 +15,13 @@
         <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
         <td>
             <a href="{plink MailBox:message, 'id' => $message['id'],
-                                             'type' => App\Model\Domain\Entities\Message::SENT}"
+                                             'type' => App\Model\Domain\Entities\IMessage::SENT}"
                title="{$message['subject']}">
                 {$message['subject']|truncate:60}
             </a>
         </td>
         <td><a href="{plink MailBox:message, 'id' => $message['id'],
-                                             'type' => App\Model\Domain\Entities\Message::SENT}">Prohlédnout</a></td>
+                                             'type' => App\Model\Domain\Entities\IMessage::SENT}">Prohlédnout</a></td>
         <td><a href="{link deleteMessage!, 'id' => $message['id']}"
                class="ajax item">Odstranit</a></td>
     </tr>

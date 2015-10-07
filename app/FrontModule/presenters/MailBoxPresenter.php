@@ -9,10 +9,10 @@ use App\Model\Components\IMessageDetailControlFactory;
 use App\Model\Components\IMessagesTableControlFactory;
 use App\Model\Components\INewMessageControlFactory;
 use App\Model\MessagesHandlers\IMessagesHandler;
-use App\Model\Query\MessageReferencesQuery;
-use App\Model\Domain\Entities\Message;
+use Exceptions\Runtime\MessageTypeException;
+use App\Model\Domain\Entities\SentMessage;
+use App\Model\Domain\Entities\IMessage;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Query\MessagesQuery;
 
 class MailBoxPresenter extends SecurityPresenter
 {
@@ -64,7 +64,7 @@ class MailBoxPresenter extends SecurityPresenter
     private $messagesHandler;
 
     /**
-     * @var Message
+     * @var IMessage
      */
     private $message;
 
@@ -139,29 +139,14 @@ class MailBoxPresenter extends SecurityPresenter
     {
         $user = $this->user->getIdentity();
 
-        if ($type === Message::SENT) {
-            $this->message = $this->messagesFacade
-                                  ->fetchMessage(
-                                      (new MessagesQuery())
-                                      ->byId($id)
-                                      ->byAuthor($user)
-                                  );
-        } else if ($type === Message::RECEIVED) {
-            $reference = $this->messagesFacade
-                                  ->fetchMessageReference(
-                                      (new MessageReferencesQuery())
-                                      ->includingMessage()
-                                      ->includingMessageAuthor(['id', 'username'])
-                                      ->byMessage($id)
-                                      ->byRecipient($user)
-                                  );
-
-            $this->message = $reference === null ? null : $reference->getMessage();
-        } else {
+        try {
+            $this->message = $this->messagesFacade->readMessage($id, $type, $user);
+        } catch (MessageTypeException $e) {
             $this->redirect('MailBox:receivedUnread');
         }
 
-        if ($this->message === null) {
+        if ($this->message === null or
+            !$this->authorizator->isAllowed($user, $this->message, 'view')) {
             $this->flashMessage('Zpráva nebyla nalezena.', 'warning');
             $this->redirect('MailBox:receivedUnread');
         }

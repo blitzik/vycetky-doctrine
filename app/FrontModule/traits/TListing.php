@@ -34,7 +34,7 @@ trait TListing
     {
         $result = $this->listingsFacade->getListingByID($listingID, $withTime);
         if ($result->getListing() === null or
-            $result->getListing()->getUser()->getId() !== $this->user->getIdentity()->getId()) {
+            !$this->authorizator->isAllowed($this->user->getIdentity(), $result->getListing())) {
             $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
             $this->redirect('Listing:overview');
         }

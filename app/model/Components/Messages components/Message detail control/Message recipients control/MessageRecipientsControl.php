@@ -2,16 +2,16 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Query\MessageReferencesQuery;
+use App\Model\Query\ReceivedMessagesQuery;
 use Doctrine\ORM\AbstractQuery;
 use Nette\Application\UI\Control;
 
 class MessageRecipientsControl extends Control
 {
     /**
-     * @var Message
+     * @var SentMessage
      */
     private $message;
 
@@ -21,7 +21,7 @@ class MessageRecipientsControl extends Control
     private $messagesFacade;
 
     public function __construct(
-        Message $message,
+        SentMessage $message,
         MessagesFacade $messagesFacade
     ) {
         $this->message = $message;
@@ -33,12 +33,7 @@ class MessageRecipientsControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        $template->referenceMessagesRecipients = $this->messagesFacade
-            ->fetchMessagesReferences(
-                (new MessageReferencesQuery())
-                ->includingRecipient(['id', 'username'])
-                ->byMessage($this->message)
-            )->toArray(AbstractQuery::HYDRATE_ARRAY);
+        $template->recipients = $this->messagesFacade->findRecipients($this->message);
 
         $template->render();
     }

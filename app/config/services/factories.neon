@@ -129,15 +129,20 @@ services:
 
 	messageDetailControlFactory:
 		implement: App\Model\Components\IMessageDetailControlFactory
-		parameters: [App\Model\Domain\Entities\Message message]
+		parameters: [App\Model\Domain\Entities\IMessage message]
 		arguments: [%message%]
 
 	messageRecipientsControlFactory:
 		implement: App\Model\Components\IMessageRecipientsControlFactory
-		parameters: [App\Model\Domain\Entities\Message message]
+		parameters: [App\Model\Domain\Entities\SentMessage message]
 		arguments: [%message%]
 
 	newMessageControlFactory:
 		implement: App\Model\Components\INewMessageControlFactory
 		parameters: [App\Model\Domain\Entities\User user]
 		arguments: [%user%]
+
+	usersRelationshipsRestrictionsControlFactory:
+		implement: App\Model\Components\IUsersRelationshipsRestrictionsControlFactory
+		parameters: [array usersBlockedByMe, array usersBlockingMe, array suspendedUsers]
+		arguments: [%usersBlockedByMe%, %usersBlockingMe%, %suspendedUsers%]

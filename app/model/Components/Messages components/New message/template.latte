@@ -1,22 +1,26 @@
 
-hola
 
-{*}
 {form newMessageForm}
-<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
-    {$error}
-</div>
+<ul class="form-errors" n:if="$form->hasErrors()">
+    <li n:foreach="$form->errors as $error" class="form-error">
+        {$error}
+    </li>
+</ul>
 
 <table class="table t-message">
-    <tr><td colspan="2">{if $user->isInRole('administrator')}{input isSystemMessage}{/if}</td><th>{label receivers /}</th></tr>
-    <tr><th>{label subject /}</th><td>{input subject}</td><td rowspan="3">{input receivers}</td></tr>
-    <tr><th>{label message /}</th><td>{input message}</td></tr>
+    <tr><td colspan="2">{if $user->isAllowed('administrator-message', 'view-option')}{input isSendAsAdmin}{/if}</td><th>{label recipients /}</th></tr>
+    <tr><th>{label subject /}</th><td>{input subject}</td><td rowspan="3">{input recipients}</td></tr>
+    <tr><th>{label text /}</th><td>{input text}</td></tr>
     <tr><td></td><td>{input send}</td></tr>
 </table>
 {/form newMessageForm}
-{*}
 
-<div class="box box-classic box-text">
+<div class="restrictions-tables">
+{control relationshipsRestrictions}
+</div>
+
+<div class="box box-classic box-messages-capabilities"
+     n:if="!$user->isInRole('admin')">
 
     <h3>Možnosti zpráv</h3>
 

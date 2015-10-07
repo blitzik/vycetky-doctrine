@@ -4,6 +4,9 @@ services:
 
 	userAuthenticator: App\Model\Authentication\UserAuthenticator
 
+	authorizatorFactory: App\Model\Authorization\AuthorizatorFactory
+	authorizator: @authorizatorFactory::create
+
 	nette.latteFactory:
 		setup:
 			- addFilter(null, [Filters\FilterLoader(), 'loader'])
@@ -16,6 +19,7 @@ services:
 
 	# Service layers
 	localitiesService: App\Model\Services\LocalitiesService
+	usersService: App\Model\Services\UsersService
 	itemsService: App\Model\Services\ItemsService
 
 	#Profile

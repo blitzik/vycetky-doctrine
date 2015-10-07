@@ -5,7 +5,7 @@
 
 {define username}
 {if $message['isSystemMessage'] == true}
-    {$message['author']['role']}
+    {*$message['author']['role']*}Správce systému
 {else}
     {if isset($message['author'])}
         {$message['author']['username']}
@@ -29,14 +29,14 @@
 
         <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
         <td>
-            <a href="{plink MailBox:message, 'id' => $message['id'],
-                                             'type' => App\Model\Domain\Entities\Message::RECEIVED}"
+            <a href="{plink MailBox:message, 'id' => $messageReference['id'],
+                                             'type' => App\Model\Domain\Entities\IMessage::RECEIVED}"
                title="{$message['subject']}">
                 {$message['subject']|truncate:60}
             </a>
         </td>
-        <td><a href="{plink MailBox:message, 'id' => $message['id'],
-                                             'type' => App\Model\Domain\Entities\Message::RECEIVED}">Prohlédnout</a></td>
+        <td><a href="{plink MailBox:message, 'id' => $messageReference['id'],
+                                             'type' => App\Model\Domain\Entities\IMessage::RECEIVED}">Prohlédnout</a></td>
         <td><a href="{link deleteMessage!, 'id' => $messageReference['id']}"
                class="ajax item">Odstranit</a></td>
     </tr>

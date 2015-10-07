@@ -2,7 +2,9 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IUsersRelationshipsRestrictionsControlFactory;
 use App\Model\Components\IUsersOverviewControlFactory;
+use App\Model\Facades\UsersFacade;
 
 class UsersPresenter extends SecurityPresenter
 {
@@ -12,11 +14,17 @@ class UsersPresenter extends SecurityPresenter
      */
     public $usersOverviewFactory;
 
+    /**
+     * @var UsersFacade
+     * @inject
+     */
+    public $usersFacade;
+
 
     /*
-     * -------------------------
-     * ------ INVITATIONS ------
-     * -------------------------
+     * ----------------------------
+     * ------ USERS OVERVIEW ------
+     * ----------------------------
      */
 
     public function actionOverview()

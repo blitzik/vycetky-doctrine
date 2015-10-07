@@ -2,12 +2,14 @@
 
 namespace App\Model\Domain\Entities;
 
+use App\Model\Authorization\IRole;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
+use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 use DateTime;
@@ -18,11 +20,12 @@ use DateTime;
  *      name="user",
  *      options={"collate": "utf8_czech_ci"},
  *      indexes={
- *          @Index(name="role_username", columns={"role", "username"})
+ *          @Index(name="role_username", columns={"role", "username"}),
+ *          @Index(name="is_closed", columns={"is_closed"})
  *      }
  * )
  */
-class User extends Entity
+class User extends Entity implements IIdentity, IRole
 {
     use Identifier;
 
@@ -54,7 +57,7 @@ class User extends Entity
      * @ORM\Column(name="role", type="string", length=20, nullable=false, unique=false)
      * @var string
      */
-    protected $role;
+    private $role;
     
     /**
      * @ORM\Column(name="ip", type="string", length=39, nullable=false, unique=false)
@@ -96,9 +99,15 @@ class User extends Entity
     private $host;
 
     /**
+     * @ORM\Column(name="is_closed", type="boolean", nullable=false, unique=false, options={"default": false})
+     * @var bool
+     */
+    private $isClosed;
+
+    /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="usersBlockingMe", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(
-     *      name="blocked_users",
+     *      name="user_relationship_restriction",
      *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@JoinColumn(name="blocked_user_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
@@ -106,7 +115,7 @@ class User extends Entity
     private $usersBlockedByMe;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="usersBlockedByMe")
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="usersBlockedByMe", fetch="EXTRA_LAZY")
      */
     private $usersBlockingMe;
 
@@ -126,7 +135,7 @@ class User extends Entity
         $email,
         $ip,
         User $host,
-        $role = 'Zaměstnanec',
+        $role = 'employee',
         $name = null
     ) {
         $this->setUsername($username);
@@ -142,6 +151,7 @@ class User extends Entity
         $this->usersBlockingMe = new ArrayCollection;
 
         $this->host = $host;
+        $this->isClosed = false;
     }
 
     public function getAllMessages()
@@ -255,6 +265,19 @@ class User extends Entity
         $this->tokenValidity = null;
     }
 
+    public function toggleAccessibility()
+    {
+        $this->isClosed = $this->isClosed == true ? false : true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUserAccountAccessible()
+    {
+        return $this->isClosed == false;
+    }
+
     /**
      * @return string
      */
@@ -279,6 +302,19 @@ class User extends Entity
         return $this->host;
     }
 
+    /**
+     * @return array
+     */
+    public function getRoles()
+    {
+        return [$this->role];
+    }
+
+    public function isInRole($role)
+    {
+        return $this->role === $role;
+    }
+
     public function blockUser(User $user)
     {
         if (!$this->usersBlockedByMe->contains($user)) {
@@ -296,14 +332,26 @@ class User extends Entity
     /**
      * @return array
      */
-    public function getAllUsersBlockedByMe()
+    public function getUsersBlockedByMe()
     {
         return $this->usersBlockedByMe->toArray();
     }
 
-    public function getAllUsersBlockingMe()
+    public function getUsersBlockingMe()
     {
         return $this->usersBlockingMe->toArray();
     }
+
+    /* ************************** */
+
+    /**
+     * Returns a string identifier of the Role.
+     * @return string
+     */
+    function getRoleId()
+    {
+        return $this->role;
+    }
+
 
 }

@@ -2,13 +2,13 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\IMessage;
 
 interface IMessageDetailControlFactory
 {
     /**
-     * @param Message $message
+     * @param IMessage $message
      * @return MessageDetailControl
      */
-    public function create(Message $message);
+    public function create(IMessage $message);
 }

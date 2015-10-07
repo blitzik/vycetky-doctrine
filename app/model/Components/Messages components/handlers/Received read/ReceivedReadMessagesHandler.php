@@ -2,15 +2,15 @@
 
 namespace App\Model\MessagesHandlers;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Query\MessageReferencesQuery;
+use App\Model\Query\ReceivedMessagesQuery;
 
 class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHandler
 {
     /**
-     * @var MessageReferencesQuery
+     * @var ReceivedMessagesQuery
      */
     private $query;
 
@@ -20,10 +20,11 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
     ) {
         parent::__construct($user, $messagesFacade);
 
-        $this->query = new MessageReferencesQuery();
+        $this->query = new ReceivedMessagesQuery();
         $this->query->findReadMessages()
                     ->includingMessageAuthor(['id', 'username', 'role'])
-                    ->byRecipient($user);
+                    ->byRecipient($user)
+                    ->onlyActive();
     }
 
     /**
@@ -31,7 +32,7 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
      */
     public function getMessagesType()
     {
-        return Message::RECEIVED;
+        return SentMessage::RECEIVED;
     }
 
     /**
@@ -48,7 +49,7 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
      */
     public function removeMessage($messageID)
     {
-
+        $this->messagesFacade->removeMessagesReferences([$messageID]);
     }
 
     /**
@@ -57,6 +58,6 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
      */
     public function removeMessages(array $messagesIDs)
     {
-
+        $this->messagesFacade->removeMessagesReferences($messagesIDs);
     }
 }

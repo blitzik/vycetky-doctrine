@@ -2,6 +2,7 @@
 
 namespace App\Model\Domain\Entities;
 
+use App\Model\Authorization\IResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -12,21 +13,16 @@ use Nette\Utils\Validators;
 /**
  * @ORM\Entity
  * @ORM\Table(
- *      name="message",
+ *      name="sent_message",
  *      options={"collate": "utf8_czech_ci"},
  *      indexes={
  *          @Index(name="author_deleted", columns={"author", "deleted"})
  *      }
  * )
  */
-class Message extends Entity
+class SentMessage extends Entity implements IMessage, IResource
 {
     use Identifier;
-
-    const SENT     = 'sent';
-    const RECEIVED = 'received';
-    const READ     = 'read';
-    const UNREAD   = 'unread';
 
     /**
      * @ORM\Column(name="sent", type="datetime", nullable=false, unique=false)
@@ -131,7 +127,7 @@ class Message extends Entity
     }
 
     /**
-     * @return mixed
+     * @return User
      */
     public function getAuthor()
     {
@@ -150,5 +146,42 @@ class Message extends Entity
     {
         return $this->isSystemMessage;
     }
+
+    /* ************************* */
+
+    public function getMessage()
+    {
+        return $this;
+    }
+
+    public function isSentMessage()
+    {
+        return true;
+    }
+
+    public function isReceivedMessage()
+    {
+        return false;
+    }
+
+    /**
+     * Returns Resource's owner ID
+     *
+     * @return int
+     */
+    public function getOwnerId()
+    {
+        return $this->author->getId();
+    }
+
+    /**
+     * Returns a string identifier of the Resource.
+     * @return string
+     */
+    function getResourceId()
+    {
+        return 'message';
+    }
+
 
 }

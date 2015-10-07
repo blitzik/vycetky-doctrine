@@ -2,15 +2,15 @@
 
 namespace App\Model\MessagesHandlers;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\MessagesFacade;
-use App\Model\Query\MessagesQuery;
+use App\Model\Query\SentMessagesQuery;
 
 class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
 {
     /**
-     * @var MessagesQuery
+     * @var SentMessagesQuery
      */
     private $query;
 
@@ -20,8 +20,10 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
     ) {
         parent::__construct($user, $messagesFacade);
 
-        $this->query = new MessagesQuery();
-        $this->query->byAuthor($user);
+        $this->query = new SentMessagesQuery();
+        $this->query
+             ->byAuthor($user)
+             ->onlyActive();
     }
 
     /**
@@ -29,7 +31,7 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
      */
     public function getMessagesType()
     {
-        return Message::SENT;
+        return SentMessage::SENT;
     }
 
     /**
@@ -47,7 +49,7 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
      */
     public function removeMessage($messageID)
     {
-
+        $this->messagesFacade->removeMessages([$messageID]);
     }
 
     /**
@@ -56,6 +58,6 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
      */
     public function removeMessages(array $messagesIDs)
     {
-
+        $this->messagesFacade->removeMessages($messagesIDs);
     }
 }

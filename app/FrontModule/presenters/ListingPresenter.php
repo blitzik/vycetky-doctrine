@@ -132,7 +132,7 @@ class ListingPresenter extends SecurityPresenter
     public function renderOverview($month, $year)
     {
         /*$this->numberOfMessages = $this->messageFacade
-             ->getNumberOfReceivedMessages(Entities\Message::UNREAD);*/
+             ->getNumberOfReceivedMessages(Entities\SentMessage::UNREAD);*/
 
         //$this->template->numberOfMessages = $this->numberOfMessages;
     }

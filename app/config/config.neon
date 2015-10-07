@@ -47,3 +47,8 @@ includes:
 	- services/writers.neon
 	- services/managers.neon
 	- services/facades.neon
+
+decorator:
+	App\FrontModule\Presenters\SecurityPresenter:
+		setup:
+			- setAuthorizator(@authorizator)

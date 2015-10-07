@@ -2,6 +2,7 @@
 
 namespace App\Model\Domain\Entities;
 
+use App\Model\Authorization\IResource;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
@@ -19,7 +20,7 @@ use DateTime;
  *      }
  * )
  */
-class Listing extends Entity
+class Listing extends Entity implements IResource
 {
     use Identifier;
 
@@ -201,5 +202,28 @@ class Listing extends Entity
     {
         return $this->numberOfDaysInListingMonth;
     }
+
+    /* ************************** */
+
+
+    /**
+     * Returns a string identifier of the Resource.
+     * @return string
+     */
+    function getResourceId()
+    {
+        return 'entity';
+    }
+
+    /**
+     * Returns Resource's owner ID
+     *
+     * @return int
+     */
+    public function getOwnerId()
+    {
+        return $this->user->getId();
+    }
+
 
 }

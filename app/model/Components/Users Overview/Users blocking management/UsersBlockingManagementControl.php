@@ -9,20 +9,22 @@ use Components\IPaginatorFactory;
 class UsersBlockingManagementControl extends UsersOverviewControl
 {
     public function __construct(
-        User $user,
+        User $userEntity,
         UsersFacade $usersFacade,
+        IPaginatorFactory $paginatorFactory,
         IUserBlockingControlFactory $userBlockingControlFactory,
-        IPaginatorFactory $paginatorFactory
+        IUsersRelationshipsRestrictionsControlFactory $relationshipsRestrictionsControlFactory
     ) {
         parent::__construct(
-            $user,
+            $userEntity,
             $usersFacade,
+            $paginatorFactory,
             $userBlockingControlFactory,
-            $paginatorFactory
+            $relationshipsRestrictionsControlFactory
         );
 
         // slightly modified query
-        $this->usersQuery->findUsersBlockedBy($user);
+        $this->usersQuery->findUsersBlockedBy($userEntity);
     }
 
     public function onUnblockUser(UserBlockingControl $control, User $user = null)

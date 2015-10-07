@@ -2,6 +2,7 @@
 
 namespace App\UserModule\Presenters;
 
+use Exceptions\Runtime\InaccessibleAccountException;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
 
@@ -64,7 +65,13 @@ class LoginPresenter extends Presenter
 
         } catch (\Nette\Security\AuthenticationException $e) {
             $form->addError($e->getMessage());
-            return;
+        } catch (InaccessibleAccountException $a) {
+            $this->flashMessage(
+                'Váš účet byl uzavřen.
+                 Pro více informací kontaktujte správce aplikace na adrese:
+                 vycetkovy-system@alestichava.cz', 'warning'
+            );
+            $this->redirect('this');
         }
     }
 

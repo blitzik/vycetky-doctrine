@@ -101,6 +101,23 @@ class AccountPresenter extends SecurityPresenter
         $this->redirect('this');
     }
 
+
+    /*
+     * --------------------
+     * ------ BACKUP ------
+     * --------------------
+     */
+
+    public function actionDatabaseBackup()
+    {
+
+    }
+
+    public function renderDatabaseBackup()
+    {
+
+    }
+
     /**
      * todo - prijde do administrace pozdeji
      * @Actions detail
@@ -172,6 +189,9 @@ class AccountPresenter extends SecurityPresenter
     {
         $comp = $this->usersBlockingManagementFactory
                      ->create($this->user->getIdentity());
+
+        $comp->hideRelationshipsRestrictions();
+        $comp->hideHintBox();
 
         return $comp;
     }

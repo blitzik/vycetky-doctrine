@@ -3,7 +3,7 @@
 {include 'navigation.latte'}
 
 {define messageType}
-    {if $message->author->getId() == $user->getIdentity()->getId()}
+    {if $message->getMessage()->author->getId() == $user->getIdentity()->getId()}
         Odeslaná
     {else}
         Přijatá

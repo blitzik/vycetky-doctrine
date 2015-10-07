@@ -2,8 +2,8 @@
 
 namespace App\Model\Query;
 
-use App\Model\Domain\Entities\Message;
-use App\Model\Domain\Entities\MessageReference;
+use App\Model\Domain\Entities\SentMessage;
+use App\Model\Domain\Entities\ReceivedMessage;
 use App\Model\Domain\Entities\User;
 use Exceptions\Logic\InvalidArgumentException;
 use Kdyby\Doctrine\QueryBuilder;
@@ -11,7 +11,7 @@ use Kdyby\Doctrine\QueryObject;
 use Kdyby;
 use Nette\Utils\Validators;
 
-class MessageReferencesQuery extends QueryObject
+class ReceivedMessagesQuery extends QueryObject
 {
     /**
      * @var array|\Closure[]
@@ -27,12 +27,17 @@ class MessageReferencesQuery extends QueryObject
     /* INTERNAL properties */
 
     /**
+     * @var QueryBuilder
+     */
+    private $queryBuilder;
+
+    /**
      * @var User
      */
     private $recipient;
 
     /**
-     * @var Message
+     * @var ReceivedMessage
      */
     private $message;
 
@@ -80,7 +85,7 @@ class MessageReferencesQuery extends QueryObject
     public function includingRecipient(array $fields = null)
     {
         $this->select[] = function (QueryBuilder $qb) use ($fields) {
-            $qb->innerJoin('mr.recipient', 'r');
+            $qb->innerJoin('rm.recipient', 'r');
 
             if (isset($fields) and !empty($fields)) {
                 $parts = implode(',', $fields);
@@ -100,7 +105,7 @@ class MessageReferencesQuery extends QueryObject
         $this->filter[] = function(QueryBuilder $qb) {
             $this->joinMessage($qb);
             $qb->addSelect('m');
-            $qb->andWhere('mr.read = 1');
+            $qb->andWhere('rm.read = 1');
         };
 
         return $this;
@@ -113,7 +118,7 @@ class MessageReferencesQuery extends QueryObject
         $this->filter[] = function(QueryBuilder $qb) {
             $this->joinMessage($qb);
             $qb->addSelect('m');
-            $qb->andWhere('mr.read = 0');
+            $qb->andWhere('rm.read = 0');
         };
 
         return $this;
@@ -121,10 +126,8 @@ class MessageReferencesQuery extends QueryObject
 
     public function byRecipient(User $recipient)
     {
-        $this->recipient = $recipient;
-
         $this->filter[] = function(QueryBuilder $qb) use ($recipient) {
-            $qb->andWhere('mr.recipient = :recipient')
+            $qb->andWhere('rm.recipient = :recipient')
                ->setParameter('recipient', $recipient);
         };
 
@@ -132,24 +135,33 @@ class MessageReferencesQuery extends QueryObject
     }
 
     /**
-     * @param Message|int $message
+     * @param SentMessage|int $message
      * @return $this
      */
     public function byMessage($message)
     {
         if (!Validators::is($message, 'numericint') and
-            !($message instanceof Message)) {
+            !($message instanceof SentMessage)) {
             throw new InvalidArgumentException(
                 'Argument $message must be integer number or
-                 instance of ' . Message::class
+                 instance of ' . SentMessage::class
             );
         }
 
         $this->message = $message;
 
         $this->filter[] = function (QueryBuilder $qb) use ($message) {
-            $qb->andWhere('mr.message = :message')
+            $qb->andWhere('rm.message = :message')
                ->setParameter('message', $message);
+        };
+
+        return $this;
+    }
+
+    public function onlyActive()
+    {
+        $this->filter[] = function (QueryBuilder $qb) {
+            $qb->andWhere('rm.deleted = 0');
         };
 
         return $this;
@@ -160,7 +172,7 @@ class MessageReferencesQuery extends QueryObject
         if (!isset($this->isMessageJoined) or $this->isMessageJoined === false) {
             $this->isMessageJoined = true;
 
-            $qb->innerJoin('mr.message', 'm');
+            $qb->innerJoin('rm.message', 'm');
         }
     }
 
@@ -170,29 +182,11 @@ class MessageReferencesQuery extends QueryObject
      */
     protected function doCreateCountQuery(Kdyby\Persistence\Queryable $repository)
     {
-        $qb = new QueryBuilder($repository->getEntityManager());
-        $qb->select('COUNT(mr.id) as total_count')
-           ->from(MessageReference::class, 'mr');
+        $this->queryBuilder
+             ->resetDQLParts(['select', 'orderBy', 'join'])
+             ->select('COUNT(rm.id) as total_count');
 
-        if (isset($this->recipient)) {
-            $qb->where('mr.recipient = :recipient')
-               ->setParameter('recipient', $this->recipient);
-        }
-
-        if (isset($this->message)) {
-            $qb->where('mr.message = :message')
-               ->setParameter('message', $this->message);
-        }
-
-        if ($this->isLookingForRead === true) {
-            $qb->andWhere('mr.read = 1');
-        }
-
-        if ($this->isLookingForRead === false) {
-            $qb->andWhere('mr.read = 0');
-        }
-
-        return $qb;
+        return $this->queryBuilder;
     }
 
     /**
@@ -216,15 +210,16 @@ class MessageReferencesQuery extends QueryObject
      */
     private function createBasicDql(Kdyby\Persistence\Queryable $repository)
     {
-        $qb = (new QueryBuilder($repository->getEntityManager()))
-              ->select('mr')
-              ->from(MessageReference::class, 'mr');
+        $this->queryBuilder = (new QueryBuilder($repository->getEntityManager()))
+              ->select('rm')
+              ->from(ReceivedMessage::class, 'rm')
+              ->orderBy('rm.id', 'DESC');
 
         foreach ($this->filter as $modifier) {
-            $modifier($qb);
+            $modifier($this->queryBuilder);
         }
 
-        return $qb;
+        return $this->queryBuilder;
     }
 
 }

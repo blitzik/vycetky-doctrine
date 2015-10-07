@@ -2,16 +2,15 @@
 
 namespace App\Model\MessagesHandlers;
 
-use App\Model\Query\MessageReferencesQuery;
-use App\Model\Domain\Entities\Message;
+use App\Model\Query\ReceivedMessagesQuery;
+use App\Model\Domain\Entities\SentMessage;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Domain\Entities\User;
-use Doctrine\ORM\AbstractQuery;
 
 class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessagesHandler
 {
     /**
-     * @var MessageReferencesQuery
+     * @var ReceivedMessagesQuery
      */
     private $query;
 
@@ -21,10 +20,11 @@ class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessages
     ) {
         parent::__construct($user, $messagesFacade);
 
-        $this->query = new MessageReferencesQuery();
-        $this->query->findUnreadMessages()
-                    ->includingMessageAuthor(['id', 'username', 'role'])
-                    ->byRecipient($user);
+        $this->query = new ReceivedMessagesQuery();
+        $this->query->byRecipient($user)
+                    ->onlyActive()
+                    ->findUnreadMessages()
+                    ->includingMessageAuthor(['id', 'username', 'role']);
     }
 
     /**
@@ -32,7 +32,7 @@ class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessages
      */
     public function getMessagesType()
     {
-        return Message::RECEIVED;
+        return SentMessage::RECEIVED;
     }
 
     /**
@@ -49,7 +49,7 @@ class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessages
      */
     public function removeMessage($messageID)
     {
-
+        $this->messagesFacade->removeMessagesReferences([$messageID]);
     }
 
     /**
@@ -58,6 +58,6 @@ class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessages
      */
     public function removeMessages(array $messagesIDs)
     {
-
+        $this->messagesFacade->removeMessagesReferences($messagesIDs);
     }
 }

@@ -3,17 +3,12 @@
 namespace App\Model\Services\Writers;
 
 use App\Model\Domain\Entities\Listing;
-use App\Model\Domain\Entities\Locality;
-use App\Model\Domain\Entities\WorkedHours;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\ListingItemNotFoundException;
 use App\Model\Services\Readers\ListingItemsReader;
 use Exceptions\Logic\InvalidArgumentException;
-use Exceptions\Runtime\NegativeResultOfTimeCalcException;
-use Exceptions\Runtime\OtherHoursZeroTimeException;
-use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\Entities\ListingItem;
@@ -93,6 +88,7 @@ class ListingItemsWriter extends Object
         $direction
     ) {
         $day = $listingItem->day;
+        $item = null;
         try {
             if ($direction === self::WRITE_UP) {
                 $day += self::WRITE_UP;

@@ -1,0 +1,24 @@
+
+<div n:snippet="accountRestriction" class="left">
+
+    {if array_key_exists($userBeingBlockedID, $usersWithClosedAccountIDs)}
+    <a href="{link openAccount!, $userBeingBlockedID}"
+       n:if="$user->isAllowed('user', 'close')" class="ajax btn-primary">Open Accout</a>
+    {else}
+    <a href="{link closeAccount!, $userBeingBlockedID}"
+           n:if="$user->isAllowed('user', 'close')" class="ajax btn-violet">Close Accout</a>
+    {/if}
+
+</div>
+
+<div n:snippet="userRestriction" class="left">
+
+    {if array_key_exists($userBeingBlockedID, $blockedUsersIDs)}
+    <a href="{link unblockUser!, id => $userBeingBlockedID}"
+       class="ajax btn-green">Zrušit blokaci uživatele</a>
+    {else}
+    <a href="{link blockUser!, id => $userBeingBlockedID}"
+       class="ajax btn-red">Blokovat uživatele</a>
+    {/if}
+
+</div>

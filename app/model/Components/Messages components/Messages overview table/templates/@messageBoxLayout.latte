@@ -1,7 +1,9 @@
 <div class="box box-messages">
 
 {snippet all}
+
 <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+
 {if $messages}
 
 {form messagesActions}
@@ -22,15 +24,16 @@
 </tr>
 </thead>
 
-{block messagesList}{/block}
-
+{block messagesList messages => $messages}{/block}
 </table>
 {/form messagesActions}
 
 <script>
-$(function (){
-    checkAllFunc();
-});
+(function (global, $) {
+    $(function (){
+        checkAllFunc();
+    });
+})(window, window.jQuery)
 </script>
 
 {else}

@@ -11,7 +11,6 @@ namespace Exceptions\Runtime;
          * Class NotPersistedEntityInstanceException
          * @package Exceptions\Runtime
          */
-        class NotPersistedEntityInstanceException extends RuntimeException {}
 
         class InvalidMemberTypeException extends RuntimeException {}
 
@@ -41,6 +40,10 @@ namespace Exceptions\Runtime;
         class InvalidUserInvitationEmailException extends RuntimeException {}
 
         class InvitationCreationAttemptException extends RuntimeException{}
+
+        class RestrictedUserException extends RuntimeException {}
+
+        class InaccessibleAccountException extends RuntimeException {}
 
 
         class InvalidStateException extends RuntimeException {}
@@ -82,6 +85,8 @@ namespace Exceptions\Runtime;
         class MessageLengthException extends RuntimeException {}
 
         class MessageNotFoundException extends RuntimeException {}
+
+        class MessageTypeException extends RuntimeException {}
 
         // WorkedHours
         class OtherHoursZeroTimeException extends RuntimeException {}

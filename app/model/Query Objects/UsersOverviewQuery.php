@@ -49,6 +49,15 @@ class UsersOverviewQuery extends QueryObject
         return $this;
     }
 
+    public function findUsersWithClosedAccount()
+    {
+        $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) {
+            $qb->andWhere('u.isClosed = 1');
+        };
+
+        return $this;
+    }
+
     public function withoutUser(User $user)
     {
         $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($user){
@@ -69,6 +78,24 @@ class UsersOverviewQuery extends QueryObject
         return $this;
     }
 
+    public function onlyActiveUsers()
+    {
+        $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) {
+            $qb->andWhere('u.isClosed = 0');
+        };
+
+        return $this;
+    }
+
+    public function orderByUsername($order = 'ASC')
+    {
+        $this->filter[] = function (Kdyby\Doctrine\QueryBuilder $qb) use ($order) {
+            $qb->orderBy('u.username', $order);
+        };
+
+        return $this;
+    }
+
     /**
      * @param Kdyby\Persistence\Queryable $repository
      * @return \Doctrine\ORM\Query|\Doctrine\ORM\QueryBuilder
@@ -81,7 +108,7 @@ class UsersOverviewQuery extends QueryObject
             $qb = $this->createBasicDql($repository);
         }
 
-        $qb->resetDQLPart('select');
+        $qb->resetDQLParts(['select', 'orderBy']);
         $qb->select('COUNT(u.id) as total_count');
 
         return $qb;

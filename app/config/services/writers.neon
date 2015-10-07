@@ -11,3 +11,6 @@ services:
 
 	listingItemsWriter:
 		class: App\Model\Services\Writers\ListingItemsWriter
+
+	messagesWriter:
+		class: App\Model\Services\Writers\MessagesWriter

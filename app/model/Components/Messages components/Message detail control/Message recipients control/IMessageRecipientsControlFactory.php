@@ -2,13 +2,13 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 
 interface IMessageRecipientsControlFactory
 {
     /**
-     * @param Message $message
+     * @param SentMessage $message
      * @return MessageRecipientsControl
      */
-    public function create(Message $message);
+    public function create(SentMessage $message);
 }

@@ -7,6 +7,7 @@ use App\Model\Domain\Entities\User;
 use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Users\UserSystemCreator;
+use App\Model\Services\UsersService;
 use App\Model\Services\Writers\UsersWriter;
 use Exceptions\Runtime\DuplicateEmailException;
 use Exceptions\Runtime\DuplicateUsernameException;
@@ -16,6 +17,7 @@ use Exceptions\Runtime\InvitationNotFoundException;
 use Exceptions\Runtime\UserNotFoundException;
 use Kdyby\Persistence\Query;
 use Nette\Object;
+use Nette\Utils\Arrays;
 
 class UsersFacade extends Object
 {
@@ -30,6 +32,11 @@ class UsersFacade extends Object
     private $usersWriter;
 
     /**
+     * @var UsersService
+     */
+    private $usersService;
+
+    /**
      * @var InvitationsReader
      */
     private $invitationsReader;
@@ -42,11 +49,13 @@ class UsersFacade extends Object
     public function __construct(
         UsersReader $usersReader,
         UsersWriter $usersWriter,
+        UsersService $usersService,
         InvitationsReader $invitationsReader,
         UserSystemCreator $userSystemCreator
     ) {
         $this->usersReader = $usersReader;
         $this->usersWriter = $usersWriter;
+        $this->usersService = $usersService;
         $this->invitationsReader = $invitationsReader;
         $this->userSystemCreator = $userSystemCreator;
     }
@@ -85,6 +94,59 @@ class UsersFacade extends Object
     public function getUserByEmail($email)
     {
         return $this->usersReader->getUserByEmail($email);
+    }
+
+    /**
+     * @param bool $onlyActiveUsers
+     * @param array|null $except
+     * @return array
+     */
+    public function findAllUsers($onlyActiveUsers = false, array $except = null)
+    {
+        $users = Arrays::associate($this->usersReader->findAllUsers($onlyActiveUsers), 'id');
+
+        $users = (isset($except) ? array_diff_key($users, $except) : $users);
+
+        return $this->usersService->separateSuspendedUsers($users);
+    }
+
+    /**
+     * @return array
+     */
+    public function findSuspendedUsers()
+    {
+        return Arrays::associate($this->usersReader->findSuspendedUsers(), 'id');
+    }
+
+    /**
+     * @param array $usersIDs
+     * @return array
+     */
+    public function findUsers(array $usersIDs)
+    {
+        return $this->usersReader->findUsersByIDs($usersIDs);
+    }
+
+    /**
+     * Finds users that are blocked by or blocking given user
+     *
+     * @param User $user
+     * @return array
+     * @throws UserNotFoundException
+     */
+    public function findRestrictedUsers(User $user)
+    {
+        $result = $this->usersReader->getUserWithRestrictedRelationships($user);
+        if (empty($result)) {
+            return $result;
+        }
+
+        $resultArray = [
+            'usersBlockedByMe' => Arrays::associate($result[0]['usersBlockedByMe'], 'id'),
+            'usersBlockingMe'  => Arrays::associate($result[0]['usersBlockingMe'], 'id')
+        ];
+
+        return /*$this->usersService->mergeUsersBlockingEachOther(*/$resultArray/*)*/;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Model\Domain\Entities;
 
+use App\Model\Authorization\IResource;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Exceptions\Logic\InvalidArgumentException;
@@ -20,7 +21,7 @@ use Nette\Utils\Validators;
  *      }
  * )
  */
-class ListingItem extends Entity
+class ListingItem extends Entity implements IResource
 {
     use Identifier;
 
@@ -204,5 +205,26 @@ class ListingItem extends Entity
         return $this->workedHours;
     }
 
+    /* ************************** */
+
+
+    /**
+     * Returns a string identifier of the Resource.
+     * @return string
+     */
+    function getResourceId()
+    {
+        return 'entity';
+    }
+
+    /**
+     * Returns Resource's owner ID
+     *
+     * @return int
+     */
+    public function getOwnerId()
+    {
+        return $this->listing->getUser()->getId();
+    }
 
 }

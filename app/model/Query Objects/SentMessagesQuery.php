@@ -2,13 +2,13 @@
 
 namespace App\Model\Query;
 
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\User;
 use Kdyby\Doctrine\QueryBuilder;
 use Kdyby\Doctrine\QueryObject;
 use Kdyby;
 
-class MessagesQuery extends QueryObject
+class SentMessagesQuery extends QueryObject
 {
     /**
      * @var array|\Closure[]
@@ -30,7 +30,7 @@ class MessagesQuery extends QueryObject
     public function withAuthor(array $fields = null)
     {
         $this->select[] = function (QueryBuilder $qb) use ($fields) {
-            $qb->innerJoin('m.author', 'a');
+            $qb->innerJoin('sm.author', 'a');
 
             if (isset($fields) and !empty($fields)) {
                 $parts = implode(',', $fields);
@@ -46,7 +46,7 @@ class MessagesQuery extends QueryObject
     public function byId($id)
     {
         $this->filter[] = function(QueryBuilder $qb) use ($id) {
-            $qb->andWhere('m.id = :id')
+            $qb->andWhere('sm.id = :id')
                 ->setParameter('id', $id);
         };
 
@@ -56,7 +56,7 @@ class MessagesQuery extends QueryObject
     public function onlyActive()
     {
         $this->filter[] = function(QueryBuilder $qb) {
-            $qb->andWhere('m.deleted = 0');
+            $qb->andWhere('sm.deleted = 0');
         };
 
         return $this;
@@ -65,7 +65,7 @@ class MessagesQuery extends QueryObject
     public function byAuthor(User $author)
     {
         $this->filter[] = function(QueryBuilder $qb) use ($author) {
-            $qb->andWhere('m.author = :author')
+            $qb->andWhere('sm.author = :author')
                ->setParameter('author', $author);
         };
 
@@ -85,7 +85,7 @@ class MessagesQuery extends QueryObject
         }
 
         $qb->resetDQLPart('select');
-        $qb->select('COUNT(m.id) as total_count');
+        $qb->select('COUNT(sm.id) as total_count');
 
         return $qb;
     }
@@ -112,8 +112,9 @@ class MessagesQuery extends QueryObject
     private function createBasicDql(Kdyby\Persistence\Queryable $repository)
     {
         $this->queryBuilder = (new QueryBuilder($repository->getEntityManager()))
-                              ->select('m')
-                              ->from(Message::class, 'm');
+                              ->select('sm')
+                              ->from(SentMessage::class, 'sm')
+                              ->orderBy('sm.id', 'DESC');
 
         foreach ($this->filter as $modifier) {
             $modifier($this->queryBuilder);

@@ -3,12 +3,18 @@
 {if !empty($users)}
 
 {control paginator}
-<table class="table t-classic">
+<table class="table t-classic users-overview">
 <tr><th>Uživatelské jméno</th><th></th></tr>
-{foreach $users as $id => $username}
+{foreach $users as $id => $userData}
     <tr>
-        <td>{$username}</td>
-        <td>{control userBlocking-$id}</td>
+        <td>{$userData['username']}</td>
+        <td>
+            {if $userData['isClosed'] === false or $user->isAllowed('suspended-users', 'view')}
+                {control userBlocking-$id}
+            {else}
+                Uživatel byl vyloučen
+            {/if}
+        </td>
     </tr>
 {/foreach}
 </table>
@@ -17,3 +23,20 @@
     <p>Nebyli nalezeni žádní uživatelé.</p>
 {/if}
 {/snippet}
+
+<div class="box-hint right" n:if="$isHintBoxVisible">
+    <h3>Blokování uživatelů</h3>
+
+    <p>V systému může obvykle každý uživatel komunikovat
+       s každým uživatelem (zasílat zprávy, výčetky apod.).
+       </p>
+
+    <p>Pokud si <strong>nepřejete</strong>, aby Vám jiný uživatel zasílal zprávy,
+       výčetky či jakkoliv jinak Vás mohl kontaktovat, můžete
+       s takovým uživatelem přerušit komunikaci kliknutím na
+       příslušné tlačítko vedle jména daného uživatele.</p>
+</div>
+
+<div class="restrictions-tables" n:if="$isHintBoxVisible">
+    {control relationshipsRestrictions}
+</div>

@@ -5,6 +5,8 @@ namespace App\Model\Services\Readers;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\User;
+use Doctrine\ORM\NoResultException;
+use Exceptions\Runtime\UserNotFoundException;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Persistence\Query;
@@ -69,16 +71,21 @@ class UsersReader extends Object
 
     /**
      * @param int $id
+     * @param bool $loadPartial
      * @return User|null
      */
-    public function getUserByID($id)
+    public function getUserByID($id, $loadPartial = false)
     {
-        $query = $this->getBasicUserQuery()
+        $qb = $this->getBasicUserQuery()
                       ->where('u.id = :id')
-                      ->setParameter('id', $id)
-                      ->getQuery();
+                      ->setParameter('id', $id);
+                      //->getQuery();
 
-        return $query->getOneOrNullResult();
+        if ($loadPartial === true) {
+            $qb->select('partial u.{id, username, role}');
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -93,6 +100,75 @@ class UsersReader extends Object
                       ->getQuery();
 
         return $query->getOneOrNullResult();
+    }
+
+    /**
+     * @param bool $onlyActiveUsers
+     * @return array
+     */
+    public function findAllUsers($onlyActiveUsers = false)
+    {
+        $q = $this->em->createQueryBuilder();
+        $q->select('partial u.{id, username, isClosed}')
+          ->from(User::class, 'u');
+
+        if ($onlyActiveUsers === true) {
+            $q->where('u.isClosed = 0');
+        }
+
+        $q->orderBy('u.username', 'ASC');
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @return array
+     */
+    public function findSuspendedUsers()
+    {
+        return $this->em->createQuery(
+            'SELECT partial u.{id, username} FROM ' .User::class. ' u
+             WHERE u.isClosed = 1'
+        )->getArrayResult();
+    }
+
+    /**
+     * @param array $IDs
+     * @return array
+     */
+    public function findUsersByIDs(array $IDs)
+    {
+        $q = $this->em->createQuery(
+            'SELECT partial u.{id, username, isClosed} FROM ' .User::class. ' u
+             WHERE u.id IN (:IDs)'
+        )->setParameter('IDs', $IDs);
+
+        return $q->getResult();
+    }
+
+    /**
+     * @param User $user
+     * @return mixed
+     * @throws UserNotFoundException
+     */
+    public function getUserWithRestrictedRelationships(User $user)
+    {
+        $q = $this->em->createQuery(
+            'SELECT partial u.{id},
+                    partial bbm.{id, username, isClosed},
+                    partial bm.{id, username, isClosed}
+
+             FROM ' .User::class. ' u
+             LEFT JOIN u.usersBlockedByMe bbm
+             LEFT JOIN u.usersBlockingMe bm
+             WHERE u = :user'
+        )->setParameter('user', $user);
+
+        try {
+            return $q->getArrayResult();
+        } catch (NoResultException $e) {
+            throw new UserNotFoundException;
+        }
     }
 
     /**

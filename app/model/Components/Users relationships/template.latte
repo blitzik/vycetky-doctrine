@@ -1,0 +1,33 @@
+
+{define table}
+    {var $canBeSeen = $user->isAllowed('user-relationships-restrictions-tables-identifiers', 'view')}
+
+    <table class="table t-classic">
+        <tr><td{if $canBeSeen} colspan="2"{/if}>{$tableCaption}</td></tr>
+        <tr><th n:if="$canBeSeen">ID</th><th>Uživatelské jméno</th></tr>
+        {if count($users) > 0}
+        {foreach $users as $id => $user}
+            <tr>
+                <td n:if="$canBeSeen">{$id}</td>
+                <td>{$user['username']}</td>
+            </tr>
+        {/foreach}
+        {else}
+        <tr><td colspan="2">- žádní uživatelé -</td></tr>
+        {/if}
+    </table>
+{/define}
+
+{snippet relationshipsTables}
+{include #table, tableCaption => 'Mnou zablokovaní uživatelé',
+                 users => $usersBlockedByMe}
+
+{include #table, tableCaption => 'Uživatelé blokující mě',
+                 users => $usersBlockingMe}
+
+{include #table, tableCaption => 'Vzájemně se blokuji s',
+                 users => $usersBlockingEachOther}
+
+{include #table, tableCaption => 'Vyloučení uživatelé',
+                 users => $suspendedUsers}
+{/snippet}

@@ -3,6 +3,7 @@
 namespace App\Model\Authentication;
 
 use App\Model\Services\Readers\UsersReader;
+use Exceptions\Runtime\InaccessibleAccountException;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
 use Nette\Security\IIdentity;
@@ -40,6 +41,7 @@ class UserAuthenticator extends Object implements IAuthenticator
      * and returns IIdentity on success or throws AuthenticationException
      * @return IIdentity
      * @throws AuthenticationException
+     * @throws InaccessibleAccountException
      */
     public function authenticate(array $credentials)
     {
@@ -58,6 +60,10 @@ class UserAuthenticator extends Object implements IAuthenticator
         } elseif (Passwords::needsRehash($user->password)) {
 
             $user->password = Passwords::hash($password);
+        }
+
+        if (!$user->isUserAccountAccessible()) {
+            throw new InaccessibleAccountException; // user is banned
         }
 
         $this->onLoggedIn($user);

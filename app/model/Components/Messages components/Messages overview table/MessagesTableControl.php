@@ -12,8 +12,9 @@ use Nextras\Application\UI\SecuredLinksControlTrait;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Application\UI\Control;
 use Components\IPaginatorFactory;
-use App\Model\Domain\Entities\Message;
+use App\Model\Domain\Entities\SentMessage;
 use Nette\Application\UI\Form;
+use Tracy\Debugger;
 
 class MessagesTableControl extends Control
 {
@@ -51,6 +52,9 @@ class MessagesTableControl extends Control
     protected function createComponentPaginator()
     {
         $vp = $this->paginatorFactory->create();
+        $vp->onPaginate[] = function () {
+            $this->redrawControl();
+        };
 
         return $vp;
     }
@@ -63,7 +67,7 @@ class MessagesTableControl extends Control
         $this->resultSet = $this->messagesHandler->getResultSet();
 
         $paginator = $this['paginator']->getPaginator();
-        $this->resultSet->applyPaginator($paginator, 20);
+        $this->resultSet->applyPaginator($paginator, 10);
 
         $messages = $this->resultSet->toArray(AbstractQuery::HYDRATE_ARRAY);
 
@@ -77,11 +81,11 @@ class MessagesTableControl extends Control
     private function switchTemplateByMessagesType(ITemplate $template)
     {
         switch ($this->messagesHandler->getMessagesType()) {
-            case Message::RECEIVED:
+            case SentMessage::RECEIVED:
                 $template->setFile(__DIR__ . '/templates/receivedMessagesTable.latte');
                 break;
 
-            case Message::SENT:
+            case SentMessage::SENT:
                 $template->setFile(__DIR__ . '/templates/sentMessagesTable.latte');
                 break;
         }
@@ -96,6 +100,7 @@ class MessagesTableControl extends Control
 
         $form->addSubmit('delete', 'Odstranit označené')
                 ->setAttribute('class', 'ajax')
+                ->setHtmlId('mass-delete-submit-button')
                 ->onClick[] = $this->processDeleteMessages;
 
         $form['delete']->getControlPrototype()
@@ -113,11 +118,11 @@ class MessagesTableControl extends Control
         if (!empty($messagesIDs)) {
             try {
                 $this->messagesHandler->removeMessages($messagesIDs);
-                $this->flashMessage('Vybrané zprávy byli úspěšně smazány.', 'success');
+                $this->flashMessage('Vybrané zprávy byli úspěšně odstraněny.', 'success');
 
             } catch (DBALException $e) {
                 $this->flashMessage(
-                    'Při pokusu o hromadné smazání zpráv došlo k chybě.
+                    'Při pokusu o hromadné odstranění zpráv došlo k chybě.
                      Zkuste akci opakovat později.',
                     'error'
                 );
@@ -125,7 +130,6 @@ class MessagesTableControl extends Control
 
             if ($this->presenter->isAjax()) {
                 $this->redrawControl();
-
             } else {
                 $this->redirect('this');
             }
@@ -137,14 +141,16 @@ class MessagesTableControl extends Control
      */
     public function handleDeleteMessage($id)
     {
-        $this->messagesHandler->removeMessage($id);
+        try {
+            $this->messagesHandler->removeMessage($id);
+            $this->flashMessage('Zpráva byla úspěšně odstraněna.', 'success');
+        } catch (DBALException $e) {
+            $this->flashMessage('Zprávu se nepodařilo odstranit.', 'error');
+        }
 
         if ($this->presenter->isAjax()) {
             $this->redrawControl();
-
         } else {
-
-            $this->flashMessage('Zpráva byla úspěšně smazána.', 'success');
             $this->redirect('this');
         }
     }
