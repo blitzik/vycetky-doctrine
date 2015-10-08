@@ -16,28 +16,23 @@
 {/define}
 
 {block messagesList}
-    {foreach $messages as $messageReference}
-    {var $message = $messageReference['message']}
+    {foreach $messages as $receivedMessage}
+    {var $message = $receivedMessage['message']}
     <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
-        <td>
-            <input type="checkbox" name="msg[]"
-                   value="{$messageReference['id']}"
-                   class="itemToCheck">
-        </td>
 
         <td>{include #username}</td>
 
         <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
         <td>
-            <a href="{plink MailBox:message, 'id' => $messageReference['id'],
+            <a href="{plink MailBox:message, 'id' => $receivedMessage['id'],
                                              'type' => App\Model\Domain\Entities\IMessage::RECEIVED}"
                title="{$message['subject']}">
                 {$message['subject']|truncate:60}
             </a>
         </td>
-        <td><a href="{plink MailBox:message, 'id' => $messageReference['id'],
+        <td><a href="{plink MailBox:message, 'id' => $receivedMessage['id'],
                                              'type' => App\Model\Domain\Entities\IMessage::RECEIVED}">Prohlédnout</a></td>
-        <td><a href="{link deleteMessage!, 'id' => $messageReference['id']}"
+        <td><a href="{link deleteMessage!, 'id' => $receivedMessage['id']}"
                class="ajax item">Odstranit</a></td>
     </tr>
     {/foreach}

@@ -6,11 +6,6 @@
 {block messagesList}
     {foreach $messages as $message}
     <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
-        <td>
-            <input type="checkbox" name="msg[]"
-                   value="{$message['id']}"
-                   class="itemToCheck">
-        </td>
 
         <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
         <td>

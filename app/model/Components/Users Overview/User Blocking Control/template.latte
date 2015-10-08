@@ -3,10 +3,10 @@
 
     {if array_key_exists($userBeingBlockedID, $usersWithClosedAccountIDs)}
     <a href="{link openAccount!, $userBeingBlockedID}"
-       n:if="$user->isAllowed('user', 'close')" class="ajax btn-primary">Open Accout</a>
+       n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-primary">Open Accout</a>
     {else}
     <a href="{link closeAccount!, $userBeingBlockedID}"
-           n:if="$user->isAllowed('user', 'close')" class="ajax btn-violet">Close Accout</a>
+           n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-violet">Close Accout</a>
     {/if}
 
 </div>

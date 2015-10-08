@@ -35,6 +35,7 @@ class Authorizator extends Object implements IAuthorizator
     }
 
 
+
     private $front = ['Front:Account', 'Front:Listing', 'Front:Item',
                       'Front:MailBox', 'Front:Users', 'Front:Help'];
 
@@ -47,11 +48,8 @@ class Authorizator extends Object implements IAuthorizator
             $authorizator->addResource($presenter);
         }
 
-        $authorizator->addResource('user');
-        $authorizator->addResource('user-relationships-restrictions-tables-identifiers');
-        $authorizator->addResource('suspended-users');
-        $authorizator->addResource('new-message');
-        $authorizator->addResource('administrator-message');
+        $authorizator->addResource('relationships_tables');
+        $authorizator->addResource('users_overview');
     }
 
 

@@ -1,6 +1,6 @@
 
 {define table}
-    {var $canBeSeen = $user->isAllowed('user-relationships-restrictions-tables-identifiers', 'view')}
+    {var $canBeSeen = $user->isAllowed('relationships_tables', 'view_identifiers')}
 
     <table class="table t-classic">
         <tr><td{if $canBeSeen} colspan="2"{/if}>{$tableCaption}</td></tr>

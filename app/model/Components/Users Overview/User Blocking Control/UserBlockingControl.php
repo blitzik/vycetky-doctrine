@@ -126,7 +126,6 @@ class UserBlockingControl extends Control
      */
     public function handleCloseAccount($id)
     {
-        $this->checkPermission($id);
         $user = $this->toggleAccountAccessibility($id);
 
         $this->usersWithClosedAccountIDs[$user->getId()] = null;
@@ -140,7 +139,6 @@ class UserBlockingControl extends Control
      */
     public function handleOpenAccount($id)
     {
-        $this->checkPermission($id);
         $user = $this->toggleAccountAccessibility($id);
 
         $this->refresh('accountRestriction');
@@ -158,6 +156,7 @@ class UserBlockingControl extends Control
 
     private function toggleAccountAccessibility($id)
     {
+        $this->checkPermission($id);
         $user = $this->getUser($id);
         if ($user !== null) {
             $user->toggleAccessibility();
@@ -171,7 +170,7 @@ class UserBlockingControl extends Control
 
     private function checkPermission($userBeingProcessedID)
     {
-        if (!$this->presenter->user->isAllowed('user', 'change-access')) {
+        if (!$this->presenter->user->isAllowed('users_overview', 'suspend_user')) {
             Debugger::log(
                 'User: ' .$this->userEntity->username. ' tried to close Account
                  of user with ID = ' .$userBeingProcessedID);

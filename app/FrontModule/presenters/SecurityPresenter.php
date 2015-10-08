@@ -52,8 +52,7 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
 
     public function checkRequirements($element)
     {
-        if (!$this->authorizator->isAllowed($this->user->getIdentity(), $this->name, $this->action)
-            || ($this->signal !== NULL && !$this->authorizator->isAllowed($this->user->getIdentity(), $this->name, $this->formatSignalString()))) {
+        if (!$this->authorizator->isAllowed($this->user->getIdentity(), $this->name, $this->action)) {
             throw new Nette\Application\ForbiddenRequestException;
         }
 

@@ -9,7 +9,7 @@
     <tr>
         <td>{$userData['username']}</td>
         <td>
-            {if $userData['isClosed'] === false or $user->isAllowed('suspended-users', 'view')}
+            {if $userData['isClosed'] === false or $user->isAllowed('users_overview', 'suspend_user')}
                 {control userBlocking-$id}
             {else}
                 Uživatel byl vyloučen
