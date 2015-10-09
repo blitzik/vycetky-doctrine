@@ -1,5 +1,8 @@
 services:
 
+	recipientsSelectBoxFactory:
+		class: App\Forms\Fields\RecipientsSelectBoxFactory
+
 	listingFormFactory: App\Model\Components\ListingFormFactory
 
 	itemUpdateFormFactory:
@@ -52,13 +55,13 @@ services:
 
 	sharingListingControlFactory:
 		implement: App\Model\Components\ISharingListingControlFactory
-		parameters: [App\Model\Entities\Listing listing]
-		arguments: [%listing%]
+		parameters: [App\Model\ResultObjects\ListingResult listingResult]
+		arguments: [%listingResult%]
 
 	listingFormControlFactory:
 		implement: App\Model\Components\IListingFormControlFactory
-		parameters: [listing]
-		arguments: [%listing%]
+		parameters: [listing, App\Model\Domain\Entities\User owner]
+		arguments: [%listing%, %owner%]
 
 	listingDescriptionControlFactory:
 		implement: App\Model\Components\IListingDescriptionControlFactory
@@ -134,8 +137,8 @@ services:
 
 	messageRecipientsControlFactory:
 		implement: App\Model\Components\IMessageRecipientsControlFactory
-		parameters: [App\Model\Domain\Entities\SentMessage message]
-		arguments: [%message%]
+		parameters: [array recipients]
+		arguments: [%recipients%]
 
 	newMessageControlFactory:
 		implement: App\Model\Components\INewMessageControlFactory

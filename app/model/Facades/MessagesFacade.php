@@ -11,50 +11,41 @@ use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\Query\SentMessagesQuery;
 use App\Model\Services\Managers\MessagesManager;
 use App\Model\Services\Readers\MessagesReader;
+use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\MessagesWriter;
-use App\Model\Subscribers\Validation\NewMessageResultObject;
+use App\Model\Subscribers\Results\NewMessageResultObject;
 use Exceptions\Logic\InvalidArgumentException;
 use Exceptions\Runtime\MessageTypeException;
 use Nette\Object;
 
 class MessagesFacade extends Object
 {
-    /**
-     * @var MessagesManager
-     */
+    /** @var MessagesManager  */
     private $messagesManager;
 
-    /**
-     * @var MessagesReader
-     */
+    /** @var MessagesReader  */
     private $messagesReader;
 
-    /**
-     * @var MessagesWriter
-     */
+    /** @var MessagesWriter  */
     private $messagesWriter;
 
-    /**
-     * @var UsersFacade
-     */
-    private $usersFacade;
+    /** @var UsersReader  */
+    private $usersReader;
 
-    /**
-     * @var Authorizator
-     */
+    /** @var Authorizator  */
     private $authorizator;
 
     public function __construct(
         MessagesManager $messagesManager,
         MessagesReader $messagesReader,
         MessagesWriter $messagesWriter,
-        UsersFacade $usersFacade,
+        UsersReader $usersReader,
         Authorizator $authorizator
     ) {
         $this->messagesManager = $messagesManager;
         $this->messagesReader = $messagesReader;
         $this->messagesWriter = $messagesWriter;
-        $this->usersFacade = $usersFacade;
+        $this->usersReader = $usersReader;
         $this->authorizator = $authorizator;
     }
 
@@ -124,9 +115,9 @@ class MessagesFacade extends Object
      * @param SentMessage $message
      * @return array
      */
-    public function findRecipients(SentMessage $message)
+    public function findMessageRecipients(SentMessage $message)
     {
-        $mr = $this->messagesReader->findMessageReferences($message->getId());
+        $mr = $this->messagesReader->findReceivedMessages($message->getId());
         $recipients = [];
         foreach ($mr as $reference) {
             $recipients[$reference['recipient']['id']] = $reference['recipient'];
@@ -144,7 +135,7 @@ class MessagesFacade extends Object
      */
     public function sendMessage(SentMessage $message, array $recipientsIDs)
     {
-        $recipients = $this->usersFacade->findUsers($recipientsIDs);
+        $recipients = $this->usersReader->findUsersByIDs($recipientsIDs);
 
         $messageResult = new NewMessageResultObject($message);
         $references = $this->messagesWriter->sendMessage($message, $recipients);

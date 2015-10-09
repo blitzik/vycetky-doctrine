@@ -16,14 +16,10 @@ use Nette\Object;
 
 class ListingItemsManager extends Object
 {
-    /**
-     * @var WorkedHoursProvider
-     */
+    /** @var WorkedHoursProvider  */
     private $workedHoursProvider;
 
-    /**
-     * @var LocalityProvider
-     */
+    /** @var LocalityProvider  */
     private $localityProvider;
 
     public function __construct(

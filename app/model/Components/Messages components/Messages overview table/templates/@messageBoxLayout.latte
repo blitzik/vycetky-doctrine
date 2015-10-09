@@ -24,6 +24,16 @@
 {block messagesList messages => $messages}{/block}
 </table>
 
+{define class}
+    {if $message['isSystemMessage'] === true}
+    class="m-system-message"
+    {elseif $message['sentByAuthorRole'] === true}
+    class="m-{$message['author']['role']}"
+    {elseif $isOdd}
+    class="m-odd"
+    {/if}
+{/define}
+
 <script>
 (function (global, $) {
     $(function (){

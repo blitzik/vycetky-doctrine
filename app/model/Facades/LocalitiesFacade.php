@@ -11,14 +11,10 @@ use Nette\Utils\Validators;
 
 class LocalitiesFacade extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var LocalitiesService
-     */
+    /** @var LocalitiesService  */
     private $localityService;
 
     public function __construct(

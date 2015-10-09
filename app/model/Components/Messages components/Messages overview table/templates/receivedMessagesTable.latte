@@ -4,8 +4,10 @@
 {block messageTimeLabel}<th>Přijato</th>{/block}
 
 {define username}
-{if $message['isSystemMessage'] == true}
-    {*$message['author']['role']*}Správce systému
+{if $message['isSystemMessage'] === true}
+    {*$message['author']['role']*}Systém
+{elseif $message['sentByAuthorRole'] === true}
+   {$message['author']['role']|upper}
 {else}
     {if isset($message['author'])}
         {$message['author']['username']}
@@ -18,7 +20,7 @@
 {block messagesList}
     {foreach $messages as $receivedMessage}
     {var $message = $receivedMessage['message']}
-    <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
+    <tr{include #class message => $message, isOdd => $iterator->isOdd()}>
 
         <td>{include #username}</td>
 
@@ -31,7 +33,7 @@
             </a>
         </td>
         <td><a href="{plink MailBox:message, 'id' => $receivedMessage['id'],
-                                             'type' => App\Model\Domain\Entities\IMessage::RECEIVED}">Prohlédnout</a></td>
+                                             'type' => App\Model\Domain\Entities\IMessage::RECEIVED}">Přečíst zprávu</a></td>
         <td><a href="{link deleteMessage!, 'id' => $receivedMessage['id']}"
                class="ajax item">Odstranit</a></td>
     </tr>

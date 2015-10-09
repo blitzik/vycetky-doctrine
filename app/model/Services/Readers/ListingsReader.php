@@ -13,14 +13,10 @@ use Nette\Object;
 
 class ListingsReader extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $listingsRepository;
 
     public function __construct(

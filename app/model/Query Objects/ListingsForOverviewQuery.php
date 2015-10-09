@@ -11,14 +11,10 @@ use Kdyby;
 
 class ListingsForOverviewQuery extends QueryObject
 {
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $filter = [];
 
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $select = [];
 
     /** @var int */

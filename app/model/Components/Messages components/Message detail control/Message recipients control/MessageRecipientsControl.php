@@ -2,30 +2,16 @@
 
 namespace App\Model\Components;
 
-use App\Model\Domain\Entities\SentMessage;
-use App\Model\Facades\MessagesFacade;
-use App\Model\Query\ReceivedMessagesQuery;
-use Doctrine\ORM\AbstractQuery;
-use Nette\Application\UI\Control;
 
-class MessageRecipientsControl extends Control
+class MessageRecipientsControl extends BaseComponent
 {
-    /**
-     * @var SentMessage
-     */
-    private $message;
-
-    /**
-     * @var MessagesFacade
-     */
-    private $messagesFacade;
+    /** @var array  */
+    private $recipients;
 
     public function __construct(
-        SentMessage $message,
-        MessagesFacade $messagesFacade
+        array $recipients
     ) {
-        $this->message = $message;
-        $this->messagesFacade = $messagesFacade;
+        $this->recipients = $recipients;
     }
 
     public function render()
@@ -33,7 +19,7 @@ class MessageRecipientsControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        $template->recipients = $this->messagesFacade->findRecipients($this->message);
+        $template->recipients = $this->recipients;
 
         $template->render();
     }

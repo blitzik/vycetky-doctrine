@@ -9,20 +9,14 @@ use Kdyby;
 
 class UsersOverviewQuery extends QueryObject
 {
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $filter = [];
 
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $select = [];
 
 
-    /**
-     * @var Kdyby\Doctrine\QueryBuilder
-     */
+    /** @var Kdyby\Doctrine\QueryBuilder */
     private $queryBuilder;
 
 

@@ -3,40 +3,35 @@
 namespace App\Model\Components;
 
 use App\Model\Domain\Entities\IMessage;
-use App\Model\Domain\Entities\SentMessage;
 use App\Model\Facades\MessagesFacade;
-use Nette\Application\UI\Control;
 
-class MessageDetailControl extends Control
+class MessageDetailControl extends BaseComponent
 {
-    /**
-     * @var IMessageRecipientsControlFactory
-     */
+    /** @var IMessageRecipientsControlFactory  */
     private $recipientsControlFactory;
 
-    /**
-     * @var MessagesFacade
-     */
+    /** @var MessagesFacade  */
     private $messagesFacade;
 
-    /**
-     * @var IMessage
-     */
+    /** @var IMessage  */
     private $message;
+
+    /** @var  array */
+    private $recipients;
 
     public function __construct(
         IMessage $message,
         MessagesFacade $messagesFacade,
         IMessageRecipientsControlFactory $recipientsControlFactory
     ) {
-        $this->message = $message->getMessage();
+        $this->message = $message;
         $this->messagesFacade = $messagesFacade;
         $this->recipientsControlFactory = $recipientsControlFactory;
     }
 
     protected function createComponentRecipientsList()
     {
-        return $this->recipientsControlFactory->create($this->message);
+        return $this->recipientsControlFactory->create($this->recipients);
     }
 
     public function render()
@@ -44,7 +39,10 @@ class MessageDetailControl extends Control
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        $template->message = $this->message;
+        $this->recipients = $this->messagesFacade
+                                 ->findMessageRecipients($this->message->getMessage());
+
+        $template->messageEntity = $this->message;
 
         $template->render();
     }

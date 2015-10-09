@@ -12,14 +12,10 @@ use Tracy\Debugger;
 
 class InvitationsSender extends Object
 {
-    /**
-     * @var EmailNotifier
-     */
+    /** @var EmailNotifier  */
     private $emailNotifier;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $systemEmail;
 
     public function __construct(

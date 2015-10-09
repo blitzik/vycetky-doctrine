@@ -16,7 +16,7 @@ use Nette\Utils\Validators;
  *      name="sent_message",
  *      options={"collate": "utf8_czech_ci"},
  *      indexes={
- *          @Index(name="author_deleted", columns={"author", "deleted"})
+ *          @Index(name="author_deleted_system", columns={"author", "deleted", "is_system_message"})
  *      }
  * )
  */
@@ -60,19 +60,22 @@ class SentMessage extends Entity implements IMessage, IResource
      */
     private $isSystemMessage = false;
 
+    /**
+     * @ORM\Column(name="sent_by_author_role", type="boolean", nullable=false, unique=false, options={"default": false})
+     * @var bool
+     */
+    private $sentByAuthorRole = false;
+
     public function __construct(
         $subject,
         $text,
-        User $author,
-        $isSystemMessage = false
+        User $author
     ) {
         $this->setSubject($subject);
         $this->setText($text);
 
         $this->author = $author;
         $this->sent = new \DateTime('now');
-
-        $this->isSystemMessage = $isSystemMessage;
     }
 
     /**
@@ -97,9 +100,19 @@ class SentMessage extends Entity implements IMessage, IResource
         $this->text = $text;
     }
 
-    public function setAsDeleted()
+    public function markAsDeleted()
     {
         $this->deleted = true;
+    }
+
+    public function markAsSystemMessage()
+    {
+        $this->isSystemMessage = true;
+    }
+
+    public function sendByAuthorRole()
+    {
+        $this->sentByAuthorRole = true;
     }
 
     /**
@@ -145,6 +158,11 @@ class SentMessage extends Entity implements IMessage, IResource
     public function isSystemMessage()
     {
         return $this->isSystemMessage;
+    }
+
+    public function isSentByAuthorRole()
+    {
+        return $this->sentByAuthorRole;
     }
 
     /* ************************* */

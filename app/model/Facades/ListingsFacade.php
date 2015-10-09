@@ -6,6 +6,9 @@ use App\Model\Domain\Entities\ListingItem;
 use App\Model\ResultObjects\ListingResult;
 use App\Model\Services\Managers\ListingsManager;
 use App\Model\Services\Readers\ListingsReader;
+use App\Model\Services\Readers\UsersReader;
+use App\Model\Services\Writers\ListingsWriter;
+use App\Model\Subscribers\Results\ResultObject;
 use Doctrine\ORM\ORMException;
 use Exceptions\Runtime\ListingNotFoundException;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
@@ -15,32 +18,33 @@ use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Services\ItemsService;
 use App\Model\Domain\FillingItem;
+use Exceptions\Runtime\RecipientsNotFoundException;
 use Kdyby\Doctrine\QueryObject;
 use Nette\Object;
-use Nette\Utils\Validators;
 use Tracy\Debugger;
 
 class ListingsFacade extends Object
 {
-    /**
-     * @var ListingsManager
-     */
+    /** @var array  */
+    public $onListingSharing = [];
+
+    /** @var ListingsManager  */
     private $listingsManager;
 
-    /**
-     * @var ItemsService
-     */
+    /** @var ItemsService  */
     private $itemsService;
 
-    /**
-     * @var ListingsReader
-     */
+    /** @var ListingsReader  */
     private $listingsReader;
 
-    /**
-     * @var ItemsFacade
-     */
+    /** @var ListingsWriter  */
+    private $listingsWriter;
+
+    /** @var ItemsFacade  */
     private $itemsFacade;
+
+    /** @var UsersReader  */
+    private $usersReader;
 
     /**
      * @var \Nette\Security\User
@@ -50,14 +54,18 @@ class ListingsFacade extends Object
     public function __construct(
         ListingsManager $listingsManager,
         ListingsReader $listingsReader,
+        ListingsWriter $listingsWriter,
         ItemsService $itemService,
+        UsersReader $usersReader,
         ItemsFacade $itemFacade,
         \Nette\Security\User $user
     ) {
         $this->listingsManager = $listingsManager;
         $this->listingsReader = $listingsReader;
+        $this->listingsWriter = $listingsWriter;
 
         $this->itemsService = $itemService;
+        $this->usersReader = $usersReader;
         $this->itemsFacade = $itemFacade;
         $this->user = $user;
     }
@@ -116,7 +124,7 @@ class ListingsFacade extends Object
      */
     public function removeListing(Listing $listing)
     {
-        $this->listingsManager->removeListing($listing);
+        $this->listingsWriter->removeListing($listing);
     }
 
     /**
@@ -171,80 +179,36 @@ class ListingsFacade extends Object
 
     /**
      * @param Listing $listing
+     * @param int $recipientID
      * @param $description
-     * @param array $recipients
-     * @param array $ignoredItemsIDs
-     * @return Listing[]
-     * @throws \DibiException
+     * @param array|null $ignoredListingDays
+     * @return ResultObject
+     * @throws RecipientsNotFoundException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function shareListing(
         Listing $listing,
+        $recipientID,
         $description,
-        array $recipients,
-        array $ignoredItemsIDs = null
+        array $ignoredListingDays = []
     ) {
-        $this->checkListingValidity($listing);
-        Validators::assert($description, 'unicode');
-
-        $listingItems = $listing->listingItems;
-
-        if (isset($ignoredItemsIDs)) {
-            $ignoredItemsIDs = array_flip($ignoredItemsIDs);
-            foreach ($listingItems as $key => $item) {
-                if (array_key_exists($item->listingItemID, $ignoredItemsIDs)) {
-                    unset($listingItems[$key]);
-                }
-            }
+        $recipient = $this->usersReader->findUsersByIDs([$recipientID]);
+        if (empty($recipient)) {
+            throw new RecipientsNotFoundException;
         }
 
-        $newListings = [];
-        foreach ($recipients as $recipientID) {
-            $newListing = clone $listing;
-            $newListing->user = $recipientID;
-            $newListing->description = $description;
-            $newListing->hourlyWage = null;
+        $newListing =  $this->listingsManager
+                            ->shareListing(
+                                $listing,
+                                $recipient[0],
+                                $description,
+                                $ignoredListingDays
+                            );
 
-            $newListings[] = $newListing;
-        }
+        $resultObject = new ResultObject($newListing);
+        $this->onListingSharing($newListing, $listing->getUser(), $resultObject);
 
-        try {
-            $this->transaction->begin();
-
-            $this->listingRepository->saveListings($newListings);
-
-            $items = [];
-            foreach ($newListings as $listing) {
-                $newItemsForListing = $this->itemsService
-                                           ->createItemsCopies($listingItems);
-                $newItemsForListing = $this->itemsService
-                                           ->setListingForGivenItems(
-                                               $newItemsForListing,
-                                               $listing
-                                           );
-
-                $items = array_merge($items, $newItemsForListing);
-                if (count($items) > 120) {
-                    $this->listingItemRepository->saveListingItems($items);
-                    unset($items);
-
-                    $items = [];
-                }
-            }
-            // save the rest items
-            if (!empty($items)) {
-                $this->listingItemRepository->saveListingItems($items);
-            }
-
-            $this->transaction->commit();
-
-            return $newListings;
-
-        } catch (\DibiException $e) {
-            $this->transaction->rollback();
-            Debugger::log($e, Debugger::ERROR);
-
-            throw $e;
-        }
+        return $resultObject;
     }
 
     /**
@@ -378,19 +342,6 @@ class ListingsFacade extends Object
         }
 
         return false;
-    }
-
-    /**
-     * @param Listing $listing
-     * @throws InvalidArgumentException
-     */
-    private function checkListingValidity(Listing $listing)
-    {
-        if ($listing->isDetached()) {
-            throw new InvalidArgumentException(
-                'Argument $listing must be attached instance of ' . Listing::class
-            );
-        }
     }
 
 }

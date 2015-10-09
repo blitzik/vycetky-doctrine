@@ -2,18 +2,16 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Domain\Entities\Locality;
 use Nette\Forms\Controls\SubmitButton;
 use App\Model\Facades\LocalitiesFacade;
-use App\Model\Entities\Locality;
 use Nette\Application\UI\Form;
 
 class LocalityPresenter extends SecurityPresenter
 {
     const VISIBLE_LOCALITIES = 25;
 
-    /**
-     * @persistent
-     */
+    /** @persistent */
     public $search;
 
     /**
@@ -22,9 +20,7 @@ class LocalityPresenter extends SecurityPresenter
      */
     public $localityFacade;
 
-    /**
-     * @var Locality[]
-     */
+    /**  @var Locality[] */
     private $localities;
 
     public function actionItemAutocomplete($search)

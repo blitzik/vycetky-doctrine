@@ -14,55 +14,36 @@ use Exceptions\Runtime\OtherHoursZeroTimeException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Application\Responses\JsonResponse;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 
-class ItemFormControl extends Control
+class ItemFormControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
     /** @var array */
     public $onSuccessItemPersist = [];
 
-    /**
-     * @var ItemsFacade
-     */
-    private $itemsFacade;
-
-    /**
-     * @var LocalitiesFacade
-     */
-    private $localitiesFacade;
-
-    /**
-     * @var ItemUpdateFormFactory
-     */
-    private $itemUpdateFormFactory;
-
-    /**
-     * @var IListingDescriptionControlFactory
-     */
+    /** @var IListingDescriptionControlFactory  */
     private $listingDescriptionControlFactory;
 
-    /**
-     * @var ListingItem
-     */
+    /** @var ItemUpdateFormFactory  */
+    private $itemUpdateFormFactory;
+
+    /** @var LocalitiesFacade  */
+    private $localitiesFacade;
+
+    /** @var EntityManager */
+    private $entityManager;
+
+    /** @var ItemsFacade  */
+    private $itemsFacade;
+
+    /** @var ListingItem */
     private $listingItem;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $day;
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
 
     public function __construct(
         Listing $listing,
@@ -70,7 +51,7 @@ class ItemFormControl extends Control
         ItemsFacade $itemsFacade,
         LocalitiesFacade $localitiesFacade,
         ItemUpdateFormFactory $itemUpdateFormFactory,
-        IListingDescriptionControlFactory $listingDescriptionControlFactory,
+        IListingDescriptionControlFactory $listingDescriptionControlFactorySelect,
         EntityManager $entityManager
     ) {
         $this->listing = $listing;
@@ -79,7 +60,7 @@ class ItemFormControl extends Control
         $this->itemsFacade = $itemsFacade;
         $this->localitiesFacade = $localitiesFacade;
         $this->itemUpdateFormFactory = $itemUpdateFormFactory;
-        $this->listingDescriptionControlFactory = $listingDescriptionControlFactory;
+        $this->listingDescriptionControlFactory = $listingDescriptionControlFactorySelect;
         $this->entityManager = $entityManager;
     }
 

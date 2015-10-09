@@ -8,6 +8,7 @@ use Nette\Object;
 
 class Authorizator extends Object implements IAuthorizator
 {
+    /** @var Permission  */
     private $authorizator;
 
     public function __construct()
@@ -48,6 +49,8 @@ class Authorizator extends Object implements IAuthorizator
             $authorizator->addResource($presenter);
         }
 
+        $authorizator->addResource('new_message_control');
+        $authorizator->addResource('recipients_selectBox');
         $authorizator->addResource('relationships_tables');
         $authorizator->addResource('users_overview');
     }

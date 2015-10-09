@@ -199,7 +199,8 @@ class ListingPresenter extends SecurityPresenter
              $this->listingResult->getListing() :
              null;
 
-        return $this->listingFormControlFactory->create($l);
+        return $this->listingFormControlFactory
+                    ->create($l, $this->user->getIdentity());
     }
 
     /*
@@ -358,9 +359,10 @@ class ListingPresenter extends SecurityPresenter
 
     public function actionShare($id)
     {
-        $this->listing = $this->getEntireListingByID($id);
-        if ($this->listing->workedDays == 0) {
-            $this->flashMessage('Nelze sdílet prázdnou výčetku.', 'warning');
+        $this->listingResult = $this->getListingByID($id, true);
+
+        if ($this->listingResult->getWorkedDays() == 0) {
+            $this->flashMessage('Nelze upravovat prázdnou výčetku.', 'warning');
             $this->redirect('Listing:detail', ['id' => $id]);
         }
     }
@@ -375,7 +377,8 @@ class ListingPresenter extends SecurityPresenter
      */
     protected function createComponentListingTableForSharing()
     {
-        return $this->sharingListingTableControlFactory->create($this->listing);
+        return $this->sharingListingTableControlFactory
+                    ->create($this->listingResult);
     }
 
     /*

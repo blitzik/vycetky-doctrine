@@ -2,43 +2,42 @@
 
 namespace App\Model\Notifications;
 
+use App\Model\Domain\Entities\Listing;
+use App\Model\Domain\Entities\SentMessage;
+use App\Model\Domain\Entities\User;
 use Nette\Application\LinkGenerator;
-use App\Model\Entities\Message;
-use App\Model\Entities\Listing;
 use App\Model\Time\TimeUtils;
 use Nette\Object;
 
 class SharedListingNotification extends Object
 {
-    /**
-     * @var LinkGenerator
-     */
+    /** @var LinkGenerator  */
     private $linkGenerator;
 
-    public function __construct(LinkGenerator $linkGenerator)
-    {
+    public function __construct(
+        LinkGenerator $linkGenerator
+    ) {
         $this->linkGenerator = $linkGenerator;
     }
 
     public function getNotificationMessage(
-        Listing $listing,
-        $senderName,
-        $recipientName
+        Listing $newListing,
+        User $sender
     ) {
-        $period = TimeUtils::getMonthName($listing->month) . ' ' . $listing->year;
+        $period = TimeUtils::getMonthName($newListing->month) . ' ' . $newListing->year;
 
-        $m = new Message(
-            $this->constructSubject($senderName, $period),
+        $m = new SentMessage(
+            $this->constructSubject($sender->username, $period),
             $this->constructMessage(
-                $senderName,
-                $recipientName,
+                $sender->username,
+                $newListing->getUser()->username,
                 $period,
                 $this->linkGenerator->link(
                     'Front:Listing:detail',
-                    ['id' => $listing->listingID]
+                    ['id' => $newListing->getId()]
                 )
             ),
-            0 // system
+            $sender
         );
 
         return $m;

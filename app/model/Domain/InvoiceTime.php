@@ -8,9 +8,7 @@ class InvoiceTime extends \Nette\Object
     const TIME_REGEXP = '~^\d+:[03]0:00$~';
     const TIME_STEP = 1800;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $time;
 
 

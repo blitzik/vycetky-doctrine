@@ -11,19 +11,13 @@ use Nette\Object;
 
 class EmailNotifier extends Object
 {
-    /**
-     * @var IMailer
-     */
+    /** @var IMailer  */
     private $mailer;
 
-    /**
-     * @var LinkGenerator
-     */
+    /** @var LinkGenerator  */
     private $linkGenerator;
 
-    /**
-     * @var ITemplateFactory
-     */
+    /** @var ITemplateFactory  */
     private $templateFactory;
 
 

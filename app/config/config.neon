@@ -52,3 +52,7 @@ decorator:
 	App\FrontModule\Presenters\SecurityPresenter:
 		setup:
 			- setAuthorizator(@authorizator)
+
+	App\Model\Components\BaseComponent:
+		setup:
+			- setAuthorizator(@authorizator)

@@ -2,7 +2,6 @@
 
 namespace App\Model\Components;
 
-use App\Model\Authorization\Authorizator;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\MessagesFacade;
 use App\Model\MessagesHandlers\IMessagesHandler;
@@ -10,58 +9,34 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\AbstractQuery;
 use Kdyby\Doctrine\ResultSet;
 use Nette\Application\UI\ITemplate;
-use Nextras\Application\UI\SecuredLinksControlTrait;
-use Nette\Forms\Controls\SubmitButton;
-use Nette\Application\UI\Control;
 use Components\IPaginatorFactory;
 use App\Model\Domain\Entities\SentMessage;
-use Nette\Application\UI\Form;
-use Tracy\Debugger;
 
-class MessagesTableControl extends Control
+class MessagesTableControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
-    /**
-     * @var IPaginatorFactory
-     */
+    /** @var IPaginatorFactory  */
     private $paginatorFactory;
 
-    /**
-     * @var User
-     */
+    /** @var  User */
     private $user;
 
-    /**
-     * @var IMessagesHandler
-     */
+    /** @var IMessagesHandler  */
     private $messagesHandler;
 
-    /**
-     * @var MessagesFacade
-     */
+    /** @var MessagesFacade  */
     private $messagesFacade;
 
-    /**
-     * @var Authorizator
-     */
-    private $authorizator;
-
-    /**
-     * @var ResultSet
-     */
+    /** @var ResultSet */
     private $resultSet;
 
     public function __construct(
         IMessagesHandler $handler,
         IPaginatorFactory $pf,
-        MessagesFacade $messagesFacade,
-        Authorizator $authorizator
+        MessagesFacade $messagesFacade
     ) {
         $this->paginatorFactory = $pf;
         $this->messagesHandler = $handler;
         $this->messagesFacade = $messagesFacade;
-        $this->authorizator = $authorizator;
         $this->user = $handler->getUser();
     }
 

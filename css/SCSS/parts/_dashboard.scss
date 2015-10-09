@@ -643,6 +643,11 @@ $baseListing-color: #ffdfda;
   border-bottom: 1px solid #9EC4DE;
 }
 
+.m-admin{
+  background-color: #ffbfbf;
+  border-bottom: 1px solid darken(#ffbfbf, 5%);
+}
+
 #new-message-form{
   margin-bottom: 20px;
 }

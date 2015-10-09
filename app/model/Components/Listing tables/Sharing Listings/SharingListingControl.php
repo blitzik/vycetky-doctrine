@@ -2,98 +2,80 @@
 
 namespace App\Model\Components;
 
+use App\Forms\Fields\RecipientsSelectBoxFactory;
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
+use App\Model\Domain\Entities\User;
 use App\Model\Notifications\SharedListingNotification;
-use Nextras\Application\UI\SecuredLinksControlTrait;
-use App\Model\Facades\MessagesFacade;
+use App\Model\ResultObjects\ListingResult;
+use Doctrine\DBAL\DBALException;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Facades\UsersFacade;
-use Nette\Application\UI\Control;
 use App\Model\Domain\Entities\Listing;
+use Exceptions\Runtime\RecipientsNotFoundException;
 use Nette\Application\UI\Form;
-use Nette\Security\User;
 
-class SharingListingControl extends Control
+class SharingListingControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-    
-    /**
-     * @var SharedListingNotification
-     */
+    /** @var SharedListingNotification  */
     private $sharedListingNotification;
 
-    /**
-     * @var IItemsTableControlFactory
-     */
+    /** @var IItemsTableControlFactory  */
     private $itemsTableControlFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var RecipientsSelectBoxFactory  */
+    private $recipientsSelectBoxFactory;
+
+    /** @var ListingsFacade  */
     private $listingFacade;
 
-    /**
-     * @var MessagesFacade
-     */
-    private $messagesFacade;
-
-    /**
-     * @var UsersFacade
-     */
+    /** @var UsersFacade  */
     private $usersFacade;
 
-    /**
-     * @var User
-     */
+    /** @var User  */
     private $user;
 
+    /** @var ListingResult  */
+    private $listingResult;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing  */
     private $listing;
 
-    /**
-     * @var array
-     */
-    private $users;
+    /** @var array  */
+    private $users = [];
 
-    /**
-     * @var Listing[]
-     */
-    private $newListings;
+    /** @var array */
+    private $restrictedUsers = [];
 
 
     public function __construct(
-        Listing $listing,
+        ListingResult $listingResult,
+        RecipientsSelectBoxFactory $recipientsSelectBoxFactory,
         SharedListingNotification $sharedListingNotification,
         IItemsTableControlFactory $itemsTableControlFactory,
         //MessagesFacade $messagesFacade,
         ListingsFacade $listingFacade,
-        UsersFacade $usersFacade,
-        User $user
+        UsersFacade $usersFacade
     ) {
-        $this->listing = $listing;
+        $this->listingResult = $listingResult;
+        $this->listing = $listingResult->getListing();
+        $this->user = $listingResult->getListing()->getUser();
 
+        $this->recipientsSelectBoxFactory = $recipientsSelectBoxFactory;
         $this->sharedListingNotification = $sharedListingNotification;
         $this->itemsTableControlFactory = $itemsTableControlFactory;
-        $this->messagesFacade = $messagesFacade;
         $this->listingFacade = $listingFacade;
         $this->usersFacade = $usersFacade;
-        $this->user = $user;
 
-        $this->users = $this->usersFacade->findAllUsers([$this->user->id]);
+        $this->restrictedUsers = $this->usersFacade->findRestrictedUsers($this->user);
+        $this->users = $this->usersFacade->findAllUsers();
     }
 
     protected function createComponentItemsTable()
     {
-        $comp = $this->itemsTableControlFactory->create($this->listing);
+        $comp = $this->itemsTableControlFactory->create($this->listingResult);
         $comp->showTableCaption(
-            $this->listing->description,
-            $this->listing->workedDays,
-            $this->listing->totalWorkedHours,
             'Front:Listing:detail',
-            ['id' => $this->listing->listingID]
+            ['id' => $this->listing->getId()]
         );
 
         $comp->showCheckBoxes();
@@ -109,57 +91,58 @@ class SharingListingControl extends Control
                 ->setRequired('Vyplňte pole Popis Výčetky.')
                 ->setAttribute('placeholder', 'Vyplňte popis výčetky');
 
-        $form->addMultiSelect('recipients', 'Pro uživatele:', null, 7)
-                ->setRequired('Vyberte alespoň jednoho příjemce.')
-                ->setItems($this->users);
+        $form['recipient'] = $this->recipientsSelectBoxFactory
+                                   ->create(
+                                       $this->user,
+                                       array_merge($this->users, $this->restrictedUsers)
+                                   );
+        $form['recipient']->setAttribute('size', 10);
 
         $form->addSubmit('send', 'Odeslat výčetku');
 
         $form->onSuccess[] = [$this, 'processListingSharing'];
-        $form->onSuccess[] = [$this, 'sendNotifications'];
+        //$form->onSuccess[] = [$this, 'sendNotifications'];
 
         return $form;
     }
 
     public function processListingSharing(Form $form, $values)
     {
-        $ignoredItems = $form->getHttpData(Form::DATA_TEXT, 'items[]');
+        $ignoredDays = $form->getHttpData(Form::DATA_TEXT, 'items[]');
+        if (count($ignoredDays) == $this->listingResult->getWorkedDays()) {
+            $form->addError(
+                'Nelze odeslat prázdnou výčetku!
+                 Nezapomeňte, zaškrtnutím se řádek výčetky nebude sdílet.'
+            );
+            return;
+        }
 
         try {
-            $this->newListings = $this->listingFacade->shareListing(
+            $resultObject = $this->listingFacade->shareListing(
                 $this->listing,
+                $values['recipient'],
                 $values['description'],
-                $values['recipients'],
-                $ignoredItems
+                $ignoredDays
             );
 
-        } catch (\DibiException $e) {
-            $this->presenter->flashMessage('Nastala chyba při pokusu o sdílení výčetky. Zkuste akci opakovat později.', 'error');
-            $this->redirect('this');
-        }
+            $this->presenter->flashMessage('Výčetka byla úspěšně sdílena.', 'success');
 
-        $this->presenter->flashMessage('Výčetka byla úspěšně sdílena.', 'success');
-    }
+            if (!$resultObject->hasNoErrors()) {
+                $err = $resultObject->getFirstError();
+                $this->flashMessage($err['message'], $err['type']);
+            }
 
-    public function sendNotifications(Form $form, $values)
-    {
-        $messages = [];
-        foreach ($this->newListings as $listing) {
-            $message = $this->sharedListingNotification->getNotificationMessage(
-                $listing,
-                $this->user->getIdentity()->username,
-                $this->users[$listing->getOwnerID()]
+        } catch (RecipientsNotFoundException $rnf) {
+            $form->addError(
+                'Nelze zaslat výčetku vybranému uživateli.'
             );
+            return;
 
-            $messages[$listing->getOwnerID()] = $message;
-        }
-
-        try {
-            $this->messagesFacade->sendMessages($messages);
-
-        } catch (\DibiException $e) {
-            $this->presenter->flashMessage('Nepodařilo se odeslat upozornění příjemcům.', 'warning');
-            $this->redirect('this');
+        } catch (DBALException $e) {
+            $form->addError(
+                'Nastala chyba při pokusu o sdílení výčetky.
+                 Zkuste akci opakovat později.'
+            );
         }
 
         $this->redirect('this');
@@ -169,8 +152,6 @@ class SharingListingControl extends Control
     {
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/templates/template.latte');
-
-        $this['itemsTable']->setListingItems($this->listing->listingItems);
 
         $template->render();
     }

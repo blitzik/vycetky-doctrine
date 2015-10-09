@@ -21,9 +21,10 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
         parent::__construct($user, $messagesFacade);
 
         $this->query = new SentMessagesQuery();
-        $this->query
-             ->byAuthor($user)
-             ->onlyActive();
+        $this->query->withAuthor(['id', 'username', 'role'])
+                    ->byAuthor($user)
+                    ->onlyActive()
+                    ->withoutSystemMessages();
     }
 
     /**

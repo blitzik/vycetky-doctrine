@@ -13,37 +13,25 @@ use Nette\Utils\Validators;
 
 class ReceivedMessagesQuery extends QueryObject
 {
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $filter = [];
 
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $select = [];
 
 
     /* INTERNAL properties */
 
-    /**
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     private $queryBuilder;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $recipient;
 
-    /**
-     * @var ReceivedMessage
-     */
+    /** @var ReceivedMessage */
     private $message;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $isLookingForRead;
     private $isMessageJoined;
 

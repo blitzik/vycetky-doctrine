@@ -2,48 +2,37 @@
 
 namespace App\Model\Components;
 
+use App\Model\Domain\Entities\User;
 use App\Model\Facades\ListingsFacade;
 use Nette\InvalidArgumentException;
-use Nette\Application\UI\Control;
 use App\Model\Domain\Entities\Listing;
 use Nette\Application\UI\Form;
 use App\Model\Time\TimeUtils;
-use Nette\Security\User;
 
-class ListingFormControl extends Control
+class ListingFormControl extends BaseComponent
 {
-    /**
-     * @var IListingDescriptionControlFactory
-     *
-     */
+    /** @var IListingDescriptionControlFactory  */
     private $listingDescriptionFactory;
 
-    /**
-     * @var ListingFormFactory
-     */
+    /** @var ListingFormFactory  */
     private $listingFormFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingFacade;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
-    /**
-     * @var User
-     */
-    private $user;
+
+    /** @var User */
+    private $owner;
 
 
     public function __construct(
         $listing,
+        User $owner,
         IListingDescriptionControlFactory $listingDescriptionFactory,
         ListingFormFactory $listingFormFactory,
-        ListingsFacade $listingFacade,
-        User $user
+        ListingsFacade $listingFacade
     ) {
         parent::__construct();
 
@@ -56,7 +45,7 @@ class ListingFormControl extends Control
         $this->listingDescriptionFactory = $listingDescriptionFactory;
         $this->listingFormFactory = $listingFormFactory;
         $this->listingFacade = $listingFacade;
-        $this->user = $user;
+        $this->owner = $owner;
     }
 
     protected function createComponentListingDescription()
@@ -122,7 +111,7 @@ class ListingFormControl extends Control
             $this->listing = new Listing(
                 $values['year'],
                 $values['month'],
-                $this->user->getIdentity()
+                $this->owner
             );
         }
 

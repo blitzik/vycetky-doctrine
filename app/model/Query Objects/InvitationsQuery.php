@@ -12,19 +12,13 @@ use Kdyby;
 
 class InvitationsQuery extends QueryObject
 {
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $filter = [];
 
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $select = [];
 
-    /**
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     private $queryBuilder;
 
     public function onlyWithFields(array $fields)

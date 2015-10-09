@@ -2,106 +2,51 @@
 
 namespace App\Model\Components;
 
-use App\Model\Authorization\Authorizator;
+use App\Forms\Fields\RecipientsSelectBoxFactory;
 use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\UsersFacade;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\MessageLengthException;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
-use Nette\Utils\Arrays;
 
-class NewMessageControl extends Control
+class NewMessageControl extends BaseComponent
 {
-    /**
-     * @var UsersFacade
-     */
-    private $usersFacade;
-
-    /**
-     * @var Authorizator
-     */
-    private $authorizator;
-
-    /**
-     * @var MessagesFacade
-     */
-    private $messagesFacade;
-
-    /**
-     * @var IUsersRelationshipsRestrictionsControlFactory
-     */
+    /** @var IUsersRelationshipsRestrictionsControlFactory  */
     private $restrictionsControlFactory;
 
-    /**
-     * @var User
-     */
+    /** @var RecipientsSelectBoxFactory  */
+    private $recipientsSelectBoxFactory;
+
+    /** @var MessagesFacade  */
+    private $messagesFacade;
+
+    /** @var UsersFacade  */
+    private $usersFacade;
+
+    /**  @var User */
     private $user;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $users;
-    private $recipients;
     private $restrictedUsers;
 
     public function __construct(
         User $user,
         UsersFacade $usersFacade,
-        Authorizator $authorizator,
         MessagesFacade $messagesFacade,
+        RecipientsSelectBoxFactory $recipientsSelectBoxFactory,
         IUsersRelationshipsRestrictionsControlFactory $restrictionsControlFactory
     ) {
         $this->user = $user;
         $this->usersFacade = $usersFacade;
-        $this->authorizator = $authorizator;
         $this->messagesFacade = $messagesFacade;
+        $this->recipientsSelectBoxFactory = $recipientsSelectBoxFactory;
         $this->restrictionsControlFactory = $restrictionsControlFactory;
 
         $this->restrictedUsers = $this->usersFacade->findRestrictedUsers($this->user);
-        $this->users = $this->findUsers();
-
-        $this->recipients = $this->prepareRecipientsForList(
-            $this->restrictedUsers,
-            $this->users
-        );
-    }
-
-    private function prepareRecipientsForList(
-        array $restrictedUsers,
-        array $possibleRecipients
-    ) {
-        $recipients = [];
-        if (!$this->authorizator->isAllowed($this->user, 'message', 'send_to_restricted_recipients')) {
-            $recipients = array_diff_key(
-                $possibleRecipients['activeUsers'],
-                $possibleRecipients['suspendedUsers'],
-                $restrictedUsers['usersBlockedByMe'],
-                $restrictedUsers['usersBlockingMe']
-            );
-        } else {
-            $recipients = $possibleRecipients['activeUsers'] +
-                $possibleRecipients['suspendedUsers'] +
-                $restrictedUsers['usersBlockedByMe'] +
-                $restrictedUsers['usersBlockingMe'];
-        }
-
-        return Arrays::associate($recipients, 'id=username');
-    }
-
-    private function findUsers()
-    {
-        $recipients = $this->usersFacade
-                           ->findAllUsers();
-
-        unset(
-            $recipients['suspendedUsers'][$this->user->getId()],
-            $recipients['activeUsers'][$this->user->getId()]
-        );
-
-        return $recipients;
+        $this->users = $this->usersFacade->findAllUsers();
     }
 
     protected function createComponentNewMessageForm()
@@ -115,8 +60,12 @@ class NewMessageControl extends Control
             ->setRequired('Vyplňte prosím text zprávy.')
             ->addRule(Form::MAX_LENGTH, 'Zpráva může obsahovat maximálně %d znaků.', 2000);
 
-        $form->addMultiSelect('recipients', 'Příjemci', $this->recipients, 13)
-                ->setRequired('Vyberte alespoň jednoho příjemce.');
+        $form['recipients'] = $this->recipientsSelectBoxFactory
+                                   ->create(
+                                       $this->user,
+                                       array_merge($this->users, $this->restrictedUsers),
+                                       $this->authorizator->isAllowed($this->user, 'new_message_control', 'send_to_multiple_recipients')
+                                   );
 
         $form->addCheckbox('isSendAsAdmin', 'Odeslat zprávu jako správce aplikace');
 
@@ -136,7 +85,7 @@ class NewMessageControl extends Control
         $values = $form->getValues();
 
         if ($values['isSendAsAdmin'] == true and
-            !$this->authorizator->isAllowed($this->user, 'message', 'send_as_admin')) {
+            !$this->authorizator->isAllowed($this->user, 'new_message_control', 'send_as_admin')) {
             $form->addError('Nemáte dostatečná oprávnění k akci.');
             return;
         }
@@ -151,15 +100,18 @@ class NewMessageControl extends Control
         $message = new SentMessage(
             $values->subject,
             $text,
-            $this->user,
-            (bool)$values->isSendAsAdmin
+            $this->user
         );
+
+        if ($values['isSendAsAdmin']) {
+            $message->sendByAuthorRole();
+        }
 
         try {
             $result = $this->messagesFacade
                            ->sendMessage($message, $values->recipients);
 
-            //if (!$result->isValid()) {
+            //if (!$result->hasNoErrors()) {
             //    $er = $result->getFirstError();
             //    $form->addError($er['message']);
             //    return;

@@ -21,29 +21,19 @@ use Nette\Utils\Arrays;
 
 class UsersFacade extends Object
 {
-    /**
-     * @var UsersReader
-     */
+    /** @var UsersReader  */
     private $usersReader;
 
-    /**
-     * @var UsersWriter
-     */
+    /** @var UsersWriter  */
     private $usersWriter;
 
-    /**
-     * @var UsersService
-     */
+    /** @var UsersService  */
     private $usersService;
 
-    /**
-     * @var InvitationsReader
-     */
+    /** @var InvitationsReader  */
     private $invitationsReader;
 
-    /**
-     * @var UserSystemCreator
-     */
+    /** @var UserSystemCreator  */
     private $userSystemCreator;
 
     public function __construct(

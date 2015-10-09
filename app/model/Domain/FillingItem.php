@@ -6,9 +6,7 @@ use Nette\Object;
 
 class FillingItem extends Object implements IDisplayableItem
 {
-    /**
-     * @var \DateTime
-     */
+    /** @var \DateTime */
     protected $date;
 
     public function __construct(\DateTime $date)

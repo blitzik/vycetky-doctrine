@@ -9,14 +9,12 @@ class HelpPresenter extends SecurityPresenter
 {
 
     /**
-     * @inject
      * @var \Nette\Mail\IMailer
+     * @inject
      */
     public $mailer;
 
-    /**
-     * @var array ['admin' => ... , 'system' => ...]
-     */
+    /**  @var array ['admin' => ... , 'system' => ...] */
     private $emails;
 
     public function setEmails(array $emails)

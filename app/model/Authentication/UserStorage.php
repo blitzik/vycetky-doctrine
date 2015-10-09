@@ -8,9 +8,7 @@ use Nette\Http\Session;
 
 class UserStorage extends \Nette\Http\UserStorage
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     private $entityManager;
 
     public function  __construct(

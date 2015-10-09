@@ -2,7 +2,7 @@
 
 namespace App\Model\Subscribers;
 
-use App\Model\Subscribers\Validation\SubscriberValidationObject;
+use App\Model\Subscribers\Results\SubscriberValidationObject;
 use Kdyby\Events\Subscriber;
 use Nette\InvalidStateException;
 use Nette\Mail\IMailer;
@@ -12,14 +12,10 @@ use Tracy\Debugger;
 
 class DatabaseBackupSubscriber extends Object implements Subscriber
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $emails = [];
 
-    /**
-     * @var
-     */
+    /** @var IMailer  */
     private $mailer;
 
     public function __construct(IMailer $mailer)

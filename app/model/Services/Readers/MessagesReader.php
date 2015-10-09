@@ -12,19 +12,13 @@ use Nette\Object;
 
 class MessagesReader extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $messageRepository;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $messageReferenceRepository;
 
     public function __construct(EntityManager $entityManager)
@@ -78,7 +72,8 @@ class MessagesReader extends Object
     public function getSentMessage($id)
     {
         return $this->em->createQuery(
-            'SELECT sm FROM ' .SentMessage::class. ' sm
+            'SELECT sm, partial a.{id, username, role} FROM ' .SentMessage::class. ' sm
+             JOIN sm.author a
              WHERE sm.id = :id'
         )->setParameter('id', $id)
          ->getOneOrNullResult();
@@ -91,7 +86,7 @@ class MessagesReader extends Object
     public function getReceivedMessage($id)
     {
         return $this->em->createQuery(
-            'SELECT rm, m, partial a.{id, username} FROM ' .ReceivedMessage::class. ' rm
+            'SELECT rm, m, partial a.{id, username, role} FROM ' .ReceivedMessage::class. ' rm
              JOIN rm.message m
              JOIN m.author a
              WHERE rm.id = :id'
@@ -103,7 +98,7 @@ class MessagesReader extends Object
      * @param $messageID
      * @return array
      */
-    public function findMessageReferences($messageID)
+    public function findReceivedMessages($messageID)
     {
         return $this->em->createQuery(
             'SELECT rm, partial r.{id, username} FROM ' .ReceivedMessage::class. ' rm

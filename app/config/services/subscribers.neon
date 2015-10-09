@@ -13,3 +13,7 @@ services:
 		tags: [kdyby.subscriber]
 		setup:
 			- setEmails(%emails%)
+
+	listingSubscriber:
+		class: App\Model\Subscribers\ListingSubscriber
+		tags: [kdyby.subscriber]

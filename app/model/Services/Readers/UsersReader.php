@@ -14,14 +14,10 @@ use Nette\Object;
 
 class UsersReader extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $usersRepository;
 
     public function __construct(

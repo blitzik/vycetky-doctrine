@@ -3,37 +3,25 @@
 namespace App\Model\Components;
 
 use App\Model\Queries\Listings\ListingsForOverviewQuery;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ListingsFacade;
 use Nette\Application\UI\Multiplier;
-use Nette\Application\UI\Control;
 use Doctrine\ORM\AbstractQuery;
 use Nextras\Datagrid\Datagrid;
 use blitzik\Arrays\Arrays;
 
-class ListingsOverviewControl extends Control
+class ListingsOverviewControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
-    /**
-     * @var ListingsForOverviewQuery
-     */
+    /** @var ListingsForOverviewQuery  */
     private $listingsQuery;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingsFacade;
 
-    /**
-     * @var Listing[]
-     */
+    /** @var Listing[] */
     private $listings;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $heading;
 
 

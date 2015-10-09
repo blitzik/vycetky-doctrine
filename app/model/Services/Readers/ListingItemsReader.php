@@ -16,14 +16,10 @@ class ListingItemsReader extends Object
     const ITEM_UPPER = -1;
     const ITEM_LOWER = 1;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $listingItemRepository;
 
     public function __construct(
@@ -77,35 +73,43 @@ class ListingItemsReader extends Object
     }
 
     /**
-     * @param Listing $listing
+     * @param int $listingID
      * @param array $days
+     * @param bool $ignored
      * @return array
      */
-    public function findListingItems(Listing $listing, array $days = null)
-    {
-        $itemsQb = $this->getBasicDQL($listing);
+    public function findListingItems(
+        $listingID,
+        array $days = null,
+        $ignored = false
+    ) {
+        $itemsQb = $this->getBasicDQL($listingID);
 
         if (isset($days) and !empty($days)) {
-            $itemsQb->andWhere('li.day IN(:days)')
-                    ->setParameter('days', $days);
+            if ($ignored === false) {
+                $itemsQb->andWhere('li.day IN(:days)');
+            } else {
+                $itemsQb->andWhere('li.day NOT IN(:days)');
+            }
+            $itemsQb->setParameter('days', $days);
         }
 
         return $itemsQb->getQuery()->getResult();
     }
 
     /**
-     * @param Listing $listing
+     * @param int $listingID
      * @return \Kdyby\Doctrine\QueryBuilder
      */
-    private function getBasicDQL(Listing $listing)
+    private function getBasicDQL($listingID)
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('li, lo, wh')
            ->from(ListingItem::class, 'li')
            ->innerJoin('li.locality', 'lo')
            ->innerJoin('li.workedHours', 'wh')
-           ->where('li.listing = :listing')
-           ->setParameter('listing', $listing);
+           ->where('li.listing = :listingID')
+           ->setParameter('listingID', $listingID);
 
         return $qb;
     }

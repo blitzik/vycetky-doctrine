@@ -2,12 +2,16 @@
 
 namespace App\Model\Services\Managers;
 
+use App\Model\Domain\Entities\User;
 use App\Model\Domain\Entities\WorkedHours;
+use App\Model\Services\ItemsService;
 use App\Model\Services\Providers\WorkedHoursProvider;
 use App\Model\Services\Readers\ListingItemsReader;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\ListingsWriter;
+use Doctrine\DBAL\DBALException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 use Nette\Utils\Validators;
@@ -15,34 +19,38 @@ use Tracy\Debugger;
 
 class ListingsManager extends Object
 {
-    /**
-     * @var WorkedHoursProvider
-     */
+    /** @var WorkedHoursProvider  */
     private $workedHoursProvider;
 
-    /**
-     * @var ListingItemsReader
-     */
+    /** @var ListingItemsReader  */
     private $listingItemsReader;
 
-    /**
-     * @var ListingsWriter
-     */
+    /** @var ListingsWriter  */
     private $listingsWriter;
-    /**
-     * @var EntityManager
-     */
+
+    /** @var ItemsService  */
+    private $itemsService;
+
+    /** @var UsersReader  */
+    private $usersReader;
+
+    /** @var EntityManager  */
     private $em;
+
 
     public function __construct(
         WorkedHoursProvider $workedHoursProvider,
         ListingItemsReader $listingItemsReader,
         ListingsWriter $listingsWriter,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ItemsService $itemsService,
+        UsersReader $usersReader
     ) {
         $this->workedHoursProvider = $workedHoursProvider;
         $this->listingItemsReader = $listingItemsReader;
         $this->listingsWriter = $listingsWriter;
+        $this->itemsService = $itemsService;
+        $this->usersReader = $usersReader;
         $this->em = $entityManager;
     }
 
@@ -57,18 +65,10 @@ class ListingsManager extends Object
 
     /**
      * @param Listing $listing
-     */
-    public function removeListing(Listing $listing)
-    {
-        $this->em->remove($listing)->flush();
-    }
-
-    /**
-     * @param Listing $listing
      * @param bool $withItems
      * @param array|null $valuesForNewListing
      * @return Listing
-     * @throws \Exception
+     * @throws DBALException
      */
     public function establishListingCopy(
         Listing $listing,
@@ -98,7 +98,7 @@ class ListingsManager extends Object
             $this->em->flush();
             $this->em->clear();
 
-        } catch (\Exception $e) {
+        } catch (DBALException $e) {
             Debugger::log($e, Debugger::ERROR);
 
             throw $e;
@@ -115,7 +115,7 @@ class ListingsManager extends Object
     private function getItemsCopies(Listing $listing, array $days = null)
     {
         $items = $this->listingItemsReader
-                      ->findListingItems($listing, $days);
+                      ->findListingItems($listing->getId(), $days);
 
         $copies = [];
         if (!empty($items)) {
@@ -132,6 +132,7 @@ class ListingsManager extends Object
      * @param WorkedHours $newWorkedHours
      * @param array $daysToChange
      * @return Listing
+     * @throws DBALException
      */
     public function baseListingOn(
         Listing $listing,
@@ -141,24 +142,31 @@ class ListingsManager extends Object
         $newListing = clone $listing;
         $this->em->persist($newListing);
 
-        $workedHours = $this->workedHoursProvider
-                            ->setupWorkedHoursEntity($newWorkedHours);
+        try {
+            $workedHours = $this->workedHoursProvider
+                                ->setupWorkedHoursEntity($newWorkedHours);
 
-        $itemsCopies = $this->getItemsCopies($listing);
+            $itemsCopies = $this->getItemsCopies($listing);
 
-        $daysToChange = array_flip($daysToChange);
-        foreach ($itemsCopies as $itemCopy) {
-            if (array_key_exists($itemCopy->day, $daysToChange)) {
-                /** @var ListingItem $itemCopy */
-                $itemCopy->setWorkedTime($workedHours);
+            $daysToChange = array_flip($daysToChange);
+            foreach ($itemsCopies as $itemCopy) {
+                if (array_key_exists($itemCopy->day, $daysToChange)) {
+                    /** @var ListingItem $itemCopy */
+                    $itemCopy->setWorkedTime($workedHours);
+                }
+                $itemCopy->setListing($newListing);
+                $this->em->persist($itemCopy);
             }
-            $itemCopy->setListing($newListing);
-            $this->em->persist($itemCopy);
+
+            $this->em->flush();
+
+            return $newListing;
+
+        } catch (DBALException $e) {
+            Debugger::log($e, Debugger::ERROR);
+
+            throw $e;
         }
-
-        $this->em->flush();
-
-        return $newListing;
     }
 
     /**
@@ -189,5 +197,58 @@ class ListingsManager extends Object
                                       ->findListingItems($listing, $daysToChange);
 
         return $updatedItems;
+    }
+
+    /**
+     * @param Listing $listing
+     * @param User $recipient
+     * @param $description
+     * @param array $ignoredListingDays
+     * @return Listing
+     * @throws DBALException
+     */
+    public function shareListing(
+        Listing $listing,
+        User $recipient,
+        $description,
+        array $ignoredListingDays = []
+    ) {
+        Validators::assert($description, 'unicode');
+
+        try {
+            $this->em->beginTransaction();
+
+            /** @var ListingItem[] $listingItems */
+            $listingItems = $this->listingItemsReader
+                                 ->findListingItems(
+                                     $listing->getId(),
+                                     $ignoredListingDays,
+                                     true
+                                 );
+
+            $newListing = clone $listing;
+            $newListing->setUser($recipient);
+            $newListing->setDescription($description);
+            $newListing->setHourlyWage(null);
+            $this->em->persist($newListing);
+
+            foreach ($listingItems as $item) {
+                $newItem = clone $item;
+                $newItem->setListing($newListing);
+                $newItem->setDescription(null);
+                $newItem->removeDescOtherHours();
+                $this->em->persist($newItem);
+            }
+
+            $this->em->flush();
+            $this->em->commit();
+
+            return $newListing;
+
+        } catch (DBALException $e) {
+            Debugger::log($e, Debugger::ERROR);
+
+            throw $e;
+        }
     }
 }

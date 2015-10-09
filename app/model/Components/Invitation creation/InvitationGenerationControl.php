@@ -4,30 +4,23 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
-use App\Model\Subscribers\Validation\InvitationResultObject;
+use App\Model\Subscribers\Results\ResultObject;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationCreationAttemptException;
 use Exceptions\Runtime\UserAlreadyExistsException;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 
-class InvitationGenerationControl extends Control
+class InvitationGenerationControl extends BaseComponent
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     public $onInvitationCreation = [];
 
-    /**
-     * @var InvitationsFacade
-     */
+    /**  @var InvitationsFacade */
     private $invitationsFacade;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $user;
 
 
@@ -62,10 +55,10 @@ class InvitationGenerationControl extends Control
 
         $invitation = new Invitation(
             $value['email'],
-            $this->user->getIdentity()
+            $this->user->getIdentity() // todo - security\User tu nema co delat
         );
         try {
-            /** @var InvitationResultObject $resultObject */
+            /** @var ResultObject $resultObject */
             $resultObject = $this->invitationsFacade
                                  ->createInvitation($invitation);
 
@@ -74,7 +67,7 @@ class InvitationGenerationControl extends Control
                 'success'
             );
 
-            if (!$resultObject->isValid()) {
+            if (!$resultObject->hasNoErrors()) {
                 $error = $resultObject->getFirstError();
                 $this->flashMessage($error['message'], $error['type']);
             }

@@ -2,29 +2,19 @@
 
 namespace App\Model\Components;
 
-use App\Model\Services\UsersService;
-use Nette\Application\UI\Control;
 
-class UsersRelationshipsRestrictionsControl extends Control
+class UsersRelationshipsRestrictionsControl extends BaseComponent
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $usersBlockedByMe;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $usersBlockingMe;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $suspendedUsers;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $usersBlockingEachOther;
 
     public function __construct(

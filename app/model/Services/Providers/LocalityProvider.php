@@ -8,9 +8,7 @@ use Nette\Object;
 
 class LocalityProvider extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
     public function __construct(EntityManager $entityManager)

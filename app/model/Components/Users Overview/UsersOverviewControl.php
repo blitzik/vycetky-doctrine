@@ -2,59 +2,38 @@
 
 namespace App\Model\Components;
 
-use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Queries\Users\UsersOverviewQuery;
 use Nette\Application\UI\Multiplier;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
 use Components\IPaginatorFactory;
-use Nette\Application\UI\Control;
 use Doctrine\ORM\AbstractQuery;
 use Nette\Utils\Arrays;
-use Tracy\Debugger;
 
-class UsersOverviewControl extends Control
+class UsersOverviewControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
-    /**
-     * @var IUsersRelationshipsRestrictionsControlFactory
-     */
+    /** @var IUsersRelationshipsRestrictionsControlFactory  */
     private $relationshipsRestrictionsControlFactory;
 
-    /**
-     * @var IUserBlockingControlFactory
-     */
+    /** @var IUserBlockingControlFactory  */
     protected $userBlockingControlFactory;
 
-    /**
-     * @var IPaginatorFactory
-     */
+    /** @var IPaginatorFactory  */
     private $paginatorFactory;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $userEntity;
 
-    /**
-     * @var UsersFacade
-     */
+    /** @var UsersFacade */
     protected $usersFacade;
 
-    /**
-     * @var UsersOverviewQuery
-     */
+    /** @var UsersOverviewQuery */
     protected $usersQuery;
 
-    /**
-     * @var array
-     */
+    /**  @var array */
     protected $users = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $alreadyBlockedUsers = [];
     protected $usersWithClosedAccount = [];
 

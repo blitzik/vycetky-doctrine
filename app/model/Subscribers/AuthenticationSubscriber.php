@@ -10,14 +10,10 @@ use Nette\Object;
 
 class AuthenticationSubscriber extends Object implements Subscriber
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $entityManager;
 
-    /**
-     * @var IRequest
-     */
+    /** @var IRequest  */
     private $httpRequest;
 
     public function __construct(

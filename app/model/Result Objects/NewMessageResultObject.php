@@ -1,29 +1,14 @@
 <?php
 
-namespace App\Model\Subscribers\Validation;
+namespace App\Model\Subscribers\Results;
 
-use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\ReceivedMessage;
 use Exceptions\Logic\InvalidArgumentException;
-use Nette\Utils\Validators;
-use Nette\Object;
 
-class NewMessageResultObject extends Object
+class NewMessageResultObject extends ResultObject
 {
-    /**
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @var Invitation
-     */
-    private $message;
-
-    /**
-     * @var ReceivedMessage[]
-     */
+    /** @var ReceivedMessage[] */
     private $messageReferences;
 
     public function __construct(SentMessage $message)
@@ -32,7 +17,7 @@ class NewMessageResultObject extends Object
             throw new InvalidArgumentException('Only new instances of ' .SentMessage::class. ' are allowed');
         }
 
-        $this->message = $message;
+        parent::__construct($message);
     }
 
     public function addMessageReferences(array $references)
@@ -41,7 +26,7 @@ class NewMessageResultObject extends Object
         foreach ($references as $recipientID => $reference) {
             $message = $reference->getMessage();
             if (!$reference instanceof ReceivedMessage or
-                $message !== $this->message) {
+                $message !== $this->entity) {
                 $diff[] = $reference->getId();
             }
         }
@@ -56,43 +41,11 @@ class NewMessageResultObject extends Object
         $this->messageReferences = $references;
     }
 
-    public function addError($message, $type)
-    {
-        Validators::assert($message, 'string');
-        Validators::assert($type, 'string');
-
-        $this->errors[] = ['message' => $message, 'type' => $type];
-    }
-
     /**
      * @return bool
      */
-    public function isValid()
+    public function hasNoErrors()
     {
-        return $this->message->getId() !== null and empty($this->errors);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFirstError()
-    {
-        return reset($this->errors);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllErrors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * @return Invitation
-     */
-    public function getMessage()
-    {
-        return $this->message;
+        return $this->entity->getId() !== null and empty($this->errors);
     }
 }

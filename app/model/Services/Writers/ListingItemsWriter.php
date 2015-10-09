@@ -21,14 +21,10 @@ class ListingItemsWriter extends Object
     const WRITE_DOWN = 1;
     const WRITE_UP   = -1;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var ListingItemsReader
-     */
+    /** @var ListingItemsReader  */
     private $listingItemReader;
 
     public function __construct(

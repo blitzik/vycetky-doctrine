@@ -5,35 +5,24 @@ namespace App\Model\Components;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Time\TimeUtils;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
-class ListingCopyFormControl extends Control
+class ListingCopyFormControl extends BaseComponent
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     public $onListingCopySuccess;
 
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
-    /**
-     * @var IListingDescriptionControlFactory
-     */
+    /** @var IListingDescriptionControlFactory  */
     private $listingDescriptionFactory;
 
-    /**
-     * @var ListingFormFactory
-     */
+    /** @var ListingFormFactory  */
     private $listingFormFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingsFacade;
 
     public function __construct(

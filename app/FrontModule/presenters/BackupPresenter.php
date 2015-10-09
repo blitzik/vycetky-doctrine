@@ -13,9 +13,7 @@ class BackupPresenter extends Presenter
      */
     public $backupControlFactory;
 
-    /**
-     * @var array ['admin' => ... , 'system' => ...]
-     */
+    /** @var array ['admin' => ... , 'system' => ...] */
     private $emails;
 
     public function setEmails(array $emails)

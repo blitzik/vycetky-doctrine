@@ -9,7 +9,7 @@ use App\Model\Services\InvitationsSender;
 use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\InvitationsWriter;
-use App\Model\Subscribers\Validation\InvitationResultObject;
+use App\Model\Subscribers\Results\ResultObject;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationExpiredException;
 use Exceptions\Runtime\InvitationNotFoundException;
@@ -20,29 +20,22 @@ use Nette\Object;
 
 class InvitationsFacade extends Object
 {
-    /**
-     * @var InvitationsReader
-     */
+    /** @var array  */
+    public $onInvitationCreation = [];
+
+    /** @var InvitationsReader  */
     private $invitationsReader;
 
-    /**
-     * @var InvitationsSender
-     */
+    /** @var InvitationsSender  */
     private $invitationsSender;
 
-    /**
-     * @var InvitationHandler
-     */
+    /** @var InvitationHandler  */
     private $invitationsHandler;
 
-    /**
-     * @var InvitationsWriter
-     */
+    /** @var InvitationsWriter  */
     private $invitationsWriter;
 
-    /**
-     * @var UsersReader
-     */
+    /** @var UsersReader  */
     private $usersReader;
 
     public function __construct(
@@ -118,7 +111,7 @@ class InvitationsFacade extends Object
 
     /**
      * @param Invitation $invitation
-     * @return InvitationResultObject
+     * @return ResultObject
      * @throws InvitationAlreadyExistsException
      * @throws UserAlreadyExistsException
      */
@@ -130,7 +123,12 @@ class InvitationsFacade extends Object
             throw new UserAlreadyExistsException;
         }
 
-        return $this->invitationsHandler->process($invitation);
+        $this->invitationsHandler->process($invitation);
+
+        $resultObject = new ResultObject($invitation);
+        $this->onInvitationCreation($invitation, $resultObject);
+
+        return $resultObject;
     }
 
     /**

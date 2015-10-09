@@ -6,10 +6,9 @@ use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ListingsFacade;
 use App\Model\ResultObjects\ListingResult;
 use Doctrine\DBAL\DBALException;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
-class ListingRemovalControl extends Control
+class ListingRemovalControl extends BaseComponent
 {
     /** @var  array */
     public $onRemoveSuccess;

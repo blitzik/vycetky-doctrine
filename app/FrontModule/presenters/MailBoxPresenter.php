@@ -58,14 +58,10 @@ class MailBoxPresenter extends SecurityPresenter
      */
     public $messagesFacade;
 
-    /**
-     * @var IMessagesHandler
-     */
+    /** @var IMessagesHandler */
     private $messagesHandler;
 
-    /**
-     * @var IMessage
-     */
+    /** @var IMessage */
     private $message;
 
 

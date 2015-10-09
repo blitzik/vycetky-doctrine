@@ -4,18 +4,13 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\Listing;
 use Nette\Application\LinkGenerator;
-use Nette\Application\UI\Control;
 
-class ListingDescriptionControl extends Control
+class ListingDescriptionControl extends BaseComponent
 {
-    /**
-     * @var LinkGenerator
-     */
+    /** @var LinkGenerator */
     private $linkGenerator;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
     private $link;

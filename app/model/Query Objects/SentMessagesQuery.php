@@ -10,20 +10,14 @@ use Kdyby;
 
 class SentMessagesQuery extends QueryObject
 {
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $filter = [];
 
-    /**
-     * @var array|\Closure[]
-     */
+    /** @var array|\Closure[] */
     private $select = [];
 
 
-    /**
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     private $queryBuilder;
 
 
@@ -57,6 +51,15 @@ class SentMessagesQuery extends QueryObject
     {
         $this->filter[] = function(QueryBuilder $qb) {
             $qb->andWhere('sm.deleted = 0');
+        };
+
+        return $this;
+    }
+
+    public function withoutSystemMessages()
+    {
+        $this->filter[] = function(QueryBuilder $qb) {
+            $qb->andWhere('sm.isSystemMessage = 0');
         };
 
         return $this;

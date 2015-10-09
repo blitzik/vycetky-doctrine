@@ -2,16 +2,12 @@
 
 namespace App\Model\Components;
 
-use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
-use Nette\Application\UI\Control;
 use Tracy\Debugger;
 
-class UserBlockingControl extends Control
+class UserBlockingControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
     /** @var array */
     public $onBlockUser = [];
 
@@ -24,24 +20,16 @@ class UserBlockingControl extends Control
     /** @var array */
     public $onOpenAccount = [];
 
-    /**
-     * @var UsersFacade
-     */
+    /** @var UsersFacade  */
     private $usersFacade;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $userBeingBlockedID;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $userEntity;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $blockedUsersIDs = [];
     private $usersWithClosedAccountIDs = [];
 

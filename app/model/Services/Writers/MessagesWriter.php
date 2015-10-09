@@ -13,9 +13,7 @@ use Tracy\Debugger;
 
 class MessagesWriter extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
     public function __construct(
@@ -38,12 +36,12 @@ class MessagesWriter extends Object
     /**
      * @param SentMessage $message
      * @param array $recipients
-     * @return array
+     * @return ReceivedMessage[]
      * @throws DBALException
      */
     public function sendMessage(SentMessage $message, array $recipients)
     {
-        $messageReferences = [];
+        $receivedMessages = [];
         try {
             $this->em->beginTransaction();
 
@@ -55,16 +53,16 @@ class MessagesWriter extends Object
                         'Argument $recipients can only contains instances of ' . User::class
                     );
                 }
-                $m = $messageReferences[$recipient->getId()] = new ReceivedMessage($message, $recipient);
+                $m = $receivedMessages[$recipient->getId()] = new ReceivedMessage($message, $recipient);
                 $this->em->persist($m);
 
-                if (count($messageReferences) % 5 === 0) {
-                    $this->em->flush();
-                    $this->em->clear();
-                }
+                //if (count($receivedMessages) % 5 === 0) { // todo
+                //    $this->em->flush();
+                //    $this->em->clear();
+                //}
             }
 
-            $this->em->flush(); // flush the rest
+            $this->em->flush();
             $this->em->commit();
 
         } catch (DBALException $e) {
@@ -74,7 +72,7 @@ class MessagesWriter extends Object
             throw $e;
         }
 
-        return $messageReferences;
+        return $receivedMessages;
     }
 
     /**

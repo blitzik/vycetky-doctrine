@@ -2,14 +2,11 @@
 
 namespace App\Model\Components;
 
-use Nette\Application\UI\Control;
 use App\Model\Domain\Entities\Listing;
 
-class ListingActionsMenuControl extends Control
+class ListingActionsMenuControl extends BaseComponent
 {
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
     public function __construct(Listing $listing)

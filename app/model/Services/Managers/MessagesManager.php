@@ -7,9 +7,7 @@ use Nette\Object;
 
 class MessagesManager extends Object
 {
-    /**
-     * @var MessagesReader
-     */
+    /** @var MessagesReader  */
     private $messagesReader;
 
     public function __construct(

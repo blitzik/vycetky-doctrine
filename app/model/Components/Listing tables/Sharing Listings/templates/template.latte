@@ -1,5 +1,11 @@
 
+<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+
 {form form}
+<ul class="form-errors" n:if="$form->hasErrors()">
+    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
+</ul>
+
 <table class="table t-classic">
 <tr><th>{label description /}</th></tr>
 <tr><td>{input description}</td></tr>
@@ -7,8 +13,8 @@
 </table>
 
 <table class="table t-classic left">
-<tr><th>{label recipients /}</th></tr>
-<tr><td>{input recipients}</td></tr>
+<tr><th>{label recipient /}</th></tr>
+<tr><td>{input recipient}</td></tr>
 </table>
 
 <div class="box-hint right">

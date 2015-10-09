@@ -88,5 +88,7 @@ namespace Exceptions\Runtime;
 
         class MessageTypeException extends RuntimeException {}
 
+        class RecipientsNotFoundException extends RuntimeException {}
+
         // WorkedHours
         class OtherHoursZeroTimeException extends RuntimeException {}

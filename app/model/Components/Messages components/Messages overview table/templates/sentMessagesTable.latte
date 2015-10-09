@@ -5,7 +5,7 @@
 
 {block messagesList}
     {foreach $messages as $message}
-    <tr n:class="$message['isSystemMessage'] ? m-system-message : ($iterator->isOdd() ? null : m-odd)">
+    <tr{include #class message => $message, isOdd => $iterator->isOdd()}>
 
         <td>{$message['sent']|date:'j.n.Y v H:i'}</td>
         <td>
@@ -16,7 +16,7 @@
             </a>
         </td>
         <td><a href="{plink MailBox:message, 'id' => $message['id'],
-                                             'type' => App\Model\Domain\Entities\IMessage::SENT}">Prohlédnout</a></td>
+                                             'type' => App\Model\Domain\Entities\IMessage::SENT}">Přečíst zprávu</a></td>
         <td><a href="{link deleteMessage!, 'id' => $message['id']}"
                class="ajax item">Odstranit</a></td>
     </tr>

@@ -5,7 +5,6 @@ namespace App\Model\Services;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Writers\InvitationsWriter;
-use App\Model\Subscribers\Validation\InvitationResultObject;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationCreationAttemptException;
@@ -15,26 +14,16 @@ use Tracy\Debugger;
 
 class InvitationHandler extends Object
 {
-    public $onInvitationCreation = [];
-
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $entityManager;
 
-    /**
-     * @var InvitationsReader
-     */
+    /** @var InvitationsReader  */
     private $invitationsReader;
 
-    /**
-     * @var InvitationsWriter
-     */
+    /** @var InvitationsWriter  */
     private $invitationsWriter;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $creationAttempts = 0;
 
     public function __construct(
@@ -49,7 +38,7 @@ class InvitationHandler extends Object
 
     /**
      * @param Invitation $invitation
-     * @return InvitationResultObject
+     * @return Invitation
      * @throws InvitationAlreadyExistsException
      * @throws InvitationCreationAttemptException
      * @throws DBALException
@@ -60,20 +49,23 @@ class InvitationHandler extends Object
             $this->entityManager->beginTransaction();
                 $inv = $this->createInvitation($invitation);
             $this->entityManager->commit();
+
         } catch (InvitationCreationAttemptException $ca) {
             $this->entityManager->rollback();
 
             Debugger::log($ca, Debugger::ERROR);
             throw $ca;
+
         } catch (InvitationAlreadyExistsException $ae) {
             $this->entityManager->rollback();
             throw $ae;
+
+        } catch (DBALException $e) {
+            Debugger::log($e, Debugger::ERROR);
+            throw $e;
         }
 
-        $validationObject = new InvitationResultObject($inv);
-        $this->onInvitationCreation($invitation, $validationObject);
-
-        return $validationObject;
+        return $invitation;
     }
 
     /**

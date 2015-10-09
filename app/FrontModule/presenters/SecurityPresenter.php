@@ -9,14 +9,10 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
 {
     use \Nextras\Application\UI\SecuredLinksPresenterTrait;
 
-    /**
-     * @var \DateTime
-     */
+    /**  @var \DateTime */
     protected $currentDate;
 
-    /**
-     * @var Model\Authorization\Authorizator
-     */
+    /** @var Model\Authorization\Authorizator */
     protected $authorizator;
 
     public function setAuthorizator(Model\Authorization\Authorizator $authorizator)

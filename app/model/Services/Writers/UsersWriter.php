@@ -9,9 +9,7 @@ use Nette\Object;
 
 class UsersWriter extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
     public function __construct(EntityManager $entityManager)

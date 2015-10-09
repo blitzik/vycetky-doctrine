@@ -6,34 +6,22 @@ use Components\IPaginatorFactory;
 use Exceptions\Runtime\InvitationValidityException;
 use Nette\InvalidStateException;
 use Nette\Utils\Html;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
 use App\Model\Query\InvitationsQuery;
-use Nette\Application\UI\Control;
 
-class InvitationsManagementControl extends Control
+class InvitationsManagementControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
-    /**
-     * @var IPaginatorFactory
-     */
+    /** @var IPaginatorFactory  */
     private $paginatorFactory;
 
-    /**
-     * @var InvitationsFacade
-     */
+    /** @var InvitationsFacade  */
     private $invitationsFacade;
 
-    /**
-     * @var InvitationsQuery
-     */
+    /** @var InvitationsQuery  */
     private $invitationsQuery;
 
-    /**
-     * @var Invitation[]
-     */
+    /** @var Invitation[] */
     private $invitations;
 
 

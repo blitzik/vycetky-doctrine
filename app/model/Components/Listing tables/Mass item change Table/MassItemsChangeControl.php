@@ -3,46 +3,32 @@
 namespace App\Model\Components;
 
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
-use App\Model\Domain\Entities\ListingItem;
 use App\Model\ResultObjects\ListingResult;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Domain\Entities\WorkedHours;
-use Nette\Application\UI\Control;
 use App\Model\Domain\Entities\Listing;
 use Nette\Application\UI\Form;
 
-class MassItemsChangeControl extends Control
+class MassItemsChangeControl extends BaseComponent
 {
-    /**
-     * @var IListingDescriptionControlFactory
-     */
+    /** @var IListingDescriptionControlFactory  */
     private $listingDescriptionControlFactory;
 
-    /**
-     * @var IItemsTableControlFactory
-     */
+    /** @var IItemsTableControlFactory  */
     private $itemsTableControlFactory;
 
-    /**
-     * @var ItemUpdateFormFactory
-     */
+    /** @var ItemUpdateFormFactory  */
     private $itemUpdateFormFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingsFacade;
 
-    /**
-     * @var ListingResult
-     */
+    /** @var ListingResult  */
     private $listingResult;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
     public function __construct(

@@ -2,13 +2,13 @@
 
 namespace App\Model\Components;
 
-use App\Model\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
 
 interface ISharingListingControlFactory
 {
     /**
-     * @param Listing $listing
+     * @param ListingResult $listing
      * @return SharingListingControl
      */
-    public function create(Listing $listing);
+    public function create(ListingResult $listing);
 }

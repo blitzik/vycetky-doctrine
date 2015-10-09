@@ -3,7 +3,6 @@
 namespace App\Model\Components;
 
 use Nette\InvalidArgumentException;
-use Nette\Application\UI\Control;
 use Nette\Security\User;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
@@ -14,31 +13,21 @@ use Nette\Mail\Message;
  *
  * This Component and its signal is invoked by Cron exclusively
  */
-class DatabaseBackupControl extends Control
+class DatabaseBackupControl extends BaseComponent
 {
-    /**
-     * @var \DatabaseBackup
-     */
+    /** @var \DatabaseBackup */
     private $databaseBackup;
 
-    /**
-     * @var IMailer
-     */
+    /** @var IMailer */
     private $mailer;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     private $user;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $emails;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $backupPassword;
 
     public function __construct(

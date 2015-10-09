@@ -2,10 +2,10 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Domain\Entities\Listing;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use App\Model\Components\IListingActionsMenuControlFactory;
 use Exceptions\Runtime\ListingNotFoundException;
-use App\Model\Entities\Listing;
 use Nette\Application\UI\Form;
 use App\Model\Time\TimeUtils;
 
@@ -19,24 +19,16 @@ class MergePresenter extends SecurityPresenter
      */
     public $listingActionsMenuControlFactory;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listingToMerge;
 
-    /**
-     * @var array Listing
-     */
+    /** @var array Listing */
     private $listings;
 
-    /**
-     * @var array ListingItem
-     */
+    /** @var array ListingItem */
     private $mergedListingsItems;
 
 

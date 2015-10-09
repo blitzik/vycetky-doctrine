@@ -2,6 +2,7 @@
 
 namespace App\Model\Components\ItemsTable;
 
+use App\Model\Components\BaseComponent;
 use App\Model\Components\IListingDescriptionControlFactory;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\FillingItem;
@@ -9,40 +10,27 @@ use App\Model\Domain\IDisplayableItem;
 use App\Model\Facades\ListingsFacade;
 use App\Model\ResultObjects\ListingResult;
 use Exceptions\Logic\InvalidArgumentException;
-use Nette\Application\UI\Control;
 use App\Model\Facades\ItemsFacade;
 use App\Model\Domain\Entities\Listing;
 
-class ItemsTableControl extends Control
+class ItemsTableControl extends BaseComponent
 {
-    /**
-     * @var IListingDescriptionControlFactory
-     */
+    /** @var IListingDescriptionControlFactory  */
     private $listingDescriptionControlFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingsFacade;
 
-    /**
-     * @var ItemsFacade
-     */
+    /** @var ItemsFacade  */
     private $itemFacade;
 
-    /**
-     * @var ListingResult
-     */
+    /** @var ListingResult  */
     private $listingResult;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
-    /**
-     * @var ListingItem[]
-     */
+    /** @var ListingItem[] */
     private $items = array();
 
 

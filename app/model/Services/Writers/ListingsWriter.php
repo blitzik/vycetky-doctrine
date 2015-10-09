@@ -10,14 +10,10 @@ use Tracy\Debugger;
 
 class ListingsWriter extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var ListingsReader
-     */
+    /** @var ListingsReader  */
     private $listingsReader;
 
     public function __construct(
@@ -45,4 +41,14 @@ class ListingsWriter extends Object
             throw $e;
         }
     }
+
+    /**
+     * @param Listing $listing
+     */
+    public function removeListing(Listing $listing)
+    {
+        $this->em->remove($listing)->flush();
+    }
+
+
 }

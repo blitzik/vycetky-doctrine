@@ -14,72 +14,34 @@ use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Listing;
-use Kdyby\Doctrine\EntityRepository;
 use App\Model\Services\ItemsService;
-use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
-use Nette\Security\User;
 
 class ItemsFacade extends Object
 {
-    /**
-     * @var array
-     */
-    public $onListingItemSaving;
-
-
-    /**
-     * @var EntityRepository
-     */
-    private $listingItemRepository;
-
-    /**
-     * @var ListingItemsManager
-     */
+    /** @var ListingItemsManager  */
     private $listingItemsManager;
 
-    /**
-     * @var ListingItemsWriter
-     */
+    /** @var ListingItemsWriter  */
     private $listingItemsWriter;
 
-    /**
-     * @var ListingItemsReader
-     */
+    /** @var ListingItemsReader  */
     private $listingItemsReader;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var ItemsService
-     */
+    /** @var ItemsService  */
     private $itemsService;
-
-    /**
-     * @var User
-     */
-    private $user;
 
     public function __construct(
         ListingItemsManager $listingItemManager,
         ListingItemsWriter $listingItemsWriter,
         ListingItemsReader $listingItemReader,
-        EntityManager $entityManager,
-        ItemsService $itemService,
-        User $user
+        ItemsService $itemService
     ) {
         $this->listingItemsManager = $listingItemManager;
         $this->listingItemsWriter = $listingItemsWriter;
         $this->listingItemsReader = $listingItemReader;
-        $this->em = $entityManager;
-
-        $this->listingItemRepository = $this->em->getRepository(ListingItem::class);
 
         $this->itemsService = $itemService;
-        $this->user = $user;
     }
 
     /**

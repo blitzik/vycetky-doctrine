@@ -2,46 +2,33 @@
 
 namespace App\Model\Components\ListingTable;
 
+use App\Model\Components\BaseComponent;
 use App\Model\Components\ItemsTable\IItemsTableControlFactory;
 use App\Model\Domain\Entities\Listing;
 use App\Model\ResultObjects\ListingResult;
 use Doctrine\DBAL\DBALException;
-use Nextras\Application\UI\SecuredLinksControlTrait;
 use Exceptions\Runtime\ListingNotFoundException;
 use Exceptions\Runtime\ShiftItemDownException;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Facades\ItemsFacade;
-use Nette\Application\UI\Control;
 use App\Model\Domain\FillingItem;
 use Nette\Utils\DateTime;
 
-class ListingTableControl extends Control
+class ListingTableControl extends BaseComponent
 {
-    use SecuredLinksControlTrait;
-
-    /**
-     * @var IItemsTableControlFactory
-     */
+    /** @var IItemsTableControlFactory  */
     private $itemsTableControlFactory;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade  */
     private $listingFacade;
 
-    /**
-     * @var ItemsFacade
-     */
+    /** @var ItemsFacade  */
     private $itemFacade;
 
-    /**
-     * @var ListingResult
-     */
+    /** @var ListingResult */
     private $listingResult;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
 

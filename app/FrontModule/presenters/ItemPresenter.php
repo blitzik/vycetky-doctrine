@@ -16,10 +16,7 @@ class ItemPresenter extends SecurityPresenter
      */
     public $itemFormFactory;
 
-    /**
-     *
-     * @var Entities\Listing
-     */
+    /** @var  Entities\Listing */
     private $listing;
 
     /*

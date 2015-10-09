@@ -2,11 +2,10 @@
 
 namespace App\Model\Components;
 
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use App\Model\Time\TimeUtils;
 
-class FilterControl extends Control
+class FilterControl extends BaseComponent
 {
 
     protected function createComponentForm()

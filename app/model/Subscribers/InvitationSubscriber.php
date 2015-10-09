@@ -2,9 +2,9 @@
 
 namespace App\Model\Subscribers;
 
+use App\Model\Subscribers\Results\IResultObject;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
-use App\Model\Subscribers\Validation\InvitationResultObject;
 use Kdyby\Events\Subscriber;
 use Nette\InvalidStateException;
 use Nette\Object;
@@ -12,9 +12,7 @@ use Tracy\Debugger;
 
 class InvitationSubscriber extends Object implements Subscriber
 {
-    /**
-     * @var InvitationsFacade
-     */
+    /** @var InvitationsFacade  */
     private $invitationsFacade;
 
     public function __construct(
@@ -31,13 +29,13 @@ class InvitationSubscriber extends Object implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-            'App\Model\Services\InvitationHandler::onInvitationCreation'
+            'App\Model\Facades\InvitationsFacade::onInvitationCreation'
         ];
     }
 
     public function onInvitationCreation(
         Invitation $invitation,
-        InvitationResultObject $validationObject
+        IResultObject $validationObject
     ) {
         try {
             $this->invitationsFacade->sendInvitation($invitation);

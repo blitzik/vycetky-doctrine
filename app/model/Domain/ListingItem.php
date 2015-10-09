@@ -39,7 +39,7 @@ class ListingItem extends Entity implements IResource
     protected $day;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Locality", cascade="persist")
+     * @ORM\ManyToOne(targetEntity="Locality")
      * @ORM\JoinColumn(name="locality_id", referencedColumnName="id", nullable=false)
      * @var Locality
      */
@@ -112,6 +112,14 @@ class ListingItem extends Entity implements IResource
     }
 
     /**
+     * @param WorkedHours $workedHours
+     */
+    private function setWorkedHours(WorkedHours $workedHours)
+    {
+        $this->workedHours = $workedHours;
+    }
+
+    /**
      * @param string|null $descOtherHours
      * @throws OtherHoursZeroTimeException
      */
@@ -127,6 +135,12 @@ class ListingItem extends Entity implements IResource
         }
 
         $this->descOtherHours = $descOtherHours;
+    }
+
+
+    public function removeDescOtherHours()
+    {
+        $this->descOtherHours = null;
     }
 
     /**
@@ -160,14 +174,6 @@ class ListingItem extends Entity implements IResource
         }
 
         $this->listing = $listing;
-    }
-
-    /**
-     * @param WorkedHours $workedHours
-     */
-    private function setWorkedHours(WorkedHours $workedHours)
-    {
-        $this->workedHours = $workedHours;
     }
 
     /**

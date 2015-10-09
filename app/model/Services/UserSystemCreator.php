@@ -15,24 +15,16 @@ use Nette\Object;
 
 class UserSystemCreator extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
     
-    /**
-     * @var InvitationsReader
-     */
+    /** @var InvitationsReader  */
     private $invitationsReader;
 
-    /**
-     * @var InvitationsWriter
-     */
+    /** @var InvitationsWriter  */
     private $invitationsWriter;
 
-    /**
-     * @var UsersReader
-     */
+    /** @var UsersReader  */
     private $usersReader;
 
     public function __construct(

@@ -12,14 +12,10 @@ use Nette\Object;
 
 class InvitationsReader extends Object
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager  */
     private $em;
 
-    /**
-     * @var EntityRepository
-     */
+    /** @var EntityRepository  */
     private $invitationsRepository;
 
     public function __construct(

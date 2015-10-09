@@ -13,19 +13,13 @@ use Nette\Object;
 
 class UserAuthenticator extends Object implements IAuthenticator
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     public $onLoggedIn = [];
 
-    /**
-     * @var UsersReader
-     */
+    /**  @var UsersReader */
     private $usersReader;
 
-    /**
-     * @var IRequest
-     */
+    /** @var IRequest */
     private $httpRequest;
 
     public function __construct(

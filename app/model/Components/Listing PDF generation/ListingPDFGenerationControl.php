@@ -9,43 +9,28 @@ use App\Model\ResultObjects\ListingResult;
 use App\Model\Time\TimeUtils;
 use Joseki\Application\Responses\PdfResponse;
 use Nette;
-use Nette\Application\IResponse;
-use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
-use Nette\Http\Response;
 
-class ListingPDFGenerationControl extends Control
+class ListingPDFGenerationControl extends BaseComponent
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $companyParameters;
 
 
-    /**
-     * @var ItemsFacade
-     */
+    /**  @var ItemsFacade */
     private $itemsFacade;
 
-    /**
-     * @var ListingsFacade
-     */
+    /** @var ListingsFacade */
     private $listingsFacade;
 
-    /**
-     * @var IListingDescriptionControlFactory
-     */
+    /** @var IListingDescriptionControlFactory */
     private $listingDescriptionFactory;
 
-    /**
-     * @var ListingResult
-     */
+    /** @var ListingResult */
     private $listingResult;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
     public function __construct(
