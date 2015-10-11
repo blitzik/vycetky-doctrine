@@ -212,7 +212,7 @@ class Listing extends Entity implements IResource
      */
     function getResourceId()
     {
-        return 'entity';
+        return 'listing';
     }
 
     /**

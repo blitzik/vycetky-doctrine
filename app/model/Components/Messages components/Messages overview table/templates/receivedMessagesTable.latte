@@ -5,9 +5,9 @@
 
 {define username}
 {if $message['isSystemMessage'] === true}
-    {*$message['author']['role']*}Systém
+    {*$message['author']['role']*}<b>SYSTÉM</b>
 {elseif $message['sentByAuthorRole'] === true}
-   {$message['author']['role']|upper}
+   <b>{$message['author']['role']|capitalize}</b>
 {else}
     {if isset($message['author'])}
         {$message['author']['username']}
@@ -20,7 +20,7 @@
 {block messagesList}
     {foreach $messages as $receivedMessage}
     {var $message = $receivedMessage['message']}
-    <tr{include #class message => $message, isOdd => $iterator->isOdd()}>
+    <tr {include #class message => $message, isOdd => $iterator->isOdd()}>
 
         <td>{include #username}</td>
 

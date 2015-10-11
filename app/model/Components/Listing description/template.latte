@@ -1,3 +1,11 @@
+{define user}
+{if $listing->user->id != $user->identity->id}
+    {l} owner: {$listing->user->username}{r}
+{/if}
+{/define}
+
+{include #user listing => $listing}
+
 <a href="{$link}" n:tag-if="$isClickable">
-<b>{$period|listingMonthYear}</b>
-{if isset($description)} [ {$description} ]{/if}</a>
+#{$listing->id} - <b>{$listing->period|listingMonthYear}</b>
+{if $listing->description !== null} [ {$listing->description} ]{/if}</a>

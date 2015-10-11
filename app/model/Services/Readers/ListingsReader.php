@@ -4,6 +4,7 @@ namespace App\Model\Services\Readers;
 
 use App\Model\Domain\Entities\Listing;
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\Domain\Entities\User;
 use Exceptions\Runtime\ListingNotFoundException;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
@@ -52,6 +53,21 @@ class ListingsReader extends Object
     }
 
     /**
+     * @param User $owner
+     * @param int $year
+     * @param int $month
+     * @return array
+     */
+    public function findListingsToMerge(User $owner, $year, $month)
+    {
+        return $this->em->createQuery(
+            'SELECT l.id, l.description FROM ' .Listing::class. ' l
+             WHERE l.user = :user AND l.year = :year AND l.month = :month'
+        )->setParameters(['user' => $owner, 'year' => $year, 'month' => $month])
+         ->getArrayResult();
+    }
+
+    /**
      * @param $listingID
      * @return array|null
      */
@@ -72,7 +88,7 @@ class ListingsReader extends Object
     /**
      * @param int $listingID
      * @param bool $withWorkedTime
-     * @return array|null
+     * @return Listing|array|null
      */
     public function getByID($listingID, $withWorkedTime = false)
     {

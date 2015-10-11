@@ -1,8 +1,14 @@
 services:
 
+	accountPasswordControlFactory:
+		implement: App\Model\Components\IAccountPasswordControlFactory
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%]
+
 	recipientsSelectBoxFactory:
 		class: App\Forms\Fields\RecipientsSelectBoxFactory
 
+	passwordChangeFormFactory: App\Model\Factories\PasswordChangeFormFactory
 	listingFormFactory: App\Model\Components\ListingFormFactory
 
 	itemUpdateFormFactory:

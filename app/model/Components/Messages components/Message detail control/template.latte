@@ -35,10 +35,10 @@
 {else}
 
     {if $message->isSystemMessage() === true}
-        Systém
+        <b>SYSTÉM</b>
     {elseif $message->isSentByAuthorRole() === true}
     {dump $message->getAuthor()}
-       {$message->getAuthor()->getRoleId()|upper}
+       <b>{$message->getAuthor()->getRoleId()|capitalize}</b>
     {else}
        {$message->author->username}
     {/if}

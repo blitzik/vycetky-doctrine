@@ -576,6 +576,12 @@ $baseListing-color: #ffdfda;
   }
 }
 
+.documentation-text{
+  float: left;
+  width: 600px;
+  font-size: 115%;
+}
+
 /* --------------------
    ----- MESSAGES -----
    -------------------- */
@@ -635,17 +641,19 @@ $baseListing-color: #ffdfda;
 
 .m-odd{
   border-bottom: 1px solid #ccc;
-  background-color: #f0f0f0;
+  background-color: #F5F5F5;
 }
 
+$m-system-message-color: #FFFAF0;
 .m-system-message{
-  background-color: #DEF2FF;
-  border-bottom: 1px solid #9EC4DE;
+  background-color: $m-system-message-color;
+  //border-bottom: 1px solid darken($m-system-message-color, 5%);
 }
 
+$m-admin-message-color: #FFE4E1;
 .m-admin{
-  background-color: #ffbfbf;
-  border-bottom: 1px solid darken(#ffbfbf, 5%);
+  background-color: $m-admin-message-color;
+  //border-bottom: 1px solid darken($m-admin-message-color, 5%);
 }
 
 #new-message-form{

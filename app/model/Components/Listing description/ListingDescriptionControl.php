@@ -39,8 +39,7 @@ class ListingDescriptionControl extends BaseComponent
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
-        $template->period = $this->listing->getPeriod();
-        $template->description = $this->listing->description;
+        $template->listing = $this->listing;
         $template->link = $this->link;
         $template->isClickable = $this->isClickable;
 

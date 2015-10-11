@@ -8,8 +8,10 @@
     <li><h4>Uživatelé</h4>
         <ul>
             <li><a href="{link this}#registrace">Registrace</a></li>
+            <li><a href="{link this}#zmena-hesla">Změna hesla</a></li>
             <li><a href="{link this}#zapomenute-heslo">Zapomenuté heslo</a></li>
             <li><a href="{link this}#profil-uzivatele">Profil uživatele</a></li>
+            <li><a href="{link this}#uzivatelske-vztahy">Správa vztahů mezi uživateli</a></li>
             <li><h5>Systém zpráv</h5>
                 <ul>
                     <li><a href="{link this}#schranka">Schránka</a></li>
@@ -42,7 +44,7 @@
     </li>
 </ul>
 
-<div class="box box-text">
+<div class="documentation-text">
 
 <p>V této dokumentaci naleznete základní informace o systému. Pokud zde nenaleznete informaci,
     kterou hledáte, tak je možné kontaktovat správce pomocí
@@ -63,6 +65,15 @@
     <strong>pouze 1 účet</strong>. Pokud platnost pozvánky vyprší, již nebude možné
     pomocí této pozvánky vytvořit účet.</p>
 
+<p>Pokud se systému nepodaří pozvánku odeslat, má uživatel možnost tuto pozvánku odeslat znovu
+    pres systém každých 24 hodin. Pokud se pozvánku nedaří odeslat i na několikátý pokus,
+    může uživatel odeslat registrační číslo pozvánky sám. Toto číslo poté uživatel uplatní
+    na přihlašovací stránce <a href="{plink :User:Invitation:application}">v sekci registrace</a>.</p>
+
+<h4><a name="zmena-hesla">Změna hesla</a></h4>
+<p>Uživatel si může ve svém profilu nechat změnit heslo. Ke změně hesla je ale nutné znát heslo
+    původní.</p>
+
 <h4><a name="zapomenute-heslo">Zapomenuté heslo</a></h4>
 <p>Pokud uživatel zapomene heslo, je možné si
     <a href="{plink :User:Password:reset}">zapomenuté heslo obnovit</a>.
@@ -81,6 +92,17 @@
 <p>Uživatel si v profilu může taktéž nastavit jméno, které se bude poté defaultně zobrazovat v nastavení
     před generováním výčetky, aby se toto jméno nemuselo u každé výčetky stále zadávat.</p>
 
+<h4><a name="uzivatelske-vztahy">Správa vztahů mezi uživateli</a></h4>
+<p>Protože je systém uzavřený a uživatelé si sami určují, kdo bude systém využívat, tak
+    může komunikovat každý uživatel s každým uživatelem. V přehledu uživatelů lze vidět
+    uživatele, kteří používají systém. V tomto přehledu se taktéž nacházejí tlačítka
+    na blokaci uživatelů. Pokud chce uživatel zamezit jinému uživateli ho jakkoliv
+    kontaktovat, může tohoto uživatele zablokovat.</p>
+
+<p>Takto zablokovaný uživatel nadále nemůže odesílat zprávy, sdílet výčetky apod. s daným uživatelem.
+    Nicméně uživatel, který blokuje jiného uživatele taktéž nemůže tohoto uživatele nijak
+    kontaktovat.</p>
+
 <h3>Systém zpráv</h3>
 
 <h4><a name="schranka">Schránka</a></h4>
@@ -88,11 +110,18 @@
     nachází box, který upozorní uživatele na nově příchozí zprávy. Ve schránce může uživatel spravovat
     své příchozí a odchozí zprávy.</p>
 
+<p>V systému se nachází několik typů zpráv. Jsou to uživatelské zprávy,
+    systémové zprávy, které informují uživatele o systémových záležitostech a nakonec
+    zprávy odeslané nějakou autoritou v systému, například zprávy od Administrátora.</p>
+
 <h4><a name="nova-zprava">Nová zpráva</a></h4>
 <p>Uživatel může vytvořit zprávu, která bude mít uveden předmět, samotný text zprávy a příjemce.
-    Datum zprávy se doplní automaticky. Uživatel může jednu zprávu poslat více přijemcům tak, že s pomocí
-    tlačítka <strong>CTRL</strong> vybere více příjemců ze seznamu. Není proto nutné jednu zprávu vytvářet
-    několikrát.</p>
+    Datum zprávy se doplní automaticky.</p>
+
+<p>V seznamu příjemců se nezobrazí uživatelé, kteří blokují autora zprávy a naopak se tam nezobrazí
+    ani uživatelé, kteří jsou blokovaní autorem zprávy. Dále se v seznamu příjemců nezobrazí
+    uživatelé, kteří mají zamezen přístup do systému. Přehledd těchto vztahů lze vidět pod
+    formulářem pro zadání zprávy.</p>
 
 <p>Zprávu je možné obohatit o tučné písmo, kurzívu či odkazy. Více je popsáno u
     <a href="{link MailBox:newMessage}">samotného formuláře v nápovědě</a>.</p>
@@ -135,7 +164,7 @@
 
 <h4><a name="generovani-vycetky">Vygenerování PDF výčetky</a></h4>
 <p>Z uložené výčetky lze generovat data do PDF souboru, který se zobrazí v prohlížeči a který si
-    může následně uživatel uložit do počítače. Generovat PDF může pouze uživatel vlastnící danou výčetku.</p>
+    může následně uživatel uložit do počítače.</p>
 
 <p>Před samotným vygenerováním výčetky může uživatel mírně přizpůsobit výsledek.
     Lze upravit jméno zaměstnavatele a jméno vlastníka výčetky. Dále může
@@ -156,7 +185,7 @@
     ztrátě komentáře u položek, kterým se nově nastaví hodnota ostatních hodin na 0.</strong></p>
 
 <h4><a name="odeslani-vycetky">Odeslání výčetky</a></h4>
-<p>Uživatel může odeslat kopii své výčetky jinému uživateli či více uživatelům naráz.
+<p>Uživatel může odeslat kopii své výčetky jinému uživateli..
     Povinnou položkou je popis výčetky, který se zobrazí přijemci nebo příjemcům výčetky.
     Příjemcům se tak nezobrazí popis výčetky vlastníka.</p>
 

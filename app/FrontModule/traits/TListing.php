@@ -33,7 +33,7 @@ trait TListing
     private function getListingByID($listingID, $withTime = false)
     {
         $result = $this->listingsFacade->getListingByID($listingID, $withTime);
-        if ($result->getListing() === null or
+        if ($result === null or
             !$this->authorizator->isAllowed($this->user->getIdentity(), $result->getListing())) {
             $this->flashMessage('Výčetka nebyla nalezena.', 'warning');
             $this->redirect('Listing:overview');
@@ -45,11 +45,11 @@ trait TListing
     protected function createComponentListingDescription()
     {
         $desc = $this->listingDescriptionFactory
-                     ->create($this->listing);
+                     ->create($this->listingResult->getListing());
 
         $desc->setAsClickable(
             'Front:Listing:detail',
-            ['id' => $this->listing->id]
+            ['id' => $this->listingResult->getListingId()]
         );
 
         return $desc;

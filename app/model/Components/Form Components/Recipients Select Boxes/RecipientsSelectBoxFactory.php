@@ -41,6 +41,7 @@ class RecipientsSelectBoxFactory
     }
 
     /**
+     * @param User $sender
      * @param array $usersByRestrictions
      * @return array
      */

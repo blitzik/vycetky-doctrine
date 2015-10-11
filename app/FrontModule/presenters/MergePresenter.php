@@ -3,6 +3,8 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Domain\Entities\Listing;
+use App\Model\ResultObjects\ListingResult;
+use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use App\Model\Components\IListingActionsMenuControlFactory;
 use Exceptions\Runtime\ListingNotFoundException;
@@ -19,22 +21,17 @@ class MergePresenter extends SecurityPresenter
      */
     public $listingActionsMenuControlFactory;
 
-    /** @var Listing */
-    private $listing;
-
-    /** @var Listing */
-    private $listingToMerge;
+    /** @var ListingResult */
+    private $listingToMergeResult;
 
     /** @var array Listing */
     private $listings;
 
-    /** @var array ListingItem */
-    private $mergedListingsItems;
-
 
     protected function createComponentListingActionsMenu()
     {
-        $comp = $this->listingActionsMenuControlFactory->create($this->listing);
+        $comp = $this->listingActionsMenuControlFactory
+                     ->create($this->listingResult->getListing());
         return $comp;
     }
 
@@ -46,31 +43,45 @@ class MergePresenter extends SecurityPresenter
 
     public function actionSearch($id)
     {
-        $this->listing  = $this->getEntireListingByID($id);
+        $this->listingResult  = $this->getListingByID($id);
+        $listing = $this->listingResult->getListing();
 
         $listings = $this->listingsFacade
-                         ->findPartialListingsDataForSelect(
-                             $this->listing->year,
-                             $this->listing->month
+                         ->findListingsToMerge(
+                             $listing->getUser(),
+                             $listing->getYear(),
+                             $listing->getMonth()
                          );
-        unset($listings[$this->listing->listingID]);
+
+        unset($listings[$listing->getId()]);
 
         if (empty($listings)) {
             $this->flashMessage(
                 'Váš účet neobsahuje další výčetky za ' .
-                TimeUtils::getMonthName($this->listing->month) .
-                ' ' . $this->listing->year . ' a proto není možné
+                TimeUtils::getMonthName($listing->getMonth()) .
+                ' ' . $listing->getYear() . ' a proto není možné
                 využít Vámi požadovanou funkcionalitu.', 'warning'
             );
-            $this->redirect('Listing:detail', ['id' => $this->listing->listingID]);
+            $this->redirect('Listing:detail', ['id' => $listing->getId()]);
         }
 
-        $this->listings = $listings;
+        $this->listings = $this->prepareListingsForSearchSelect($listings);
     }
 
     public function renderSearch($id)
     {
 
+    }
+
+    private function prepareListingsForSearchSelect(array $listings)
+    {
+        $result = [];
+        foreach ($listings as $id => $description) {
+            $desc = $description ?: 'Bez popisu';
+            $result[$id] = '#'.$id. ' - ' .$desc;
+        }
+
+        return $result;
     }
 
     /**
@@ -86,16 +97,16 @@ class MergePresenter extends SecurityPresenter
 
         $form->addSubmit('send', 'Vybrat výčetku');
 
-        $form->onSuccess[] = [$this, 'proccessListingSelection'];
+        $form->onSuccess[] = [$this, 'processListingSelection'];
 
         return $form;
     }
 
-    public function proccessListingSelection(Form $form, $values)
+    public function processListingSelection(Form $form, $values)
     {
         $this->redirect(
             'Merge:listing',
-            ['id' => $this->listing->listingID,
+            ['id' => $this->listingResult->getListingId(),
              'with' => $values['listingsList']]
         );
     }
@@ -108,55 +119,47 @@ class MergePresenter extends SecurityPresenter
 
     public function actionListing($id, $with)
     {
-        $this->listing = $this->getEntireListingByID($id);
+        $this->listingResult = $this->getListingByID($id);
         if (!isset($with)) {
             $this->redirect(
                 'Merge:search',
-                ['id' => $this->listing->listingID]
+                ['id' => $this->listingResult->getListingId()]
             );
         }
 
         $listingToMergeID = intval($with);
 
-        if ($listingToMergeID == $this->listing->listingID) {
+        if ($listingToMergeID == $this->listingResult->getListingId()) {
             $this->flashMessage('Nelze spojit výčetku se sebou samou.', 'warning');
-            $this->redirect('this', ['with' => null]);
+            $this->redirect('Listing:detail', ['id' => $this->listingResult->getListingId()]);
         }
 
-        try {
-            $this->listingToMerge = $this->listingsFacade->getListingByID($listingToMergeID);
-            if (!$this->listingsFacade->haveListingsSamePeriod($this->listing, $this->listingToMerge)) {
-                $this->flashMessage(
-                    'Lze spojit pouze výčetky se stejným obdobím.',
-                    'warning'
-                );
-                $this->redirect('Merge:search', ['id' => $this->listing->listingID]);
-            }
-
-        } catch (ListingNotFoundException $e) {
+        $this->listingToMergeResult = $this->getListingByID($listingToMergeID);
+        if (!$this->listingsFacade
+                  ->haveListingsSamePeriod(
+                      $this->listingResult->getListing(),
+                      $this->listingToMergeResult->getListing())
+        ) {
             $this->flashMessage(
-                'Výčetka, kterou se snažíte vybrat nebyla nalezena.',
+                'Lze spojit pouze výčetky se stejným obdobím.',
                 'warning'
             );
-            $this->redirect('Merge:search', ['id' => $this->listing->listingID]);
-
+            $this->redirect('Merge:search', ['id' => $this->listingResult->getListingId()]);
         }
-
-        $this->mergedListingsItems = $this->listingsFacade
-                                          ->getMergedListingsItemsForEntireTable(
-                                              $this->listing,
-                                              $this->listingToMerge
-                                          );
     }
 
     public function renderListing($id, $with)
     {
-        $this->template->baseListing = $this->listing;
-        if (isset($this->listingToMerge)) {
-            $this->template->listingToMerge = $this->listingToMerge;
+        $this->template->baseListing = $this->listingResult->getListing();
+        if (isset($this->listingToMergeResult)) {
+            $this->template->listingToMerge = $this->listingToMergeResult->getListing();
 
             $this->template
-                 ->mergedListingsItems = $this->mergedListingsItems;
+                 ->mergedListingsItems = $this->listingsFacade
+                                              ->getMergedListingsItemsForEntireTable(
+                                                  $this->listingResult->getListing(),
+                                                  $this->listingToMergeResult->getListing()
+                                              );
         }
     }
 
@@ -181,29 +184,30 @@ class MergePresenter extends SecurityPresenter
         $selectedCollisionItems = $form->getHttpData(Form::DATA_TEXT, 'itm[]');
 
         try {
-            $this->listingsFacade->mergeListings(
-                $this->listing,
-                $this->listingToMerge,
-                $selectedCollisionItems
+            $listing = $this->listingsFacade->mergeListings(
+                $this->listingResult->getListing(),
+                $this->listingToMergeResult->getListing(),
+                $selectedCollisionItems,
+                $this->listingResult->getListing()->getUser()
             );
 
             $this->flashMessage('Výčetky byli úspěšně spojeny.', 'success');
             $this->redirect(
                 'Listing:overview',
-                ['year'  => $this->listing->year,
-                 'month' => $this->listing->month]
+                ['year'  => $listing->year,
+                 'month' => $listing->month]
             );
 
         } catch (NoCollisionListingItemSelectedException $ncis) {
             $form->addError('Ve výčetce se stále nachází kolizní řádek/řádky.');
             return;
 
-        } catch (\DibiException $e) {
+        } catch (DBALException $e) {
             $this->flashMessage(
                 'Při spojování výčetek došlo k chybě. Zkuste akci opakovat později.',
                 'error'
             );
-            $this->redirect('this', ['with' => null]);
+            $this->redirect('Listing:detail', ['id' => $this->listingResult->getListingId()]);
         }
     }
 }

@@ -13,56 +13,6 @@ use Nette\Object;
 
 class ItemsService extends Object
 {
-
-    /**
-     * @param Entities\ListingItem[] $listingItems
-     * @return Entities\ListingItem[] Array of detached entities
-     */
-    public function createItemsCopies(array $listingItems)
-    {
-        $collection = [];
-        foreach ($listingItems as $listingItem) {
-            if (!$listingItem instanceof Entities\ListingItem or
-                $listingItem->isDetached()) {
-                throw new InvalidArgumentException(
-                    'Only attached instances of ' .Entities\ListingItem::class. ' can pass.'
-                );
-            }
-            $collection[] = clone $listingItem;
-        }
-
-        return $collection;
-    }
-
-    /**
-     * @param Entities\ListingItem[] $listingItems
-     * @param Entities\Listing $listing
-     * @return array
-     */
-    public function setListingForGivenItems(
-        array $listingItems,
-        Entities\Listing $listing
-    ) {
-        if ($listing->isDetached())
-            throw new InvalidArgumentException(
-                'Only attached(not detached) '.Entities\Listing::class.' entity can pass!'
-            );
-
-        $newItemsCollection = [];
-        foreach ($listingItems as $listingItem) {
-            if (!$listingItem instanceof Entities\ListingItem) {
-                throw new InvalidArgumentException(
-                    'Only instances of ' .Entities\ListingItem::class. ' can pass.'
-                );
-            }
-            $listingItem->setListing($listing);
-
-            $newItemsCollection[] = $listingItem;
-        }
-
-        return $newItemsCollection;
-    }
-
     /**
      * @param Entities\ListingItem[] $listingItems
      * @return array Array of ListingItemDecorators
@@ -113,6 +63,10 @@ class ItemsService extends Object
 
         $resultCollection = array();
         for ($day = 1; $day <= 31; $day++) {
+            if (!isset($baseListingItems[$day]) and !isset($listingItems[$day])) {
+                continue;
+            }
+
             if (isset($baseListingItems[$day]) and isset($listingItems[$day])) {
                 if ($baseListingItems[$day]->compare($listingItems[$day], ['listingItemID', 'listingID'])) {
                     $resultCollection[$day][] = $baseListingItems[$day];
@@ -171,22 +125,22 @@ class ItemsService extends Object
     }
 
     /**
-     * @param Entities\Listing $baseListing
-     * @param Entities\Listing $listingToMerge
+     * @param array $baseListingItems
+     * @param array $listingToMergeItems
      * @param array $selectedCollisionItems
      * @return array
      * @throws NoCollisionListingItemSelectedException
      */
     public function getMergedListOfItems(
-        Entities\Listing $baseListing,
-        Entities\Listing $listingToMerge,
+        array $baseListingItems,
+        array $listingToMergeItems,
         array $selectedCollisionItems = []
     ) {
         $selectedCollisionItems = array_flip($selectedCollisionItems);
 
         $mergedItems = $this->mergeListingItems(
-                                $baseListing->listingItems,
-                                $listingToMerge->listingItems
+                                $baseListingItems,
+                                $listingToMergeItems
                             );
 
         $numberOfCheckedCollisionItems = null;
@@ -196,7 +150,7 @@ class ItemsService extends Object
 
             foreach ($listingItems as $item) {
                 if (count($listingItems) > 1) {
-                    if (array_key_exists($item->listingItemID, $selectedCollisionItems)) {
+                    if (array_key_exists($item->id, $selectedCollisionItems)) {
                         // it will always make clone of the first found item (from base listing)
                         $items[] = clone $item;
                         break;
@@ -209,7 +163,6 @@ class ItemsService extends Object
                     }
 
                 } else {
-
                     $items[] = clone $item;
                 }
             }
@@ -219,14 +172,11 @@ class ItemsService extends Object
     }
 
     /**
-     * Checks whether given $listingItem is Instance of ListingItem and is attached
-     * (not Detached)
      * @param $listingItem
      */
     public function checkListingItemValidity($listingItem)
     {
-        if (!$listingItem instanceof Entities\ListingItem or
-             $listingItem->isDetached()) {
+        if (!$listingItem instanceof Entities\ListingItem) {
             throw new InvalidArgumentException(
                 'Only Attached instances of '.Entities\ListingItem::class.' can pass.'
             );

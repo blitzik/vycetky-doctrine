@@ -44,7 +44,7 @@ class UsersReader extends Object
     public function isEmailRegistered($email)
     {
         $count = $this->em->createQuery(
-            'SELECT COUNT(u.id) FROM ' .User::class. ' u
+            'SELECT COUNT(u.email) FROM ' .User::class. ' u
              WHERE u.email = :email'
         )->setParameter('email', $email)->getSingleScalarResult();
 
@@ -58,7 +58,7 @@ class UsersReader extends Object
     public function isUsernameRegistered($username)
     {
         $count = $this->em->createQuery(
-            'SELECT COUNT(u.id) FROM ' .User::class. ' u
+            'SELECT COUNT(u.username) FROM ' .User::class. ' u
              WHERE u.username = :username'
         )->setParameter('username', $username)->getSingleScalarResult();
 
@@ -105,7 +105,7 @@ class UsersReader extends Object
     public function findAllUsers($onlyActiveUsers = false)
     {
         $q = $this->em->createQueryBuilder();
-        $q->select('partial u.{id, username, isClosed}')
+        $q->select('u.id, u.username, u.isClosed')
           ->from(User::class, 'u');
 
         if ($onlyActiveUsers === true) {
@@ -123,7 +123,7 @@ class UsersReader extends Object
     public function findSuspendedUsers()
     {
         return $this->em->createQuery(
-            'SELECT partial u.{id, username} FROM ' .User::class. ' u
+            'SELECT u.id, u.username FROM ' .User::class. ' u
              WHERE u.isClosed = 1'
         )->getArrayResult();
     }
@@ -135,7 +135,7 @@ class UsersReader extends Object
     public function findUsersByIDs(array $IDs)
     {
         $q = $this->em->createQuery(
-            'SELECT partial u.{id, username, isClosed} FROM ' .User::class. ' u
+            'SELECT u FROM ' .User::class. ' u
              WHERE u.id IN (:IDs)'
         )->setParameter('IDs', $IDs);
 

@@ -2,7 +2,9 @@
 
 namespace App\UserModule\Presenters;
 
+use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
+use App\Model\Factories\PasswordChangeFormFactory;
 use App\Model\Notifications\EmailNotifier;
 use Nette\Application\UI\ITemplate;
 use Nette\Application\UI\Form;
@@ -11,6 +13,12 @@ use Nette;
 
 class PasswordPresenter extends Nette\Application\UI\Presenter
 {
+    /**
+     * @var PasswordChangeFormFactory
+     * @inject
+     */
+    public $passwordChangeFactory;
+
     /**
      * @var EmailNotifier
      * @inject
@@ -26,7 +34,7 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
     /**
      * @var \App\Model\Domain\Entities\User
      */
-    private $user;
+    private $userEntity;
 
     /**
      * @var string
@@ -38,6 +46,23 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
         $this->systemEmail = $systemEmail;
     }
 
+    /*
+     * ----------------------------
+     * ------ PASSWORD RESET ------
+     * ----------------------------
+     */
+
+    public function actionReset()
+    {
+    }
+
+    public function renderReset()
+    {
+    }
+
+    /**
+     * @Actions reset
+     */
     protected function createComponentPasswordReset()
     {
         $form = new Form();
@@ -92,30 +117,35 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
             );
         }
 
-        $this->redirect('Account:login');
+        $this->redirect('Login:default');
     }
 
+    /*
+     * -----------------------------
+     * ------ PASSWORD CHANGE ------
+     * -----------------------------
+     */
 
     public function actionChange($email, $token)
     {
-        $this->user = $this->usersFacade->getUserByEmail($email);
+        $this->userEntity = $this->usersFacade->getUserByEmail($email);
 
-        if ($this->user === null or
-            $this->user->token === null or
-            $this->user->token !== $token)
+        if ($this->userEntity === null or
+            $this->userEntity->token === null or
+            $this->userEntity->token !== $token)
         {
             $this->flashMessage('Nelze změnit heslo účtu spojeného s E-mailem ' .$email, 'warning');
             $this->redirect('Password:reset');
         }
 
         $currentTime = new \DateTime;
-        if ($currentTime > $this->user->tokenValidity) {
+        if ($currentTime > $this->userEntity->tokenValidity) {
             $this->flashMessage('Čas na změnu hesla vypršel. Pro obnovu hesla využijte formuláře níže.', 'warning');
             $this->redirect('Password:reset');
         }
 
-        $this['passwordChangeForm']['username']->setDefaultValue($this->user->username);
-        $this['passwordChangeForm']['email']->setDefaultValue($this->user->email);
+        $this['passwordChangeForm']['username']->setDefaultValue($this->userEntity->username);
+        $this['passwordChangeForm']['email']->setDefaultValue($this->userEntity->email);
 
     }
 
@@ -123,9 +153,13 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
     {
     }
 
+    /**
+     * @Actions change
+     */
     protected function createComponentPasswordChangeForm()
     {
-        $form = new Form();
+        $form = $this->passwordChangeFactory->create($this->userEntity);
+        unset($form['currentPassword']);
 
         $form->addText('username', 'Uživatel:')
                 ->setRequired()
@@ -135,48 +169,51 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
                 ->setRequired()
                 ->getControlPrototype()->readonly = 'readonly';
 
-        $form->addPassword('password', 'Nové heslo:')
-                ->setRequired('Vyplňte své heslo.')
-                ->addRule(Form::MIN_LENGTH, 'Heslo musí mít alespoň %d znaků.', 5)
-                ->setAttribute('placeholder', 'Zadejte nové heslo')
-                ->setHtmlId('password-input');;
+        $this->passwordChangeFactory
+             ->onBeforeChange[] = [$this, 'onBeforeChange'];
 
-        $form->addPassword('password2', 'Kontrola hesla:')
-                ->setRequired('Vyplňte kontrolu hesla.')
-                ->addRule(Form::EQUAL, 'Zadaná hesla se musí shodovat.', $form['password'])
-                ->setAttribute('placeholder', 'Znovu zadejte své heslo')
-                ->setHtmlId('password-control-input');
+        $this->passwordChangeFactory
+             ->onSuccess[] = [$this, 'onSuccess'];
 
-        $form->addSubmit('save', 'Změnit heslo')
-             ->setHtmlId('password-save-button');
-
-        $form->onSuccess[] = callback($this, 'processChangePassword');
+        $this->passwordChangeFactory
+             ->onError = [$this, 'onError'];
 
         return $form;
     }
 
-    public function processChangePassword(Form $form)
+    public function onBeforeChange(Form $form, User $user)
     {
         $values = $form->getValues();
 
-        if ($this->user->email != $values['email']) {
-            $this->flashMessage('Vámi zadaný E-mail nesouhlasí s E-mailem, na který byl zaslán požadavek o změnu hesla!', 'warning');
+        if ($user->email != $values['email']) {
+            $this->flashMessage(
+                'Vámi zadaný E-mail nesouhlasí s E-mailem, na který byl
+                 zaslán požadavek o změnu hesla!',
+                'warning'
+            );
             $this->redirect('this');
         }
 
-        try {
-            $this->user->resetToken();
-            $this->user->password = $values['password'];
+        $user->resetToken();
+    }
 
-            $this->usersFacade->saveUser($this->user);
+    public function onSuccess(Form $form, User $user)
+    {
+        $this->flashMessage(
+            'Heslo bylo změněno. Nyní se můžete přihlásit.',
+            'success'
+        );
+        $this->redirect('Login:default');
+    }
 
-        } catch (\Exception $e) {
-            $this->flashMessage('Při pokusu o změnu hesla došlo k chybě. Na nápravě se pracuje. Zkuste to prosím později.', 'warning');
-            $this->redirect('this');
-        }
-
-        $this->flashMessage('Heslo bylo změněno. Nyní se můžete přihlásit.', 'success');
-        $this->redirect('Account:login');
+    public function onError(Form $form, User $user)
+    {
+        $this->flashMessage(
+            'Při pokusu o změnu hesla došlo k chybě. Na nápravě se
+             pracuje. Zkuste to prosím později.',
+            'warning'
+        );
+        $this->redirect('this');
     }
 
 }

@@ -619,6 +619,11 @@ h3 {
   .help-documentation-content-list li li li {
     list-style: disc; }
 
+.documentation-text {
+  float: left;
+  width: 600px;
+  font-size: 115%; }
+
 /* --------------------
    ----- MESSAGES -----
    -------------------- */
@@ -666,11 +671,13 @@ h3 {
 
 .m-odd {
   border-bottom: 1px solid #ccc;
-  background-color: #f0f0f0; }
+  background-color: #F5F5F5; }
 
 .m-system-message {
-  background-color: #DEF2FF;
-  border-bottom: 1px solid #9EC4DE; }
+  background-color: #FFFAF0; }
+
+.m-admin {
+  background-color: #FFE4E1; }
 
 #new-message-form {
   margin-bottom: 20px; }

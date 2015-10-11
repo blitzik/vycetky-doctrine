@@ -38,11 +38,12 @@ class Authorizator extends Object implements IAuthorizator
 
 
     private $front = ['Front:Account', 'Front:Listing', 'Front:Item',
-                      'Front:MailBox', 'Front:Users', 'Front:Help'];
+                      'Front:MailBox', 'Front:Users', 'Front:Help',
+                      'Front:Merge'];
 
     private function defineResources(Permission $authorizator)
     {
-        $authorizator->addResource('entity');
+        $authorizator->addResource('listing');
         $authorizator->addResource('message');
 
         foreach ($this->front as $presenter) {
@@ -59,7 +60,7 @@ class Authorizator extends Object implements IAuthorizator
 
     private function defineRelationships(Permission $authorizator)
     {
-        $authorizator->allow('employee', 'entity', Permission::ALL, [$this, 'isOwner']);
+        $authorizator->allow('employee', 'listing', Permission::ALL, [$this, 'isOwner']);
         $authorizator->allow('employee', 'message', ['send', 'remove', 'view', 'mark_as_read'], [$this, 'isOwner']);
 
         $authorizator->allow('employee', $this->front, Permission::ALL);

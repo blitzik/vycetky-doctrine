@@ -21,7 +21,7 @@ use Nette\Utils\Validators;
  *      }
  * )
  */
-class ListingItem extends Entity implements IResource
+class ListingItem extends Entity
 {
     use Identifier;
 
@@ -211,26 +211,21 @@ class ListingItem extends Entity implements IResource
         return $this->workedHours;
     }
 
-    /* ************************** */
-
-
-    /**
-     * Returns a string identifier of the Resource.
-     * @return string
-     */
-    function getResourceId()
+    public function compare(ListingItem $listingItem)
     {
-        return 'entity';
-    }
+        if ($this->day != $listingItem->day) {
+            return false;
+        }
 
-    /**
-     * Returns Resource's owner ID
-     *
-     * @return int
-     */
-    public function getOwnerId()
-    {
-        return $this->listing->getUser()->getId();
+        if ($this->locality->getId() != $listingItem->getLocality()->getId()) {
+            return false;
+        }
+
+        if ($this->workedHours->getId() != $listingItem->getWorkedHours()->getId()) {
+            return false;
+        }
+
+        return true;
     }
 
 }

@@ -3,8 +3,10 @@
 namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\ListingItem;
+use App\Model\Domain\Entities\User;
 use App\Model\ResultObjects\ListingResult;
 use App\Model\Services\Managers\ListingsManager;
+use App\Model\Services\Readers\ListingItemsReader;
 use App\Model\Services\Readers\ListingsReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\ListingsWriter;
@@ -21,12 +23,15 @@ use App\Model\Domain\FillingItem;
 use Exceptions\Runtime\RecipientsNotFoundException;
 use Kdyby\Doctrine\QueryObject;
 use Nette\Object;
-use Tracy\Debugger;
+use Nette\Utils\Arrays;
 
 class ListingsFacade extends Object
 {
     /** @var array  */
     public $onListingSharing = [];
+
+    /** @var ListingItemsReader  */
+    private $listingItemsReader;
 
     /** @var ListingsManager  */
     private $listingsManager;
@@ -46,20 +51,16 @@ class ListingsFacade extends Object
     /** @var UsersReader  */
     private $usersReader;
 
-    /**
-     * @var \Nette\Security\User
-     */
-    private $user;
-
     public function __construct(
+        ListingItemsReader $listingItemsReader,
         ListingsManager $listingsManager,
         ListingsReader $listingsReader,
         ListingsWriter $listingsWriter,
         ItemsService $itemService,
         UsersReader $usersReader,
-        ItemsFacade $itemFacade,
-        \Nette\Security\User $user
+        ItemsFacade $itemFacade
     ) {
+        $this->listingItemsReader = $listingItemsReader;
         $this->listingsManager = $listingsManager;
         $this->listingsReader = $listingsReader;
         $this->listingsWriter = $listingsWriter;
@@ -67,7 +68,6 @@ class ListingsFacade extends Object
         $this->itemsService = $itemService;
         $this->usersReader = $usersReader;
         $this->itemsFacade = $itemFacade;
-        $this->user = $user;
     }
 
     /**
@@ -101,11 +101,14 @@ class ListingsFacade extends Object
     /**
      * @param int $id
      * @param bool $withWorkedTime
-     * @return ListingResult
+     * @return ListingResult|null
      */
     public function getListingByID($id, $withWorkedTime = false)
     {
         $result = $this->listingsReader->getByID($id, $withWorkedTime);
+        if ($result === null) {
+            return null;
+        }
 
         return new ListingResult($result);
     }
@@ -117,6 +120,20 @@ class ListingsFacade extends Object
     public function getWorkedDaysAndTime($listingID)
     {
         return $this->listingsReader->getWorkedDaysAndTime($listingID);
+    }
+
+    /**
+     * @param User $user
+     * @param int $year
+     * @param int $month
+     * @return array Array listingID => description
+     */
+    public function findListingsToMerge(User $user, $year, $month)
+    {
+        $listings =  $this->listingsReader
+                          ->findListingsToMerge($user, $year, $month);
+
+        return Arrays::associate($listings, 'id=description');
     }
 
     /**
@@ -220,9 +237,6 @@ class ListingsFacade extends Object
         Listing $baseListing,
         Listing $listing
     ) {
-        $this->checkListingValidity($baseListing);
-        $this->checkListingValidity($listing);
-
         if (!$this->haveListingsSamePeriod($baseListing, $listing)) {
             throw new InvalidArgumentException(
                 'Given Listings must have same Period(Year and Month).'
@@ -231,8 +245,8 @@ class ListingsFacade extends Object
 
         $items = $this->itemsService
                       ->mergeListingItems(
-                          $baseListing->listingItems,
-                          $listing->listingItems
+                          $this->listingItemsReader->findListingItems($baseListing->getId()),
+                          $this->listingItemsReader->findListingItems($listing->id)
                       );
 
         $days = $baseListing->getNumberOfDaysInMonth();
@@ -267,81 +281,33 @@ class ListingsFacade extends Object
      * @param Listing $baseListing
      * @param Listing $listingToMerge
      * @param array $selectedCollisionItems
-     * @param \App\Model\Entities\User|int|null $user
+     * @param User $ownerOfOutputListing
      * @return Listing
      * @throws NoCollisionListingItemSelectedException
-     * @throws \DibiException
      */
     public function mergeListings(
         Listing $baseListing,
         Listing $listingToMerge,
         array $selectedCollisionItems = [],
-        $user = null
+        User $ownerOfOutputListing
     ) {
-        $this->checkListingValidity($baseListing);
-        $this->checkListingValidity($listingToMerge);
-
-        if (!$this->haveListingsSamePeriod($baseListing, $listingToMerge)) {
-            throw new InvalidArgumentException(
-                'Given Listings must have same Period(Year and Month).'
-            );
-        }
-
-        $userID = $this->getIdOfSignedInUserOnNull($user);
-
-        $items = $this->itemsService->getMergedListOfItems(
-            $baseListing,
-            $listingToMerge,
-            $selectedCollisionItems
-        );
-
-        try {
-            $this->transaction->begin();
-
-            $newListing = new Listing(
-                $baseListing->year,
-                $baseListing->month,
-                $userID
-            );
-
-            $this->saveListing($newListing);
-
-            $this->itemsService->setListingForGivenItems($items, $newListing);
-
-            $this->listingItemRepository->saveListingItems($items);
-
-            $this->transaction->commit();
-
-            return $newListing;
-
-        } catch (\DibiException $e) {
-            $this->transaction->rollback();
-            Debugger::log($e, Debugger::ERROR);
-
-            throw $e;
-        }
+        return $this->listingsManager
+                    ->mergeListings(
+                        $baseListing,
+                        $listingToMerge,
+                        $selectedCollisionItems,
+                        $ownerOfOutputListing
+                    );
     }
 
     /**
-     * @param array $listingItems
-     */
-    private function persistListingItems(array $listingItems)
-    {
-        $this->listingItemRepository->saveListingItems($listingItems);
-    }
-
-    /**
-     * @param Listing $base
-     * @param Listing $second
+     * @param Listing $listing1
+     * @param Listing $listing2
      * @return bool
      */
-    public function haveListingsSamePeriod(Listing $base, Listing $second)
+    public function haveListingsSamePeriod(Listing $listing1, Listing $listing2)
     {
-        if ($base->year === $second->year and $base->month === $second->month) {
-            return true;
-        }
-
-        return false;
+        return $this->listingsManager->haveListingsSamePeriod($listing1, $listing2);
     }
 
 }

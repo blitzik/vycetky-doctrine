@@ -2,6 +2,7 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IAccountPasswordControlFactory;
 use App\Model\Components\IUsersBlockingManagementControlFactory;
 use App\Model\Components\IInvitationGenerationControlFactory;
 use App\Model\Components\IInvitationsManagementControlFactory;
@@ -30,6 +31,12 @@ class AccountPresenter extends SecurityPresenter
      * @inject
      */
     public $invitationsManagementFactory;
+
+    /**
+     * @var IAccountPasswordControlFactory
+     * @inject
+     */
+    public $accountPasswordFactory;
 
     /**
      * @var \DatabaseBackup
@@ -253,4 +260,26 @@ class AccountPresenter extends SecurityPresenter
         return $comp;
     }
 
+
+    /*
+     * -----------------------------
+     * ------ PASSWORD CHANGE ------
+     * -----------------------------
+     */
+
+    public function actionPassword()
+    {
+    }
+
+    public function renderPassword()
+    {
+    }
+
+    /**
+     * @Actions password
+     */
+    protected function createComponentPassword()
+    {
+        return $this->accountPasswordFactory->create($this->user->getIdentity());
+    }
 }

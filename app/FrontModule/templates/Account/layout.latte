@@ -9,6 +9,11 @@
 </li>
 
 <li>
+    <a href="{link Account:password}"
+    {ifCurrent Account:password}class="selected"{/ifCurrent}>Změna hesla</a>
+</li>
+
+<li>
     <a href="{link Account:blockedUsers}"
        {ifCurrent Account:blockedUsers}class="selected"{/ifCurrent}>Správa ignorovaných uživatelů</a>
 </li>
@@ -23,11 +28,12 @@
     {ifCurrent Account:sendInvitation}class="selected"{/ifCurrent}>Odeslat novou pozvánku</a>
 </li>
 
-
+{*}
 <li n:if="$authorizator->isAllowed($user->getIdentity(), 'Front:Account', 'databaseBackup')">
     <a href="{link Account:databaseBackup}"
     {ifCurrent Account:databaseBackup}class="selected"{/ifCurrent}>Záloha databáze</a>
 </li>
+{*}
 </ul>
 </nav>
 

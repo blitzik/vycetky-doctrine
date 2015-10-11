@@ -12,6 +12,8 @@ use App\Model\Domain\Entities\ListingItem;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\ListingsWriter;
 use Doctrine\DBAL\DBALException;
+use Exceptions\Runtime\NoCollisionListingItemSelectedException;
+use Exceptions\Runtime\RuntimeException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 use Nette\Utils\Validators;
@@ -246,9 +248,83 @@ class ListingsManager extends Object
             return $newListing;
 
         } catch (DBALException $e) {
+            $this->em->rollback();
+            $this->em->close();
+
             Debugger::log($e, Debugger::ERROR);
 
             throw $e;
         }
+    }
+
+    /**
+     * @param Listing $baseListing
+     * @param Listing $listingToMerge
+     * @param array $selectedCollisionItems
+     * @param User $ownerOfOutputListing
+     * @return Listing
+     * @throws NoCollisionListingItemSelectedException
+     * @throws DBALException
+     */
+    public function mergeListings(
+        Listing $baseListing,
+        Listing $listingToMerge,
+        array $selectedCollisionItems = [],
+        User $ownerOfOutputListing
+    ) {
+        if (!$this->haveListingsSamePeriod($baseListing, $listingToMerge)) {
+            throw new RuntimeException(
+                'Given Listings must have same Period(Year and Month).'
+            );
+        }
+
+        try {
+            $this->em->beginTransaction();
+
+            $items = $this->itemsService->getMergedListOfItems(
+                $this->listingItemsReader->findListingItems($baseListing->getId()),
+                $this->listingItemsReader->findListingItems($listingToMerge->getId()),
+                $selectedCollisionItems
+            );
+
+            $newListing = new Listing(
+                $baseListing->year,
+                $baseListing->month,
+                $ownerOfOutputListing
+            );
+
+            $this->em->persist($newListing);
+            foreach ($items as $item) {
+                /** @var ListingItem $item */
+                $item->setListing($newListing);
+                $this->em->persist($item);
+            }
+
+            $this->em->flush();
+            $this->em->commit();
+            return $newListing;
+
+        } catch (DBALException $e) {
+            $this->em->rollback();
+            $this->em->close();
+
+            Debugger::log($e, Debugger::ERROR);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Listing $base
+     * @param Listing $second
+     * @return bool
+     */
+    public function haveListingsSamePeriod(Listing $base, Listing $second)
+    {
+        if ($base->year === $second->year and $base->month === $second->month) {
+            return true;
+        }
+
+        return false;
     }
 }

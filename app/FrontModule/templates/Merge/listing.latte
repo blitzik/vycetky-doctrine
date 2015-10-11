@@ -3,6 +3,12 @@
 {control listingActionsMenu}
 
 <h2 n:block="title">Spojené výčetky - výsledek</h2>
+
+{form listingsMergeForm}
+<ul class="form-errors" n:if="$form->hasErrors()">
+    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
+</ul>
+
 <div class="left-side">
     <h3>Barevné odlišení kolidujících záznamů</h3>
     <table class="table t-classic">
@@ -10,28 +16,16 @@
             <td class="baseListing">{control listingDescription}</td></tr>
         <tr><th>Spojovaná výčetka</th>
             <td class="listingToMerge">
-                <a href="{plink Listing:detail, 'id' => $listingToMerge->listingID}">
-                [#{$listingToMerge->listingID}] {$listingToMerge->entireDescription()}</a>
+                <a href="{plink Listing:detail, 'id' => $listingToMerge->getId()}">
+                #{$listingToMerge->getId()} - {$listingToMerge->entireDescription()}</a>
             </td>
         </tr>
+        <tr><td>&nbsp;</td><td>{input merge}</td></tr>
     </table>
 </div>
 
-<div class="box-hint right">
-<h3>Spojení výčetek</h3>
-<p><a href="{link Help:doc#spojeni-vycetek}">Více viz dokumentace</a></p>
-
-<p class="box box-red">Spojením se vytvoří nová výčetka. Původní výčetky
-    zůstanou nedotčeny.</p>
-</div>
-
-{form listingsMergeForm}
-<div class="errors" n:if="$form->hasErrors()" n:foreach="$form->errors as $error">
-    {$error}
-</div>
-
-{input merge}
-
+<p class="clear-element">Při spojení se vytvoří <strong>nová výčetka</strong>. Původní výčetky zůstanou nedotčeny.
+<a href="{link Help:doc#spojeni-vycetek}">Více viz dokumentace</a></p>
 <table class="detail-table">
 
 <tr>
@@ -51,45 +45,48 @@
         {foreach $listingItems as $item}
             {var $IDs[] = $item->listingItemID} {* key 0 => baseListing | 1 => listing to merge *}
         {/foreach}
+        </table><table class="detail-table">
     {/if}
     {foreach $listingItems as $item}
     <tr n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDay : null))"
         {if !$item->isFilling()}id="rowID-{$item->listingItemID}"{/if}>
 
-        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null))">{$day}</td>
-        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null))">{$item->day|dayShortcut}</td>
+        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null)), w45">{$day}</td>
+        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null)), w45">{$item->day|dayShortcut}</td>
 
         {if !$item->isFilling()}
             {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}
             {var $localityDesc = $item->locality . $description}
 
             <td>{$localityDesc|truncate:40}</td>
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+            <td n:class="w90">{if !$item->areWorkedHoursWithoutLunchZero()}
                 {$item->workStart|date:'H:i'} - {$item->workEnd|date:'H:i'}{/if}</td>
 
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+            <td n:class="w45">{if !$item->areWorkedHoursWithoutLunchZero()}
                 {$item->lunch|toTimeWithComma:true}{/if}</td>
 
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+            <td n:class="w45">{if !$item->areWorkedHoursWithoutLunchZero()}
                 {$item->hours|toTimeWithComma}{/if}</td>
 
-            <td{if $item->descOtherHours} title="{$item->descOtherHours}"
-                                          class="desc-other-hours"{/if}>
+            <td n:class="w45, $item->descOtherHours ? desc-other-hours"{if $item->descOtherHours} title="{$item->descOtherHours}"{/if}>
                                           {$item->otherHours|toTimeWithComma}</td>
 
         {else}
-            <td></td><td></td><td></td><td></td><td></td>
+            <td></td><td class="w90"></td><td class="w45"></td><td class="w45"></td><td class="w45"></td>
         {/if}
 
-        <td>
-            {if count($listingItems) > 1}
-                <input type="checkbox" name="itm[]" data-other="{$IDs[($item->getListingID() == $baseListing->listingID ? 1 : 0)]}" value="{$item->listingItemID}"> {* switched $IDs indexes *}
+        <td n:class="w70">
+            {if $itemsCount > 1}
+                <input type="checkbox" name="itm[]" data-other="{$IDs[($item->getListing()->getId() == $baseListing->getId() ? 1 : 0)]}" value="{$item->listingItemID}"> {* switched $IDs indexes *}
             {/if}
         </td>
     </tr>
     {/foreach}
+    {if $itemsCount > 1}
+        </table><table class="detail-table">
+    {/if}
     {if isset($IDs)}
-        {? unset($IDs)}
+        {php unset($IDs)}
     {/if}
 {/foreach}
 
@@ -97,6 +94,12 @@
 
 <script>
 $(function() {
+     $('.detail-table tr').click(function(event) {
+         if (event.target.type !== 'checkbox') {
+            $(':checkbox', this).trigger('click');
+         }
+     });
+
     $(':checkbox').prop('checked', false);
 
     $(':checkbox').on('click', function() {

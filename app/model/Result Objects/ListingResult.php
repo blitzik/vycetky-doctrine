@@ -103,4 +103,12 @@ class ListingResult extends Object
     {
         return $this->listing;
     }
+
+    /**
+     * @return int
+     */
+    public function getListingId()
+    {
+        return $this->listing->getId();
+    }
 }
