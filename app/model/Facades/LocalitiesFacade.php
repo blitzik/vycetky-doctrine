@@ -2,9 +2,13 @@
 
 namespace App\Model\Facades;
 
+use App\Model\Domain\Entities\Listing;
+use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Locality;
+use App\Model\Domain\Entities\User;
 use App\Model\Services\LocalitiesService;
 use Kdyby\Doctrine\EntityManager;
+use Kdyby\Doctrine\Mapping\ResultSetMappingBuilder;
 use Nette\Object;
 use Nette\Utils\Arrays;
 use Nette\Utils\Validators;
@@ -27,30 +31,29 @@ class LocalitiesFacade extends Object
     }
 
     /**
-     *
      * @param string $localityName
+     * @param Listing $listing
      * @param int $limit
-     * @param \App\Model\Domain\Entities\User| $user
-     * @return string Localities
+     * @return array
      */
     public function findLocalitiesForAutocomplete(
         $localityName,
-        $limit,
-        \App\Model\Domain\Entities\User $user
+        Listing $listing,
+        $limit
     ) {
         Validators::assert($localityName, 'string');
         Validators::assert($limit, 'numericint:0..');
 
         $localities = $this->em->createQuery(
-            'SELECT l.id, l.name FROM ' .Locality::class. ' l
-             INNER JOIN l.users u
-             WHERE l.name LIKE COLLATE(:name, utf8_czech_ci) AND u.id = :userID'
+            'SELECT partial li.{id}, partial l.{id, name} FROM ' .ListingItem::class. ' li
+             JOIN li.locality l
+             WHERE li.listing = :listing AND l.name LIKE COLLATE(:name, utf8_czech_ci)'
         )->setMaxResults($limit)
          ->setParameters([
             'name' => '%'.$localityName.'%',
-            'userID' => $user->getId()
+            'listing' => $listing
         ])->getArrayResult();
 
-        return Arrays::associate($localities, 'id=name');
+        return array_column(array_column($localities, 'locality'), 'name', 'id');
     }
 }

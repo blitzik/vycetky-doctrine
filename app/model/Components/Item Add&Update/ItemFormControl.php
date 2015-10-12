@@ -143,8 +143,8 @@ class ItemFormControl extends BaseComponent
                     $this->localitiesFacade
                         ->findLocalitiesForAutocomplete(
                             $term,
-                            10,
-                            $this->listing->getUser()
+                            $this->listing,
+                            10
                         )
                 )
             );
@@ -155,6 +155,7 @@ class ItemFormControl extends BaseComponent
     {
         $values['day'] = $this->day;
         $values['listing'] = $this->listing;
+        $values['user'] = $this->listing->getUser();
 
         $this->listingItem = $this->itemsFacade->getByDay($this->day, $this->listing);
 

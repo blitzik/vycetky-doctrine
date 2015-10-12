@@ -2,6 +2,7 @@
 
 namespace App\Model\Components;
 
+use Nette\Application\UI\Form;
 use Nette\InvalidArgumentException;
 use Nette\Security\User;
 use Nette\Mail\IMailer;
@@ -117,6 +118,42 @@ class DatabaseBackupControl extends BaseComponent
                 $this->sendMail('Automatic database backup failure', $e->getMessage());
             }
         }
+    }
+
+    protected function createComponentBackupDatabaseForm()
+    {
+        $form = new Form;
+
+        $form->addSubmit('backup', 'Provést zálohu')
+                ->getControlPrototype()
+                ->onClick = 'return confirm(\'Skutečně chcete provést zálohu databáze?\');';
+
+        $form->onSuccess[] = [$this, 'processBackup'];
+
+        $form->addProtection();
+
+        return $form;
+    }
+
+    public function processBackup(Form $form)
+    {
+        if ($this->authorizator->isAllowed($this->user->getIdentity(), 'database_backup')) {
+            $file = WWW_DIR . '/app/backup/' . date('Y-m-d H-i-s') . '.sql';
+            try {
+                $this->databaseBackup->save($file);
+                $this->flashMessage('Záloha databáze byla úspěšně provedena!', 'success');
+
+            } catch (\Exception $e) {
+                $this->flashMessage($e->getMessage(), 'error');
+            }
+
+            $this->sendMail('Manual Database Backup', 'OK', $file);
+
+        } else {
+            $this->flashMessage('Nemáte dostatečná oprávnění k provedení akce.', 'warning');
+        }
+
+        $this->redirect('this');
     }
 
 }

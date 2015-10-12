@@ -8,12 +8,6 @@ services:
 		class: App\Model\Subscribers\InvitationSubscriber
 		tags: [kdyby.subscriber]
 
-	databaseBackupSubscriber:
-		class: App\Model\Subscribers\DatabaseBackupSubscriber
-		tags: [kdyby.subscriber]
-		setup:
-			- setEmails(%emails%)
-
 	listingSubscriber:
 		class: App\Model\Subscribers\ListingSubscriber
 		tags: [kdyby.subscriber]

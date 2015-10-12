@@ -155,13 +155,7 @@ class UsersFacade extends Object
             throw new InvalidUserInvitationEmailException;
         }
 
-        $inv = $this->invitationsReader
-                    ->getInvitation($user->email, $invitation->token);
-        if ($inv === null) {
-            throw new InvitationNotFoundException;
-        }
-
-        if (!$inv->isActive()) {
+        if (!$invitation->isActive()) {
             throw new InvitationExpiredException;
         }
 

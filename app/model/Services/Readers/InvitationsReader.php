@@ -40,7 +40,7 @@ class InvitationsReader extends Object
      * @return Invitation
      * @throws InvitationNotFoundException
      */
-    public function getInvitationByID($id)
+    public function getInvitationByEmail($id)
     {
         $qb = $this->invitationsRepository
                    ->createQueryBuilder('i')
@@ -62,8 +62,9 @@ class InvitationsReader extends Object
     public function getInvitation($email, $token = null)
     {
         $qb = $this->em->createQueryBuilder();
-        $qb->select('i')
+        $qb->select('i, partial s.{id, username}')
             ->from(Invitation::class, 'i')
+            ->innerJoin('i.sender', 's')
             ->where('i.email = :email')
             ->setParameter('email', $email);
 

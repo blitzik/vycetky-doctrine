@@ -4,16 +4,21 @@ namespace App\Model\Domain\Entities;
 
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
+use Doctrine\ORM\Mapping\Id;
 use Nette\Utils\Validators;
 
 /**
  * @ORM\Entity
  * @ORM\Table(
  *      name="locality",
- *      options={"collate": "utf8_czech_ci"}
+ *      options={"collate": "utf8_czech_ci"},
+ *      uniqueConstraints={
+ *          @UniqueConstraint(name="user_name", columns={"user", "name"})
+ *      }
  * )
  */
 class Locality extends Entity
@@ -21,30 +26,29 @@ class Locality extends Entity
     use Identifier;
 
     /**
-     * @ORM\Column(name="name", type="string", length=40, nullable=false, unique=true, options={"collation": "utf8_bin"})
+     * @ORM\Column(name="name", type="string", length=40, nullable=false, options={"collation": "utf8_bin"})
      * @var string
      */
     private $name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", fetch="EXTRA_LAZY", indexBy="id")
-     * @ORM\JoinTable(
-     *      name="locality_user",
-     *      joinColumns={@JoinColumn(name="locality_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @var ArrayCollection
+     * @ORM\ManyToOne(targetEntity="User")
+     * @JoinColumn(name="user", referencedColumnName="id", nullable=false)
+     * @var User
      */
-    private $users;
+    private $user;
 
 
     /**
      * @param string $localityName
+     * @param User $user
      */
-    public function __construct($localityName)
-    {
+    public function __construct(
+        $localityName,
+        User $user
+    ) {
         $this->setName($localityName);
-        $this->users = new ArrayCollection();
+        $this->user = $user;
     }
 
     /**
@@ -76,12 +80,10 @@ class Locality extends Entity
     }
 
     /**
-     * @param User $user
+     * @return User
      */
-    public function addUser(User $user)
+    public function getUser()
     {
-        if (!$this->users->contains($user)) {
-            $this->users[$user->getId()] = $user;
-        }
+        return $this->user;
     }
 }

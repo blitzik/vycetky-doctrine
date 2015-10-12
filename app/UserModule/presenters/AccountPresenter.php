@@ -9,7 +9,6 @@ use Exceptions\Runtime\InvalidUserInvitationEmailException;
 use Exceptions\Runtime\InvitationValidityException;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Domain\Entities\User;
-use Kdyby\Doctrine\EntityManager;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
 use Nette\Utils\Validators;
@@ -32,12 +31,6 @@ class AccountPresenter extends Presenter
      * @var Invitation
      */
     private $invitation;
-
-    /**
-     * @var EntityManager
-     * @inject
-     */
-    public $em;
 
     /*
      * ------------------------
@@ -67,6 +60,9 @@ class AccountPresenter extends Presenter
     {
     }
 
+    /**
+     * @Actions registration
+     */
     protected function createComponentRegistrationForm()
     {
         $form = new Form();

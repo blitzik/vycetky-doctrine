@@ -182,9 +182,6 @@ class ListingItem extends Entity
     public function setLocality(Locality $locality)
     {
         $this->locality = $locality;
-
-        $user = $this->listing->getUser();
-        $locality->addUser($user);
     }
 
     /**

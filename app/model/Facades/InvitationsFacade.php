@@ -132,15 +132,15 @@ class InvitationsFacade extends Object
     }
 
     /**
-     * @param int $id
+     * @param string|Invitation $invitation Invitation's E-mail or instance of Invitation
      */
-    public function removeInvitation($id)
+    public function removeInvitation($invitation)
     {
-        $this->invitationsWriter->removeInvitation($id);
+        $this->invitationsWriter->removeInvitation($invitation);
     }
 
     /**
-     * @param Invitation|int $invitation
+     * @param Invitation|string $invitation
      * @throws InvitationNotFoundException
      * @throws InvitationExpiredException
      * @throws InvalidStateException
@@ -148,8 +148,8 @@ class InvitationsFacade extends Object
      */
     public function sendInvitation($invitation)
     {
-        if (Validators::is($invitation, 'numericint')) {
-            $invitation = $this->invitationsReader->getInvitationByID($invitation);
+        if (Validators::is($invitation, 'string')) {
+            $invitation = $this->invitationsReader->getInvitationByEmail($invitation);
         }
         $this->checkInvitationState($invitation);
 

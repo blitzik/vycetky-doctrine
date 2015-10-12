@@ -26,21 +26,3 @@ doctrine:
 	user: %database.username%
 	password: %database.password%
 	dbname: %database.dbname%
-	charset: utf8
-	defaultRepositoryClassName: Kdyby\Doctrine\EntityRepository
-
-	metadata:
-		App\Model\Domain\Entities: %appDir%/model/Domain
-
-	dql:
-		string:
-			'COLLATE': App\Doctrine\MySQL\Collate
-
-		datetime:
-			'TIME_TO_SEC': App\Doctrine\MySQL\TimeToSec
-			'SEC_TO_TIME': App\Doctrine\MySQL\SecToTime
-			'ADDTIME': App\Doctrine\MySQL\AddTime
-			'SUBTIME': App\Doctrine\MySQL\SubTime
-
-	types:
-		'invoicetime': App\Doctrine\Types\InvoiceTimeType

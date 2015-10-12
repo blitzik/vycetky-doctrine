@@ -3,15 +3,22 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Components\IDatabaseBackupControlFactory;
+use App\Model\Authorization\Authorizator;
 use Nette\Application\UI\Presenter;
 
-class BackupPresenter extends Presenter
+class BackupPresenter extends SecurityPresenter
 {
     /**
      * @var IDatabaseBackupControlFactory
      * @inject
      */
     public $backupControlFactory;
+
+    /**
+     * @var Authorizator
+     * @inject
+     */
+    public $authorizator;
 
     /** @var array ['admin' => ... , 'system' => ...] */
     private $emails;
@@ -29,6 +36,9 @@ class BackupPresenter extends Presenter
     {
     }
 
+    /**
+     * @Actions databaseBackup
+     */
     protected function createComponentDatabaseBackup()
     {
         $comp = $this->backupControlFactory->create($this->emails);

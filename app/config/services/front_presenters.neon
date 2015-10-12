@@ -8,7 +8,7 @@ services:
 	helpPresenter:
 		class: App\FrontModule\Presenters\HelpPresenter
 		setup:
-			- setemails(%emails%)
+			- setEmails(%emails%)
 
 	itemPresenter:
 		class: App\FrontModule\Presenters\ItemPresenter
@@ -24,8 +24,10 @@ services:
 	mergePresenter:
 		class: App\FrontModule\Presenters\MergePresenter
 
-	accountPresenter:
+	frontAccountPresenter:
 		class: App\FrontModule\Presenters\AccountPresenter
+		setup:
+			- setEmails(%emails%)
 
 	usersPresenter:
 		class: App\FrontModule\Presenters\UsersPresenter

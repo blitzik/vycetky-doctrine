@@ -13,6 +13,7 @@ use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 use DateTime;
+use Tracy\Debugger;
 
 /**
  * @ORM\Entity
@@ -134,7 +135,7 @@ class User extends Entity implements IIdentity, IRole
         $password,
         $email,
         $ip,
-        User $host,
+        User $host = null,
         $role = 'employee',
         $name = null
     ) {

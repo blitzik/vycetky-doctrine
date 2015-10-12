@@ -7,7 +7,6 @@ use App\Model\Domain\Entities\User;
 use Kdyby\Doctrine\QueryBuilder;
 use Kdyby\Doctrine\QueryObject;
 use Kdyby\Persistence\Queryable;
-use Nette\Utils\Validators;
 use Kdyby;
 
 class InvitationsQuery extends QueryObject
@@ -64,7 +63,7 @@ class InvitationsQuery extends QueryObject
         }
 
         $qb->resetDQLPart('select');
-        $qb->select('COUNT(i.id) AS total_count');
+        $qb->select('COUNT(i.email) AS total_count');
 
         return $qb;
     }

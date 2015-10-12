@@ -45,7 +45,7 @@ class ListingItemsManager extends Object
             $newValues['lunch'], $newValues['otherHours']
         );
 
-        $locality = new Locality($newValues['locality']);
+        $locality = new Locality($newValues['locality'], $newValues['user']);
 
         if (isset($listingItem)) {
             if (!$listingItem->getWorkedHours()->hasSameValuesAs($workedHours)) {

@@ -28,13 +28,13 @@ class InvitationsWriter extends Object
     }
 
     /**
-     * @param int $id
+     * @param string|Invitation $invitation Invitation's E-mail or instance of invitation
      * @return void
      */
-    public function removeInvitation($id)
+    public function removeInvitation($invitation)
     {
         $this->em->createQuery(
-            'DELETE ' .Invitation::class. ' i WHERE i.id = :id'
-        )->execute(['id' => $id]);
+            'DELETE ' .Invitation::class. ' i WHERE i = :invitation'
+        )->execute(['invitation' => $invitation]);
     }
 }

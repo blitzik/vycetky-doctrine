@@ -67,10 +67,10 @@ class InvitationsManagementControl extends BaseComponent
     /**
      * @secured
      */
-    public function handleResendInvitation($id)
+    public function handleResendInvitation($email)
     {
         try {
-            $this->invitationsFacade->sendInvitation($id);
+            $this->invitationsFacade->sendInvitation($email);
             $this->flashMessage('Pozvánka byla úspěšně odeslána.', 'success');
 
         } catch (InvitationValidityException $v) {
@@ -102,9 +102,9 @@ class InvitationsManagementControl extends BaseComponent
     /**
      * @secured
      */
-    public function handleRemoveInvitation($id)
+    public function handleRemoveInvitation($email)
     {
-        $this->invitationsFacade->removeInvitation($id);
+        $this->invitationsFacade->removeInvitation($email);
         $this->flashMessage('Pozvánka byla úspěšně deaktivována.', 'success');
 
         $this->refreshTable();

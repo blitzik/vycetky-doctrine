@@ -2,11 +2,10 @@
 
 namespace App\Model\Domain\Entities;
 
-use Kdyby\Doctrine\Entities\Attributes\Identifier;
-use Exceptions\Logic\InvalidArgumentException;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
+use Doctrine\ORM\Mapping\Id;
 use Nette\Utils\Validators;
 use Nette\Utils\Random;
 use DateTime;
@@ -21,15 +20,14 @@ use DateTime;
  */
 class Invitation extends Entity
 {
-    use Identifier;
-
     const TOKEN_LENGTH = 8;
 
     const DURATION = '+1 week';
     const NEXT_DISPATCH = '+1 day';
     
     /**
-     * @ORM\Column(name="email", type="string", length=70, nullable=false, unique=true)
+     * @Id
+     * @ORM\Column(name="email", type="string", length=70, nullable=false)
      * @var string
      */
     private $email;
@@ -54,18 +52,18 @@ class Invitation extends Entity
 
     /**
      * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="sender", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="sender", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      * @var User
      */
     private $sender;
 
     /**
      * @param string $email
-     * @param User $sender
+     * @param User|null $sender
      */
     public function __construct(
         $email,
-        User $sender
+        User $sender = null
     ) {
         $this->setEmail($email);
         $this->sender = $sender;

@@ -35,6 +35,26 @@ extensions:
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
 
+doctrine:
+	charset: utf8
+	defaultRepositoryClassName: Kdyby\Doctrine\EntityRepository
+
+	metadata:
+		App\Model\Domain\Entities: %appDir%/model/Domain
+
+	dql:
+		string:
+			'COLLATE': App\Doctrine\MySQL\Collate
+
+		datetime:
+			'TIME_TO_SEC': App\Doctrine\MySQL\TimeToSec
+			'SEC_TO_TIME': App\Doctrine\MySQL\SecToTime
+			'ADDTIME': App\Doctrine\MySQL\AddTime
+			'SUBTIME': App\Doctrine\MySQL\SubTime
+
+	types:
+		'invoicetime': App\Doctrine\Types\InvoiceTimeType
+
 includes:
 	- parameters.neon
 	- services.neon

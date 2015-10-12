@@ -28,19 +28,27 @@ class LocalityProvider extends Object
            INSERTs that actually wont happen (e.g. safePersist()) and
            because Doctrine2 does NOT support locking of entire tables,
            we have to use native SQL(MySQL) query.
+
+           DUAL is "dummy" table - there is no need to reference any table
+           (more info in MySQL SELECT documentation)
         */
         $this->em->getConnection()->executeQuery(
-            'INSERT INTO locality (name)
-             SELECT :name FROM locality
-             WHERE NOT EXISTS(SELECT name FROM locality WHERE name = :name)
+            'INSERT INTO locality (name, user)
+             SELECT :name, :user FROM DUAL
+             WHERE NOT EXISTS(
+                   SELECT l.name, l.user
+                   FROM locality l
+                   WHERE l.user = :user AND l.name = :name)
              LIMIT 1'
-            , ['name' => $locality->getName()]);
+            , ['user' => $locality->getUser()->getId(), 'name' => $locality->getName()]);
 
         $result = $this->em->createQuery(
-            'SELECT l AS locality FROM '.Locality::class.' l
-             WHERE l.name = :name'
-        )->setParameter('name', $locality->getName())
-         ->getSingleResult()['locality'];
+            'SELECT l FROM '.Locality::class.' l
+             WHERE l.user = :user AND l.name = :name'
+        )->setParameters([
+            'user' => $locality->getUser(),
+            'name' => $locality->getName()
+        ])->getSingleResult();
 
         return $result;
     }

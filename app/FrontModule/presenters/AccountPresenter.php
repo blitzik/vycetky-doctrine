@@ -3,6 +3,7 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Components\IAccountPasswordControlFactory;
+use App\Model\Components\IDatabaseBackupControlFactory;
 use App\Model\Components\IUsersBlockingManagementControlFactory;
 use App\Model\Components\IInvitationGenerationControlFactory;
 use App\Model\Components\IInvitationsManagementControlFactory;
@@ -12,7 +13,8 @@ use \Nette\Application\UI\Form;
 
 class AccountPresenter extends SecurityPresenter
 {
-    //public $onDatabaseBackupSuccess = [];
+    /** @var array ['admin' => ... , 'system' => ...] */
+    private $emails;
 
     /**
      * @var IUsersBlockingManagementControlFactory
@@ -39,16 +41,21 @@ class AccountPresenter extends SecurityPresenter
     public $accountPasswordFactory;
 
     /**
-     * @var \DatabaseBackup
+     * @var IDatabaseBackupControlFactory
      * @inject
      */
-    //public $databaseBackup;
+    public $databaseBackupFactory;
 
     /**
      * @var UsersFacade
      * @inject
      */
     public $usersFacade;
+
+    public function setEmails(array $emails)
+    {
+        $this->emails = $emails;
+    }
 
     /*
      * --------------------
@@ -126,51 +133,12 @@ class AccountPresenter extends SecurityPresenter
     }
 
     /**
-     * todo - prijde do administrace pozdeji
-     * @Actions detail
+     * @Actions databaseBackup
      */
-    /*protected function createComponentBackupDatabaseForm()
+    protected function createComponentBackup()
     {
-        $form = new Form();
-
-        $form->addSubmit('backup', 'Provést zálohu')
-                ->getControlPrototype()
-                ->onClick = 'return confirm(\'Skutečně chcete provést zálohu databáze?\');';
-
-        $form->onSuccess[] = [$this, 'processBackup'];
-
-        $form->addProtection();
-
-        return $form;
+        return $this->databaseBackupFactory->create($this->emails);
     }
-
-    public function processBackup(Form $form)
-    {
-        if ($this->user->getIdentity()->role === 'administrator') {
-            $file = WWW_DIR . '/app/backup/' . date('Y-m-d H-i-s') . '.sql';
-            try {
-                $this->databaseBackup->save($file);
-                $this->flashMessage('Záloha databáze byla úspěšně provedena!', 'success');
-
-            } catch (\Exception $e) {
-                $this->flashMessage($e->getMessage(), 'error');
-            }
-
-            $validationObject = new SubscriberValidationObject();
-            $this->onDatabaseBackupSuccess($file, $validationObject);
-            if ($validationObject->isValid()) {
-                $this->flashMessage('Soubor se zálohou byl úspěšně odeslán.', 'success');
-            } else {
-                $error = $validationObject->getFirstError();
-                $this->flashMessage($error['message'], $error['type']);
-            }
-
-        } else {
-            $this->flashMessage('Nemáte dostatečná oprávnění k provedení akce.', 'warning');
-        }
-
-        $this->redirect('this');
-    }*/
 
 
     /*

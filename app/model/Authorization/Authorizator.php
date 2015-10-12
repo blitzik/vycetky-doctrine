@@ -54,6 +54,8 @@ class Authorizator extends Object implements IAuthorizator
         $authorizator->addResource('recipients_selectBox');
         $authorizator->addResource('relationships_tables');
         $authorizator->addResource('users_overview');
+
+        $authorizator->addResource('database_backup');
     }
 
 

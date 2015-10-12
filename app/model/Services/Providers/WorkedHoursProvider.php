@@ -30,10 +30,13 @@ class WorkedHoursProvider extends Object
            INSERTs that actually wont happen (e.g. safePersist()) and
            because Doctrine2 does NOT support locking of entire tables,
            we have to use native SQL(MySQL) query.
+
+           DUAL is "dummy" table - there is no need to reference any table
+           (more info in MySQL SELECT documentation)
         */
         $this->em->getConnection()->executeQuery(
             'INSERT INTO worked_hours (work_start, work_end, lunch, other_hours)
-             SELECT :workStart, :workEnd, :lunch, :otherHours FROM worked_hours
+             SELECT :workStart, :workEnd, :lunch, :otherHours FROM DUAL
              WHERE NOT EXISTS(
                    SELECT work_start, work_end, lunch, other_hours
                    FROM worked_hours
@@ -43,11 +46,11 @@ class WorkedHoursProvider extends Object
             , $values);
 
         $result = $this->em->createQuery(
-            'SELECT wh AS workedHours FROM '.WorkedHours::class.' wh
+            'SELECT wh FROM '.WorkedHours::class.' wh
              WHERE wh.workStart = :workStart AND wh.workEnd = :workEnd AND
                    wh.lunch = :lunch AND wh.otherHours = :otherHours'
         )->setParameters($values)
-         ->getSingleResult()['workedHours'];
+         ->getOneOrNullResult();
 
         return $result;
     }

@@ -22,10 +22,10 @@
         <td>{$invitation->validity->format('j.n.Y')}</td>
         <td>{if $invitation->canBeSend()}Hned{else}Zítra{/if}</td>
         <td>
-            <a href="{link removeInvitation!, 'id' => $invitation->id}" class="ajax btn-red">Zrušit</a>
+            <a href="{link removeInvitation!, 'email' => $invitation->email}" class="ajax btn-red">Zrušit</a>
 
             {if $invitation->canBeSend()}
-                <a href="{link resendInvitation!, 'id' => $invitation->id}" class="btn-blue">Odeslat znovu</a>
+                <a href="{link resendInvitation!, 'email' => $invitation->email}" class="btn-blue">Odeslat znovu</a>
             {/if}
         </td>
     </tr>

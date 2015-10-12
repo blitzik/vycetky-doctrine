@@ -64,7 +64,7 @@ class UserSystemCreator extends Object
             // e.g. when two users are trying to register
             // at the same time on the same Invitation
             if ($this->usersReader->isEmailRegistered($newUser->email)) {
-                $this->invitationsWriter->removeInvitation($invitation->id);
+                $this->invitationsWriter->removeInvitation($invitation);
                 throw new DuplicateEmailException;
             }
 
@@ -73,7 +73,7 @@ class UserSystemCreator extends Object
             }
         }
 
-        $this->invitationsWriter->removeInvitation($invitation->id);
+        $this->invitationsWriter->removeInvitation($invitation);
         $this->em->commit();
         return $user;
     }
