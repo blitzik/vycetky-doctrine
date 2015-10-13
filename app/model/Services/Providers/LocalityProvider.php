@@ -33,20 +33,19 @@ class LocalityProvider extends Object
            (more info in MySQL SELECT documentation)
         */
         $this->em->getConnection()->executeQuery(
-            'INSERT INTO locality (name, user)
-             SELECT :name, :user FROM DUAL
+            'INSERT INTO locality (name)
+             SELECT :name FROM DUAL
              WHERE NOT EXISTS(
-                   SELECT l.name, l.user
+                   SELECT l.name
                    FROM locality l
-                   WHERE l.user = :user AND l.name = :name)
+                   WHERE l.name = :name)
              LIMIT 1'
-            , ['user' => $locality->getUser()->getId(), 'name' => $locality->getName()]);
+            , ['name' => $locality->getName()]);
 
         $result = $this->em->createQuery(
             'SELECT l FROM '.Locality::class.' l
-             WHERE l.user = :user AND l.name = :name'
+             WHERE l.name = :name'
         )->setParameters([
-            'user' => $locality->getUser(),
             'name' => $locality->getName()
         ])->getSingleResult();
 

@@ -16,9 +16,6 @@ services:
 	listingPresenter:
 		class: App\FrontModule\Presenters\ListingPresenter
 
-	localityPresenter:
-		class: App\FrontModule\Presenters\LocalityPresenter
-
 	# todo mailbox presenter
 
 	mergePresenter:

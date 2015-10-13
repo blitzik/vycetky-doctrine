@@ -19,6 +19,7 @@ services:
 
 	# Service layers
 	localitiesService: App\Model\Services\LocalitiesService
+	messageService: App\Model\Services\MessagesService
 	usersService: App\Model\Services\UsersService
 	itemsService: App\Model\Services\ItemsService
 

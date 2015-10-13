@@ -73,7 +73,7 @@ class MessagesReader extends Object
     {
         return $this->em->createQuery(
             'SELECT sm, partial a.{id, username, role} FROM ' .SentMessage::class. ' sm
-             JOIN sm.author a
+             LEFT JOIN sm.author a
              WHERE sm.id = :id'
         )->setParameter('id', $id)
          ->getOneOrNullResult();
@@ -88,7 +88,7 @@ class MessagesReader extends Object
         return $this->em->createQuery(
             'SELECT rm, m, partial a.{id, username, role} FROM ' .ReceivedMessage::class. ' rm
              JOIN rm.message m
-             JOIN m.author a
+             LEFT JOIN m.author a
              WHERE rm.id = :id'
         )->setParameter('id', $id)
          ->getOneOrNullResult();

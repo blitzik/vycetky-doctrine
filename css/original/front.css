@@ -659,7 +659,8 @@ h3 {
 .t-message {
   max-width: 650px;
   float: left;
-  margin-right: 20px; }
+  margin-right: 20px;
+  margin-bottom: 20px; }
 
 .t-recipients {
   float: left;

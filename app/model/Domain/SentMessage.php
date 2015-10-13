@@ -49,6 +49,18 @@ class SentMessage extends Entity implements IMessage, IResource
     private $author;
     
     /**
+     * @ORM\Column(name="author_name", type="string", length=25, nullable=false, unique=false)
+     * @var string
+     */
+    private $authorName;
+    
+    /**
+     * @ORM\Column(name="author_role", type="string", length=20, nullable=true, unique=false)
+     * @var string
+     */
+    private $authorRole;
+    
+    /**
      * @ORM\Column(name="deleted", type="boolean", nullable=false, unique=false, options={"default": false})
      * @var bool
      */
@@ -75,6 +87,7 @@ class SentMessage extends Entity implements IMessage, IResource
         $this->setText($text);
 
         $this->author = $author;
+        $this->authorName = $author->username;
         $this->sent = new \DateTime('now');
     }
 
@@ -113,6 +126,7 @@ class SentMessage extends Entity implements IMessage, IResource
     public function sendByAuthorRole()
     {
         $this->sentByAuthorRole = true;
+        $this->authorRole = $this->author->getRoleId();
     }
 
     /**
@@ -145,6 +159,30 @@ class SentMessage extends Entity implements IMessage, IResource
     public function getAuthor()
     {
         return $this->author;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->author;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthorName()
+    {
+        return $this->authorName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthorRole()
+    {
+        return $this->authorRole;
     }
 
     /**

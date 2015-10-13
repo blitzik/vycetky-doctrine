@@ -23,4 +23,9 @@ interface IMessage
      * @return bool
      */
     public function isReceivedMessage();
+
+    /**
+     * @return User
+     */
+    public function getOwner();
 }

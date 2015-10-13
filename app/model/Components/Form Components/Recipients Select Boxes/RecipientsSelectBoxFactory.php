@@ -36,6 +36,7 @@ class RecipientsSelectBoxFactory
         }
 
         $selectBox->setAttribute('size', 13);
+        $selectBox->setRequired('Vyberte příjemce.');
 
         return $selectBox;
     }
@@ -47,13 +48,16 @@ class RecipientsSelectBoxFactory
      */
     private function prepareRecipients(User $sender, array $usersByRestrictions)
     {
+        if (empty($usersByRestrictions)) {
+            return [];
+        }
+
         unset(
             $usersByRestrictions['suspendedUsers'][$sender->getId()],
             $usersByRestrictions['activeUsers'][$sender->getId()]
         );
 
-        $recipients = [];
-        if (!$this->authorizator->isAllowed($sender, 'recipients_selectBox', 'view_restricted_recipients')) {
+        if (!$this->authorizator->isAllowed($sender, 'message', 'send_to_restricted_recipients')) {
             $recipients = array_diff_key(
                 $usersByRestrictions['activeUsers'],
                 $usersByRestrictions['suspendedUsers'],

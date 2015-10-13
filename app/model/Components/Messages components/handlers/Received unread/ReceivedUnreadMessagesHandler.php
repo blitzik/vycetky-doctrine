@@ -40,7 +40,7 @@ class ReceivedUnreadMessagesHandler extends MessagesHandler implements IMessages
      */
     public function getResultSet()
     {
-        return $this->messagesFacade->fetchMessagesReferences($this->query);
+        return $this->messagesFacade->fetchReceivedMessages($this->query);
     }
 
     /**

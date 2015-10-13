@@ -64,7 +64,6 @@ class MailBoxPresenter extends SecurityPresenter
     /** @var IMessage */
     private $message;
 
-
     /*
      * -----------------------------
      * ----- RECEIVED MESSAGES -----
@@ -146,6 +145,8 @@ class MailBoxPresenter extends SecurityPresenter
             $this->flashMessage('Zpráva nebyla nalezena.', 'warning');
             $this->redirect('MailBox:receivedUnread');
         }
+
+
     }
 
     public function renderMessage($id)
@@ -171,9 +172,9 @@ class MailBoxPresenter extends SecurityPresenter
      */
 
 
-    public function actionNewMessage()
+    public function actionNewMessage($responseRecipient)
     {
-
+        $this['newMessage']->setResponseRecipient(intval($responseRecipient));
     }
 
     public function renderNewMessage()

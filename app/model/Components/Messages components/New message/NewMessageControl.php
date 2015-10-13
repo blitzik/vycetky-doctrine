@@ -10,6 +10,7 @@ use App\Model\Facades\UsersFacade;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\MessageLengthException;
 use Nette\Application\UI\Form;
+use Tracy\Debugger;
 
 class NewMessageControl extends BaseComponent
 {
@@ -31,6 +32,9 @@ class NewMessageControl extends BaseComponent
     /** @var array */
     private $users;
     private $restrictedUsers;
+    private $possibleRecipients = [];
+
+    private $responseRecipient;
 
     public function __construct(
         User $user,
@@ -44,27 +48,40 @@ class NewMessageControl extends BaseComponent
         $this->messagesFacade = $messagesFacade;
         $this->recipientsSelectBoxFactory = $recipientsSelectBoxFactory;
         $this->restrictionsControlFactory = $restrictionsControlFactory;
+    }
 
-        $this->restrictedUsers = $this->usersFacade->findRestrictedUsers($this->user);
-        $this->users = $this->usersFacade->findAllUsers();
+    public function setResponseRecipient($recipient)
+    {
+        $this->responseRecipient = $recipient;
+    }
+
+    private function loadUsers()
+    {
+        if (empty($this->possibleRecipients)) {
+            $this->restrictedUsers = $this->usersFacade->findRestrictedUsers($this->user);
+            $this->users = $this->usersFacade->findAllUsers();
+            $this->possibleRecipients = array_merge($this->users, $this->restrictedUsers);
+        }
     }
 
     protected function createComponentNewMessageForm()
     {
+        $this->loadUsers();
+
         $form = new Form();
 
         $form->addText('subject', 'Předmět', 35, 80)
             ->setRequired('Vyplňte prosím předmět zprávy.');
 
         $form->addTextArea('text', 'Zpráva', 65, 12)
-            ->setRequired('Vyplňte prosím text zprávy.')
-            ->addRule(Form::MAX_LENGTH, 'Zpráva může obsahovat maximálně %d znaků.', 2000);
+                ->setRequired('Vyplňte prosím text zprávy.')
+                ->addRule(Form::MAX_LENGTH, 'Zpráva může obsahovat maximálně %d znaků.', 2000);
 
         $form['recipients'] = $this->recipientsSelectBoxFactory
                                    ->create(
                                        $this->user,
-                                       array_merge($this->users, $this->restrictedUsers),
-                                       $this->authorizator->isAllowed($this->user, 'new_message_control', 'send_to_multiple_recipients')
+                                       $this->possibleRecipients,
+                                       $this->authorizator->isAllowed($this->user, 'message', 'send_to_multiple_recipients')
                                    );
 
         $form->addCheckbox('isSendAsAdmin', 'Odeslat zprávu jako správce aplikace');
@@ -84,8 +101,27 @@ class NewMessageControl extends BaseComponent
     {
         $values = $form->getValues();
 
+        $recipients = is_array($values->recipients) ?
+                      $values->recipients :
+                      [$values->recipients];
+
+        if (!$this->authorizator->isAllowed($this->user, 'message', 'sent_to_restricted_recipients')) {
+            $s = $this->messagesFacade
+                      ->canMessageBeSentTo(
+                          $values->recipients,
+                          $this->restrictedUsers,
+                          $this->users
+                      );
+            if ($s === false) {
+                $form->addError(
+                    'Nelze odeslat zprávu vybranému příjemci.'
+                );
+                return;
+            }
+        }
+
         if ($values['isSendAsAdmin'] == true and
-            !$this->authorizator->isAllowed($this->user, 'new_message_control', 'send_as_admin')) {
+            !$this->authorizator->isAllowed($this->user, 'message', 'send_as_admin')) {
             $form->addError('Nemáte dostatečná oprávnění k akci.');
             return;
         }
@@ -108,14 +144,8 @@ class NewMessageControl extends BaseComponent
         }
 
         try {
-            $result = $this->messagesFacade
-                           ->sendMessage($message, $values->recipients);
-
-            //if (!$result->hasNoErrors()) {
-            //    $er = $result->getFirstError();
-            //    $form->addError($er['message']);
-            //    return;
-            //}
+            $this->messagesFacade
+                 ->sendMessage($message, $recipients);
 
         } catch (MessageLengthException $ml) {
             $form->addError('Zprávu nelze uložit, protože je příliš dlouhá.');
@@ -147,6 +177,16 @@ class NewMessageControl extends BaseComponent
         $template = $this->getTemplate();
         $template->setFile(__DIR__ . '/template.latte');
 
+        $this->loadUsers();
+        $canBeSent = $this->messagesFacade
+                          ->canMessageBeSentTo(
+                              $this->responseRecipient,
+                              $this->restrictedUsers,
+                              $this->users
+                          );
+        if (isset($this->responseRecipient) and $canBeSent) {
+            $this['newMessageForm-recipients']->setDefaultValue($this->responseRecipient);
+        }
 
         $template->render();
     }

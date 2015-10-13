@@ -10,6 +10,7 @@ use App\Model\Domain\Entities\User;
 use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\Query\SentMessagesQuery;
 use App\Model\Services\Managers\MessagesManager;
+use App\Model\Services\MessagesService;
 use App\Model\Services\Readers\MessagesReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\MessagesWriter;
@@ -22,6 +23,9 @@ class MessagesFacade extends Object
 {
     /** @var MessagesManager  */
     private $messagesManager;
+
+    /** @var MessagesService  */
+    private $messagesService;
 
     /** @var MessagesReader  */
     private $messagesReader;
@@ -37,12 +41,14 @@ class MessagesFacade extends Object
 
     public function __construct(
         MessagesManager $messagesManager,
+        MessagesService $messagesService,
         MessagesReader $messagesReader,
         MessagesWriter $messagesWriter,
         UsersReader $usersReader,
         Authorizator $authorizator
     ) {
         $this->messagesManager = $messagesManager;
+        $this->messagesService = $messagesService;
         $this->messagesReader = $messagesReader;
         $this->messagesWriter = $messagesWriter;
         $this->usersReader = $usersReader;
@@ -51,36 +57,18 @@ class MessagesFacade extends Object
 
     /**
      * @param SentMessagesQuery $query
-     * @return SentMessage|null
-     */
-    public function fetchMessage(SentMessagesQuery $query)
-    {
-        return $this->messagesReader->fetchMessage($query);
-    }
-
-    /**
-     * @param SentMessagesQuery $query
      * @return array|\Kdyby\Doctrine\ResultSet
      */
-    public function fetchMessages(SentMessagesQuery $query)
+    public function fetchSentMessages(SentMessagesQuery $query)
     {
         return $this->messagesReader->fetchMessages($query);
     }
 
     /**
      * @param ReceivedMessagesQuery $query
-     * @return ReceivedMessage|null
-     */
-    public function fetchMessageReference(ReceivedMessagesQuery $query)
-    {
-        return $this->messagesReader->fetchMessageReference($query);
-    }
-
-    /**
-     * @param ReceivedMessagesQuery $query
      * @return array|\Kdyby\Doctrine\ResultSet
      */
-    public function fetchMessagesReferences(ReceivedMessagesQuery $query)
+    public function fetchReceivedMessages(ReceivedMessagesQuery $query)
     {
         return $this->messagesReader->fetchMessagesReferences($query);
     }
@@ -125,6 +113,15 @@ class MessagesFacade extends Object
         unset($mr);
 
         return $recipients;
+    }
+
+    public function canMessageBeSentTo(
+        $recipientID,
+        array $restrictedUsers,
+        array $users
+    ) {
+        return $this->messagesService
+                    ->canMessageBeSentTo($recipientID, $restrictedUsers, $users);
     }
 
     /**

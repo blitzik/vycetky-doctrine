@@ -17,6 +17,7 @@ use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\ItemsFacade;
 use App\Model\Queries\Listings\ListingsForOverviewQuery;
+use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\ResultObjects\ListingResult;
 use Exceptions\Runtime;
 use App\Model\Entities;
@@ -99,7 +100,7 @@ class ListingPresenter extends SecurityPresenter
      * @var MessagesFacade
      * @inject
      */
-    //public $messageFacade;
+    public $messageFacade;
 
     /**
      * @var ItemsFacade
@@ -131,10 +132,15 @@ class ListingPresenter extends SecurityPresenter
 
     public function renderOverview($month, $year)
     {
-        /*$this->numberOfMessages = $this->messageFacade
-             ->getNumberOfReceivedMessages(Entities\SentMessage::UNREAD);*/
+        $this->numberOfMessages = $this->messageFacade
+                                       ->fetchReceivedMessages(
+                                           (new ReceivedMessagesQuery())
+                                           ->byRecipient($this->user->getIdentity())
+                                           ->onlyActive()
+                                           ->findUnreadMessages()
+                                       )->getTotalCount();
 
-        //$this->template->numberOfMessages = $this->numberOfMessages;
+        $this->template->numberOfMessages = $this->numberOfMessages;
     }
 
     /**

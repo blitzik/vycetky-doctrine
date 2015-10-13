@@ -10,6 +10,9 @@ class MessageDetailControl extends BaseComponent
     /** @var IMessageRecipientsControlFactory  */
     private $recipientsControlFactory;
 
+    /** @var INewMessageControlFactory  */
+    private $newMessageControlFactory;
+
     /** @var MessagesFacade  */
     private $messagesFacade;
 
@@ -22,10 +25,12 @@ class MessageDetailControl extends BaseComponent
     public function __construct(
         IMessage $message,
         MessagesFacade $messagesFacade,
+        INewMessageControlFactory $newMessageControlFactory,
         IMessageRecipientsControlFactory $recipientsControlFactory
     ) {
         $this->message = $message;
         $this->messagesFacade = $messagesFacade;
+        $this->newMessageControlFactory = $newMessageControlFactory;
         $this->recipientsControlFactory = $recipientsControlFactory;
     }
 

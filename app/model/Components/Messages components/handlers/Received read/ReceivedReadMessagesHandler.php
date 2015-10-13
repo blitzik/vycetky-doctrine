@@ -21,10 +21,10 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
         parent::__construct($user, $messagesFacade);
 
         $this->query = new ReceivedMessagesQuery();
-        $this->query->findReadMessages()
-                    ->includingMessageAuthor(['id', 'username', 'role'])
-                    ->byRecipient($user)
-                    ->onlyActive();
+        $this->query->byRecipient($user)
+                    ->onlyActive()
+                    ->findReadMessages()
+                    ->includingMessageAuthor(['id', 'username', 'role']);
     }
 
     /**
@@ -40,7 +40,7 @@ class ReceivedReadMessagesHandler extends MessagesHandler implements IMessagesHa
      */
     public function getResultSet()
     {
-        return $this->messagesFacade->fetchMessagesReferences($this->query);
+        return $this->messagesFacade->fetchReceivedMessages($this->query);
     }
 
     /**

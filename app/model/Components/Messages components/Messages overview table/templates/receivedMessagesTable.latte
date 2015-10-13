@@ -7,13 +7,9 @@
 {if $message['isSystemMessage'] === true}
     {*$message['author']['role']*}<b>SYSTÉM</b>
 {elseif $message['sentByAuthorRole'] === true}
-   <b>{$message['author']['role']|capitalize}</b>
+   {$message['authorName']} {l}<b>{$message['authorRole']|firstUpper}</b>{r}
 {else}
-    {if isset($message['author'])}
-        {$message['author']['username']}
-    {else}
-        <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">
-    {/if}
+    {$message['authorName']}
 {/if}
 {/define}
 

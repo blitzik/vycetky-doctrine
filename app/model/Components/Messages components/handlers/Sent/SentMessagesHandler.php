@@ -40,7 +40,7 @@ class SentMessagesHandler extends MessagesHandler implements IMessagesHandler
      */
     public function getResultSet()
     {
-        return $this->messagesFacade->fetchMessages($this->query);
+        return $this->messagesFacade->fetchSentMessages($this->query);
     }
 
 

@@ -66,16 +66,33 @@ class ReceivedMessage extends Entity implements IMessage, IResource
         $this->deleted = true;
     }
 
+    /**
+     * @return User
+     */
     public function getRecipient()
     {
         return $this->recipient;
     }
 
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->recipient;
+    }
+
+    /**
+     * @return bool
+     */
     public function isRead()
     {
         return $this->read;
     }
 
+    /**
+     * @return bool
+     */
     public function isDeleted()
     {
         return $this->deleted;

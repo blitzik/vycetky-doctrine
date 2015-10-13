@@ -15,10 +15,7 @@ use Nette\Utils\Validators;
  * @ORM\Entity
  * @ORM\Table(
  *      name="locality",
- *      options={"collate": "utf8_czech_ci"},
- *      uniqueConstraints={
- *          @UniqueConstraint(name="user_name", columns={"user", "name"})
- *      }
+ *      options={"collate": "utf8_czech_ci"}
  * )
  */
 class Locality extends Entity
@@ -26,29 +23,19 @@ class Locality extends Entity
     use Identifier;
 
     /**
-     * @ORM\Column(name="name", type="string", length=40, nullable=false, options={"collation": "utf8_bin"})
+     * @ORM\Column(name="name", type="string", length=40, nullable=false, unique=true, options={"collation": "utf8_bin"})
      * @var string
      */
     private $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @JoinColumn(name="user", referencedColumnName="id", nullable=false)
-     * @var User
-     */
-    private $user;
-
 
     /**
      * @param string $localityName
-     * @param User $user
      */
     public function __construct(
-        $localityName,
-        User $user
+        $localityName
     ) {
         $this->setName($localityName);
-        $this->user = $user;
     }
 
     /**
@@ -77,13 +64,5 @@ class Locality extends Entity
     public function isSameAs(Locality $locality)
     {
         return $locality->name === $this->name;
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
     }
 }

@@ -28,7 +28,7 @@
     {if $message['isSystemMessage'] === true}
     class="m-system-message"
     {elseif $message['sentByAuthorRole'] === true}
-    class="m-{$message['author']['role']}"
+    class="m-{$message['authorRole']}"
     {elseif $isOdd}
     class="m-odd"
     {/if}

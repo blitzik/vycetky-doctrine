@@ -50,8 +50,6 @@ class Authorizator extends Object implements IAuthorizator
             $authorizator->addResource($presenter);
         }
 
-        $authorizator->addResource('new_message_control');
-        $authorizator->addResource('recipients_selectBox');
         $authorizator->addResource('relationships_tables');
         $authorizator->addResource('users_overview');
 

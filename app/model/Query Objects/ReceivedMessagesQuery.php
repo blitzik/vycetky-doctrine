@@ -57,7 +57,7 @@ class ReceivedMessagesQuery extends QueryObject
         $this->select[] = function (QueryBuilder $qb) use ($fields) {
             $this->joinMessage($qb);
 
-            $qb->innerJoin('m.author', 'a');
+            $qb->leftJoin('m.author', 'a');
 
             if (isset($fields) and !empty($fields)) {
                 $parts = implode(',', $fields);

@@ -1,7 +1,18 @@
 
 <table class='table t-recipients'>
 <tr><th>{count($recipients) > 1 ? 'Příjemci' : 'Příjemce'}</th></tr>
+{if empty($recipients)}
+    <tr><td>- nenalezen -</td></tr>
+{else}
 {foreach $recipients as $recipient}
-<tr><td>{$recipient['username']}</td></tr>
+<tr>
+    <td>
+        {if isset($recipient)}
+            {$recipient['username']}
+        {else}
+        {/if}
+    </td>
+</tr>
 {/foreach}
+{/if}
 </table>

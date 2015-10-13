@@ -11,6 +11,8 @@
     <th>Odesílatel</th>
     <td>
         {include #username message => $message}
+        <a href="{plink MailBox:newMessage responseRecipient => $message->getAuthor()->getId()}"
+           n:if="$message->getAuthor() !== null and !$message->isSystemMessage() ">[ Odpovědět ]</a>
     </td>
 </tr>
 {else}
@@ -28,20 +30,14 @@
 <tr><th>Text zprávy</th><td>{!$message->text|texy}</td></tr>
 </table>
 
-
 {define username}
-{if $message->getAuthor() === null and !$message->isSystemMessage()}
-    <img src="{$basePath}/images/question.png" alt="Uživatel neexistuje" title="Uživatel neexistuje">
+
+{if $message->isSystemMessage() === true}
+    <b>SYSTÉM</b>
+{elseif $message->isSentByAuthorRole() === true}
+    <b>{$message->getAuthorRole()|capitalize}</b> ({$message->getAuthorName()})
 {else}
-
-    {if $message->isSystemMessage() === true}
-        <b>SYSTÉM</b>
-    {elseif $message->isSentByAuthorRole() === true}
-    {dump $message->getAuthor()}
-       <b>{$message->getAuthor()->getRoleId()|capitalize}</b>
-    {else}
-       {$message->author->username}
-    {/if}
-
+   {$message->getAuthorName()}
 {/if}
+
 {/define}
