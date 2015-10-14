@@ -1,9 +1,7 @@
 <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
 
 {form passwordForm}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
 
 <table class="table t-classic">
     <tr><th>{label currentPassword /}</th><td>{input currentPassword}</td></tr>

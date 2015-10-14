@@ -1,9 +1,8 @@
 <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
 
 {form sendKeyForm}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
+
 <div class="invitation-box">
     <table class="invitationTable">
         <tr><th>{label email /}</th></tr>

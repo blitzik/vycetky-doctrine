@@ -5,9 +5,7 @@
 <h2 n:block="title">Spojené výčetky - výsledek</h2>
 
 {form listingsMergeForm}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
 
 <div class="left-side">
     <h3>Barevné odlišení kolidujících záznamů</h3>

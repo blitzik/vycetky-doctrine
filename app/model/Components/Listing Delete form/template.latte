@@ -1,9 +1,7 @@
 <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
 
 {form deleteListingForm}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
 
 <div class="box box-red">
 <div class="listing-removal-info">

@@ -47,3 +47,5 @@ app/backup
 /temp/sessions
 
 temp/proxies
+tests/temp
+tests/log

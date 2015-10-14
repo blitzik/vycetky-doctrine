@@ -6,9 +6,7 @@
 
     <div class="box box-classic">
     {form helpForm}
-    <ul class="form-errors" n:if="$form->hasErrors()">
-        <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-    </ul>
+    {customFormErrors}
 
         <table>
             <tr><th>{label subject /}</th></tr>

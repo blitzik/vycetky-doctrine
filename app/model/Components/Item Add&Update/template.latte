@@ -1,9 +1,7 @@
 
 {form itemForm}
 {var $day = $itemDate->format('j')}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
 
 <table class="table t-classic">
 	<tr><td colspan="5"><b>{$itemDate|dayName} {$day}</b>. {control listingDescription}</td></tr>

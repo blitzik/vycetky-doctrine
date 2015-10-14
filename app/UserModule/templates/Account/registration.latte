@@ -9,9 +9,7 @@
     <h1 n:block="title">Registrace uživatele</h1>
 
         {form registrationForm}
-        <ul class="form-errors" n:if="$form->hasErrors()">
-            <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-        </ul>
+        {customFormErrors}
 
         <div class="box">
             <table>

@@ -28,6 +28,7 @@ nette:
 	latte:
 		macros:
 			- Nextras\Latte\Macros\RedefineMacro
+			- blitzik\Macros\FormsMacro
 
 extensions:
 	console: Kdyby\Console\DI\ConsoleExtension

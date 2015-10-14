@@ -1,11 +1,7 @@
 
 
 {form newMessageForm}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">
-        {$error}
-    </li>
-</ul>
+{customFormErrors}
 
 <table class="table t-message">
     <tr><td colspan="2">{if $user->isAllowed('message', 'send_as_admin')}{input isSendAsAdmin}{/if}</td><th>{label recipients /}</th></tr>

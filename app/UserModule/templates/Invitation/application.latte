@@ -6,9 +6,7 @@
 
     <div class="box">
     {form invitationApplication}
-    <ul class="form-errors" n:if="$form->hasErrors()">
-        <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-    </ul>
+    {customFormErrors}
 
         <table>
             <tr><td>{label email /}</td></tr>

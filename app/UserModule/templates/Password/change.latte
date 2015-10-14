@@ -11,9 +11,7 @@
     <h1 n:block="title">Obnova zapomenutého hesla</h1>
 
     {form passwordChangeForm}
-    <ul class="form-errors" n:if="$form->hasErrors()">
-        <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-    </ul>
+    {customFormErrors}
 
     <div class="box">
         <table>

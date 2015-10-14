@@ -1,8 +1,6 @@
 <div class="left-side">
 {form listingResultSettings}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+{customFormErrors}
 
 <table class="table t-classic">
 <caption>{control listingDescription}</caption>

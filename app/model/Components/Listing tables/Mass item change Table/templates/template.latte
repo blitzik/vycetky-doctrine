@@ -6,9 +6,7 @@
 {/snippet}
 
 {snippet formErrors}
-<ul class="form-errors" n:if="$form->hasErrors()">
-    <li n:foreach="$form->errors as $error" class="form-error">{$error}</li>
-</ul>
+    {customFormErrors}
 {/snippet}
 
 <div class="box-wrapper">

@@ -17,6 +17,7 @@ use App\Model\Facades\LocalitiesFacade;
 use App\Model\Facades\MessagesFacade;
 use App\Model\Facades\UsersFacade;
 use App\Model\Services\InvitationHandler;
+use App\Model\Services\Providers\LocalityProvider;
 use App\Model\Services\Readers\ListingItemsReader;
 use App\Model\Services\Readers\ListingsReader;
 use App\Model\Services\Readers\MessagesReader;
@@ -107,6 +108,12 @@ class TestPresenter extends SecurityPresenter
      * @inject
      */
     public $invHandler;
+
+    /**
+     * @var LocalityProvider
+     * @inject
+     */
+    public $localityProvider;
 
     public function actionDefault()
     {
