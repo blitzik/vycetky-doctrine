@@ -3,6 +3,7 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model;
+use Doctrine\ORM\EntityNotFoundException;
 use Nette;
 
 abstract class SecurityPresenter extends Nette\Application\UI\Presenter
@@ -31,13 +32,17 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
             $this->redirect(':User:Login:default');
         }
 
-        if (!$this->user->getIdentity()->isUserAccountAccessible()) {
-            $this->flashMessage(
-                'Váš účet byl uzavřen.
+        try {
+            if (!$this->user->getIdentity()->isUserAccountAccessible()) {
+                $this->flashMessage(
+                    'Váš účet byl uzavřen.
                  Pro více informací kontaktujte správce aplikace na adrese:
                  vycetkovy-system@alestichava.cz', 'warning'
-            );
-            $this->user->logout(true);
+                );
+                $this->user->logout(true);
+                $this->redirect(':User:Login:default');
+            }
+        } catch (EntityNotFoundException $e) {
             $this->redirect(':User:Login:default');
         }
 
@@ -45,16 +50,6 @@ abstract class SecurityPresenter extends Nette\Application\UI\Presenter
 
         parent::startup();
     }
-
-    public function checkRequirements($element)
-    {
-        if (!$this->authorizator->isAllowed($this->user->getIdentity(), $this->name, $this->action)) {
-            throw new Nette\Application\ForbiddenRequestException;
-        }
-
-        parent::checkRequirements($element);
-    }
-
 
     protected function formatSignalString()
     {

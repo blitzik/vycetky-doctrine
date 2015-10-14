@@ -55,7 +55,7 @@ class SentMessage extends Entity implements IMessage, IResource
     private $authorName;
     
     /**
-     * @ORM\Column(name="author_role", type="string", length=20, nullable=true, unique=false)
+     * @ORM\Column(name="author_role", type="string", length=20, nullable=false, unique=false)
      * @var string
      */
     private $authorRole;
@@ -88,6 +88,7 @@ class SentMessage extends Entity implements IMessage, IResource
 
         $this->author = $author;
         $this->authorName = $author->username;
+        $this->authorRole = $this->author->getRoleId();
         $this->sent = new \DateTime('now');
     }
 
@@ -126,7 +127,6 @@ class SentMessage extends Entity implements IMessage, IResource
     public function sendByAuthorRole()
     {
         $this->sentByAuthorRole = true;
-        $this->authorRole = $this->author->getRoleId();
     }
 
     /**

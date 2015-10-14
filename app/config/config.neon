@@ -21,7 +21,7 @@ nette:
 		name: 'listings'
 
 	debugger:
-		email: ales.tichava@gmail.com
+		email: %mainEmail%
 		bar:
 			- Nette\Bridges\DITracy\ContainerPanel
 

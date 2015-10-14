@@ -8,7 +8,6 @@ use Nette\Application\UI\Presenter;
 
 class LoginPresenter extends Presenter
 {
-
     public function actionDefault()
     {
 

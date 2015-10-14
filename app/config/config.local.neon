@@ -3,7 +3,7 @@ parameters:
 
 	backup:
 		database:
-			password: 'password'
+			password: password
 
 	database:
 		host: 127.0.0.1

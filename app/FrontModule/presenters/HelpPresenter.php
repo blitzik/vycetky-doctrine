@@ -61,8 +61,8 @@ class HelpPresenter extends SecurityPresenter
     {
         $values = $form->getValues();
 
-        $username = $this->getUser()->getIdentity()->data['username'];
-        $email = $this->getUser()->getIdentity()->data['email'];
+        $username = $this->getUser()->getIdentity()->username;
+        $email = $this->getUser()->getIdentity()->email;
 
         $mail = new Message;
         $mail->setFrom('Výčetkový systém <' .$this->emails['system']. '>')

@@ -30,25 +30,16 @@ class Authorizator extends Object implements IAuthorizator
 
     private function defineRoles(Permission $authorizator)
     {
-        $authorizator->addRole('guest');
         $authorizator->addRole('employee');
         $authorizator->addRole('admin');
     }
 
 
 
-    private $front = ['Front:Account', 'Front:Listing', 'Front:Item',
-                      'Front:MailBox', 'Front:Users', 'Front:Help',
-                      'Front:Merge'];
-
     private function defineResources(Permission $authorizator)
     {
         $authorizator->addResource('listing');
         $authorizator->addResource('message');
-
-        foreach ($this->front as $presenter) {
-            $authorizator->addResource($presenter);
-        }
 
         $authorizator->addResource('relationships_tables');
         $authorizator->addResource('users_overview');
@@ -62,9 +53,6 @@ class Authorizator extends Object implements IAuthorizator
     {
         $authorizator->allow('employee', 'listing', Permission::ALL, [$this, 'isOwner']);
         $authorizator->allow('employee', 'message', ['send', 'remove', 'view', 'mark_as_read'], [$this, 'isOwner']);
-
-        $authorizator->allow('employee', $this->front, Permission::ALL);
-        $authorizator->deny('employee', 'Front:Account', 'databaseBackup');
 
         $authorizator->allow('admin', null, Permission::ALL);
         $authorizator->deny('admin', 'message', 'mark_as_read', [$this, 'isNotOwner']);

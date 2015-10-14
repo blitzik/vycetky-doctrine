@@ -396,6 +396,13 @@ class ListingPresenter extends SecurityPresenter
     public function actionPdfGeneration($id)
     {
         $this->listingResult = $this->getListingById($id, true);
+
+        if ($this->user->getIdentity()->name !== null) {
+            $this['listingPDFGeneration']
+                 ['listingResultSettings']
+                 ['name']->setDefaultValue($this->user->getIdentity()->name);
+        }
+
     }
 
     public function renderPdfGeneration($id)

@@ -55,7 +55,7 @@ class User extends Entity implements IIdentity, IRole
     protected $name;
     
     /**
-     * @ORM\Column(name="role", type="string", length=20, nullable=false, unique=false)
+     * @ORM\Column(name="role", type="string", length=20, nullable=false, unique=false, options={"default": "employee"})
      * @var string
      */
     private $role;

@@ -57,7 +57,7 @@ class DatabaseBackupControl extends BaseComponent
      */
     private function logError($errorMessage)
     {
-        $f = fopen(WWW_DIR . '/log/backup-failure.txt', 'a+');
+        $f = fopen(WWW_DIR . '/log/backup-problems.txt', 'a+');
         fwrite($f, PHP_EOL . date('Y-m-d H-i-s') . ' => ' . $errorMessage);
         fclose($f);
     }
@@ -117,6 +117,8 @@ class DatabaseBackupControl extends BaseComponent
                 $this->logError($e->getMessage());
                 $this->sendMail('Automatic database backup failure', $e->getMessage());
             }
+        } else {
+            $this->logError('Another try for database backup');
         }
     }
 
@@ -141,16 +143,16 @@ class DatabaseBackupControl extends BaseComponent
             $file = WWW_DIR . '/app/backup/' . date('Y-m-d H-i-s') . '.sql';
             try {
                 $this->databaseBackup->save($file);
-                $this->flashMessage('Záloha databáze byla úspěšně provedena!', 'success');
+                $this->presenter->flashMessage('Záloha databáze byla úspěšně provedena!', 'success');
 
             } catch (\Exception $e) {
-                $this->flashMessage($e->getMessage(), 'error');
+                $this->presenter->flashMessage($e->getMessage(), 'error');
             }
 
             $this->sendMail('Manual Database Backup', 'OK', $file);
 
         } else {
-            $this->flashMessage('Nemáte dostatečná oprávnění k provedení akce.', 'warning');
+            $this->presenter->flashMessage('Nemáte dostatečná oprávnění k provedení akce.', 'warning');
         }
 
         $this->redirect('this');

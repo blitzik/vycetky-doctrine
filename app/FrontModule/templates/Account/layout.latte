@@ -28,7 +28,7 @@
     {ifCurrent Account:sendInvitation}class="selected"{/ifCurrent}>Odeslat novou pozvánku</a>
 </li>
 
-<li n:if="$authorizator->isAllowed($user->getIdentity(), 'Front:Account', 'databaseBackup')">
+<li n:if="$user->isAllowed('database_backup')">
     <a href="{link Account:databaseBackup}"
     {ifCurrent Account:databaseBackup}class="selected"{/ifCurrent}>Záloha databáze</a>
 </li>

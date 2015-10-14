@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/../../../vendor/autoload.php';
+//require __DIR__ . '/../../../ven-new/autoload.php';
 
 $configurator = new Nette\Configurator;
 
