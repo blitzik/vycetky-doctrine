@@ -4,13 +4,9 @@ namespace App\Model\Facades;
 
 use App\Model\Domain\Entities\Listing;
 use App\Model\Domain\Entities\ListingItem;
-use App\Model\Domain\Entities\Locality;
-use App\Model\Domain\Entities\User;
 use App\Model\Services\LocalitiesService;
 use Kdyby\Doctrine\EntityManager;
-use Kdyby\Doctrine\Mapping\ResultSetMappingBuilder;
 use Nette\Object;
-use Nette\Utils\Arrays;
 use Nette\Utils\Validators;
 
 class LocalitiesFacade extends Object

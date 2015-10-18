@@ -1,0 +1,16 @@
+{
+  "name": "Vycetky-Grunt",
+  "version": "0.1.0",
+  "author": "Ales Tichava",
+  "private": true,
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-sass": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-cssc": "*",
+    "matchdep": "*"
+  }
+}

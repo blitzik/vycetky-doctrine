@@ -2,10 +2,11 @@
 
 namespace App\Model\Domain\Entities;
 
-use Kdyby\Doctrine\Entities\BaseEntity;
+use Kdyby\Doctrine\Entities\MagicAccessors;
 
-abstract class Entity extends BaseEntity
+abstract class Entity
 {
+    use MagicAccessors;
 
     /**
      * Returns NULL if empty string is given

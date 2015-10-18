@@ -24,6 +24,7 @@ nette:
 		email: %mainEmail%
 		bar:
 			- Nette\Bridges\DITracy\ContainerPanel
+			- Nette\Bridges\HttpTracy\SessionPanel
 
 	latte:
 		macros:

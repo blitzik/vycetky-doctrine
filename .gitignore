@@ -49,3 +49,9 @@ app/backup
 temp/proxies
 tests/temp
 tests/log
+node_modules
+.sass-cache
+js/mins/js.min.js
+js/mins/js.js
+css/user_front.min.css
+css/front.min.css

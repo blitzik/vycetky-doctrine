@@ -29,12 +29,16 @@ use Kdyby\Doctrine\QueryBuilder;
 use Kdyby\Doctrine\QueryObject;
 use Kdyby\GeneratedProxy\__CG__\App\Model\Domain\Entities\WorkedHours;
 use Kdyby\Persistence\Queryable;
+use Nette\Application\ForbiddenRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
+use Nette\Caching\Cache;
+use Nette\Caching\IStorage;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\IAuthorizator;
 use Nette\Security\Permission;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Validators;
 use Tracy\Debugger;
 
@@ -115,20 +119,36 @@ class TestPresenter extends SecurityPresenter
      */
     public $localityProvider;
 
+    /**
+     * @var IStorage
+     * @inject
+     */
+    public $cacheStorage;
+
+    protected function startup()
+    {
+        if (!$this->user->isInRole('admin')) {
+            throw new ForbiddenRequestException;
+        }
+
+        parent::startup();
+    }
+
+
     public function actionDefault()
     {
 
+    }
+
+    public function renderDefault()
+    {
+        //dump($this->name);
     }
 
     protected function createComponentVp()
     {
         $c = new VisualPaginator();
         return $c;
-    }
-
-    public function renderDefault()
-    {
-        //dump($this->name);
     }
 
     //public function checkRequirements($element)
