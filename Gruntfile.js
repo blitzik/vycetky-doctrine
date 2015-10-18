@@ -9,27 +9,33 @@ module.exports = function (grunt) {
             options: {
                 separator: ';'
             },
-            dist: {
+            base: {
                 src: [
                     'js/jquery.js',
                     'js/netteForms.js',
                     'js/nette.ajax.js',
-                    'js/main.js',
                     'js/jquery-ui.js',
                     'js/jquery.ui.touch-punch.min.js',
-                    'js/passwordValidation.js',
                     'js/placeholders.js',
-                    'js/timeConverter.js',
-                    'js/sliders.js'
+                    'js/main.js'
                 ],
                 dest: 'js/mins/js.js'
+            },
+            item: {
+                src: ['js/timeConverter.js', 'js/sliders.js'],
+                dest: 'js/mins/item.js'
             }
         },
 
         uglify: {
-            build: {
+            base: {
                 files: {
                     'js/mins/js.min.js': ['js/mins/js.js']
+                }
+            },
+            item: {
+                files: {
+                    'js/mins/item.min.js': ['js/mins/item.js']
                 }
             }
         },
