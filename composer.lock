@@ -68,12 +68,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dg/texy.git",
-                "reference": "264762196f9fa4763fb3bda7433f62d3f1d151ba"
+                "reference": "6af8ec1fb5057d2649e5c5afbf549598d8a1d1f1"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/dg/texy/zipball/6af8ec1fb5057d2649e5c5afbf549598d8a1d1f1",
-                "reference": "264762196f9fa4763fb3bda7433f62d3f1d151ba",
+                "reference": "6af8ec1fb5057d2649e5c5afbf549598d8a1d1f1",
                 "shasum": ""
             },
             "require": {
@@ -89,6 +89,9 @@
             "autoload": {
                 "classmap": [
                     "src/"
+                ],
+                "files": [
+                    "src/compatibility.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -100,7 +103,7 @@
             "authors": [
                 {
                     "name": "David Grudl",
-                    "homepage": "http://davidgrudl.com"
+                    "homepage": "https://davidgrudl.com"
                 }
             ],
             "description": "Texy converts plain text in easy to read Texy syntax into structurally valid (X)HTML. It supports adding of images, links, nested lists, tables and has full support for CSS. Texy supports hyphenation of long words (which reflects language rules), clickable emails and URL (emails are obfuscated against spambots), national typographic single and double quotation marks, ellipses, em dashes, dimension sign, nonbreakable spaces (e.g. in phone numbers), acronyms, arrows and many others. Texy code can optionally contain HTML tags.",
@@ -116,7 +119,7 @@
                 "wiki",
                 "xhtml"
             ],
-            "time": "2015-10-04 13:57:39"
+            "time": "2015-10-05 15:50:35"
         },
         {
             "name": "doctrine/annotations",
@@ -962,7 +965,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Kdyby/Doctrine/zipball/4e56faec5fa4bfce23eac6516f2c35dd2d7592b7",
+                "url": "https://api.github.com/repos/Kdyby/Doctrine/zipball/8306b0c091064fe2d183d4a2f6604121717df3bc",
                 "reference": "4e56faec5fa4bfce23eac6516f2c35dd2d7592b7",
                 "shasum": ""
             },
@@ -1213,12 +1216,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/latte.git",
-                "reference": "3d47b0af6967c99df203e98cce6201b5d84b5ea4"
+                "reference": "36d5f660b08f2153c2c0a99eb5f29c3b4f268698"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/latte/zipball/3d47b0af6967c99df203e98cce6201b5d84b5ea4",
-                "reference": "3d47b0af6967c99df203e98cce6201b5d84b5ea4",
+                "url": "https://api.github.com/repos/nette/latte/zipball/36d5f660b08f2153c2c0a99eb5f29c3b4f268698",
+                "reference": "36d5f660b08f2153c2c0a99eb5f29c3b4f268698",
                 "shasum": ""
             },
             "require": {
@@ -1260,7 +1263,7 @@
                 "templating",
                 "twig"
             ],
-            "time": "2015-10-09 15:29:11"
+            "time": "2015-10-12 17:02:09"
         },
         {
             "name": "mpdf/mpdf",
@@ -1307,16 +1310,16 @@
         },
         {
             "name": "nette/application",
-            "version": "v2.3.6",
+            "version": "v2.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/application.git",
-                "reference": "68db80ce58a5039656f11409acc597a4ea8d817d"
+                "reference": "8e87ae81c2098abd7895bfd96d9fac1cd332abc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/application/zipball/68db80ce58a5039656f11409acc597a4ea8d817d",
-                "reference": "68db80ce58a5039656f11409acc597a4ea8d817d",
+                "url": "https://api.github.com/repos/nette/application/zipball/8e87ae81c2098abd7895bfd96d9fac1cd332abc3",
+                "reference": "8e87ae81c2098abd7895bfd96d9fac1cd332abc3",
                 "shasum": ""
             },
             "require": {
@@ -1365,7 +1368,7 @@
             ],
             "description": "Nette Application MVC Component",
             "homepage": "https://nette.org",
-            "time": "2015-10-09 14:57:21"
+            "time": "2015-10-13 14:33:28"
         },
         {
             "name": "nette/bootstrap",
@@ -1645,16 +1648,16 @@
         },
         {
             "name": "nette/forms",
-            "version": "v2.3.4",
+            "version": "v2.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/forms.git",
-                "reference": "e4e3777c7a783f1877eda4a07ff2f128bdd05bf9"
+                "reference": "f89c58b1d318e4324e3c905b4d7fc45c4ec626b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/forms/zipball/e4e3777c7a783f1877eda4a07ff2f128bdd05bf9",
-                "reference": "e4e3777c7a783f1877eda4a07ff2f128bdd05bf9",
+                "url": "https://api.github.com/repos/nette/forms/zipball/f89c58b1d318e4324e3c905b4d7fc45c4ec626b6",
+                "reference": "f89c58b1d318e4324e3c905b4d7fc45c4ec626b6",
                 "shasum": ""
             },
             "require": {
@@ -1687,16 +1690,16 @@
             "authors": [
                 {
                     "name": "David Grudl",
-                    "homepage": "http://davidgrudl.com"
+                    "homepage": "https://davidgrudl.com"
                 },
                 {
                     "name": "Nette Community",
-                    "homepage": "http://nette.org/contributors"
+                    "homepage": "https://nette.org/contributors"
                 }
             ],
             "description": "Nette Forms: greatly facilitates web forms",
-            "homepage": "http://nette.org",
-            "time": "2015-07-20 01:25:35"
+            "homepage": "https://nette.org",
+            "time": "2015-10-12 13:52:41"
         },
         {
             "name": "nette/http",
