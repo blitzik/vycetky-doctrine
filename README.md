@@ -14,6 +14,8 @@ Základní informace o systému naleznete <a href="https://github.com/blitzik/vy
 - instalace Grunt ( příkazem grunt v kořenovém adresáři zpracovat CSS, JS, apod.)
 
 V tuhle chvíli by měla být aplikace ready.
+Lze změnit jquery ui theme nahráním vhodného css do složky assets/css/jquery_ui_theme/
+a poté nechat zpracovat Gruntem
 
 <h2>Vytvoření účtu</h2>
 

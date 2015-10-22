@@ -30,7 +30,7 @@ module.exports = function (grunt) {
                     'bower_components/jquery-ui/themes/base/menu.css',
                     'bower_components/jquery-ui/themes/base/slider.css',
                     //'bower_components/jquery-ui/themes/base/theme.css' // base theme
-                    'assets/css/jquery_ui_theme/jquery-ui.theme-sunny.css' // downloaded theme
+                    'assets/css/jquery_ui_theme/jquery-ui.theme.css' // downloaded theme
                 ],
                 dest: 'assets/css/original/jqueryuiCss.css'
             },
