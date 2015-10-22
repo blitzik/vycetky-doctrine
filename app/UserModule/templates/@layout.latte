@@ -1,3 +1,4 @@
+{block|strip}
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,9 +6,9 @@
 
 	<title>{ifset #title}{include title|striptags}{/ifset}</title>
 
-	<link rel="stylesheet" media="screen" href="{$basePath}/css/user_front.min.css">
+	<link rel="stylesheet" media="screen" href="{$basePath}/assets/css/user_front.min.css">
 	{block scripts}
-        <script src="{$basePath}/js/mins/js.min.js"></script>
+        <script src="{$basePath}/assets/js/js.min.js"></script>
     {/block}
 	{block head}{/block}
 </head>
@@ -22,3 +23,4 @@
     </div>
 </body>
 </html>
+{/block}

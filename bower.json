@@ -1,0 +1,29 @@
+{
+  "name": "Vycetky-Grunt",
+  "description": "",
+  "main": "bower.json",
+  "authors": [
+    "Ales Tichava"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/blitzik/vycetky-doctrine",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "nette-forms": "~2.3.6",
+    "nette.ajax.js": "~2.1.0",
+    "jquery-ui-touch-punch": "*",
+    "jquery-ui": "jquery.ui#~1.11.4",
+    "placeholders": "~4.0.1"
+  },
+  "resolutions": {
+    "nette-forms": "~2.2"
+  }
+}

@@ -9,8 +9,6 @@ function debounce(fn, delay) {
     };
 }
 
-
-
 function checkAllFunc()
 {
     $("#checkAll").change(function () {

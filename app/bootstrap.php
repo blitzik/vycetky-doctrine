@@ -1,7 +1,7 @@
 <?php
 
-require __DIR__ . '/../../../vendor/autoload.php';
-//require __DIR__ . '/../../../ven-new/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php'; // localhost
+//require __DIR__ . '/../../../ven-new/autoload.php'; // temporary production
 
 $configurator = new Nette\Configurator;
 
