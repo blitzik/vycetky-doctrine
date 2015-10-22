@@ -64,7 +64,7 @@ class InvitationsReader extends Object
         $qb = $this->em->createQueryBuilder();
         $qb->select('i, partial s.{id, username}')
             ->from(Invitation::class, 'i')
-            ->innerJoin('i.sender', 's')
+            ->leftJoin('i.sender', 's')
             ->where('i.email = :email')
             ->setParameter('email', $email);
 

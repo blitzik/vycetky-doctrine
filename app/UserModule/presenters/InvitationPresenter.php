@@ -37,7 +37,7 @@ class InvitationPresenter extends Presenter
                 ->setRequired('Vyplňte prosím pole pro E-mail.')
                 ->addRule(Form::EMAIL, 'Zadejte E-mailovou adresu ve správném formátu');
 
-        $form->addText('token', 'Registrační kód pozvánky', null, 15)
+        $form->addText('token', 'Registrační kód pozvánky', null, Invitation::TOKEN_LENGTH)
                 ->setRequired('Zadejte registrační kód');
         
         $form->addSubmit('send', 'Zkontrolovat pozvánku')
@@ -50,12 +50,6 @@ class InvitationPresenter extends Presenter
 
     public function processInvitation(Form $form, $values)
     {
-        $errMsg = 'Neplatná pozvánka';
-        if (mb_strlen($values['token']) !== Invitation::TOKEN_LENGTH) {
-            $form->addError($errMsg);
-            return;
-        }
-
         try {
             $this->invitationsFacade
                  ->checkInvitation($values['email'], $values['token']);
@@ -66,7 +60,7 @@ class InvitationPresenter extends Presenter
             );
 
         } catch (InvitationValidityException $e) {
-            $form->addError($errMsg);
+            $form->addError('Neplatná pozvánka');
         }
     }
 }

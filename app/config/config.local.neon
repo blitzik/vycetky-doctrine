@@ -3,11 +3,10 @@ parameters:
 
 	backup:
 		database:
-			password: password
+			password: heslo_pro_zalohu_databaze
 
 	database:
 		host: 127.0.0.1
-		driver: mysql
 		username: root
 		password: asqw
 		dbname: listings
@@ -22,7 +21,6 @@ parameters:
 
 doctrine:
 	host: %database.host%
-	database: %database.driver%
 	user: %database.username%
 	password: %database.password%
 	dbname: %database.dbname%

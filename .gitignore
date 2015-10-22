@@ -41,10 +41,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+btfj.dat
 /.idea
 app/backup
-/temp/cache
-/temp/sessions
+/temp/cache/*
+/temp/sessions/*
 
 temp/proxies
 tests/temp

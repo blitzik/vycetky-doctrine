@@ -2,6 +2,7 @@
 
 namespace App\Model\Domain\Entities;
 
+use Doctrine\ORM\Mapping\UniqueConstraint;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
@@ -15,7 +16,9 @@ use DateTime;
  * @ORM\Table(
  *      name="invitation",
  *      options={"collate": "utf8_czech_ci"},
- *      indexes={@Index(name="sender_validity", columns={"sender", "validity"})}
+ *      indexes={
+ *          @Index(name="sender_validity", columns={"sender", "validity"})
+ *      }
  * )
  */
 class Invitation extends Entity
@@ -27,7 +30,7 @@ class Invitation extends Entity
     
     /**
      * @Id
-     * @ORM\Column(name="email", type="string", length=70, nullable=false)
+     * @ORM\Column(name="email", type="string", length=70, nullable=false, unique=true)
      * @var string
      */
     private $email;
