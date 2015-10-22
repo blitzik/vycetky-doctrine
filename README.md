@@ -13,8 +13,9 @@ Základní informace o systému naleznete <a href="https://github.com/blitzik/vy
    měla kam aplikace odesílat zálohy databáze a v notifikačních emailech byl email
    aplikace, kam budou moci uživatelé zasílat třeba dotazy)
 - vygenerovat schéma databáze podle doctrine entit
-- instalace Bower | kořenový adresář => bower install --save
-  (je třeba předtím mít nainstalován NPM, poté nainstalovat závislosti deklarované v bower.json)
+- instalace NPM
+- instalace Bower
+- nainstalovat závislosti deklarované v bower.json | kořenový adresář => bower install --save
 - instalace Grunt
 - nainstalovat závislosti pro Grunt (soubor package.json) příkazem [npm install]
 - spustit Grunt (příkaz [grunt] v kořenovém adresáři)
