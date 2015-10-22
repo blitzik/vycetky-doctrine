@@ -13,7 +13,7 @@ Základní informace o systému naleznete <a href="https://github.com/blitzik/vy
    měla kam aplikace odesílat zálohy databáze a v notifikačních emailech byl email
    aplikace, kam budou moci uživatelé zasílat třeba dotazy)
 - vygenerovat schéma databáze podle doctrine entit
-- instalace Bower [kořenový adresář => bower install --save]
+- instalace Bower | kořenový adresář => bower install --save
   (je třeba předtím mít nainstalován NPM, poté nainstalovat závislosti deklarované v bower.json)
 - instalace Grunt
 - nainstalovat závislosti pro Grunt (soubor package.json) příkazem [npm install]
@@ -33,7 +33,7 @@ vytvořit účet v registrační části aplikace.
 <h2>Ostatní</h2>
 
 Pro automatickou zálohu databáze lze vytvořit úlohu pro CRON, která bude
-volat adresu www.vase-domena.cz/backup/database-backup?do=databaseBackup-backup&databaseBackup-pass=<b>HESLO_UVEDENE_V_CONFIGU</b>
+volat adresu www.vase-domena. cz/backup/database-backup?do=databaseBackup-backup&databaseBackup-pass=<b>HESLO_UVEDENE_V_CONFIGU</b>
 (na konci adresy se zadává heslo, které se nastaví v config.local.neon)
 
 zálohuje se vždy jen jednou za den, pokud již záloha existuje, tak se další nevytváří.
