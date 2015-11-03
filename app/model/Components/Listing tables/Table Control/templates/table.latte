@@ -5,7 +5,7 @@
 {/if}
 {/snippet}
 
-
+<div id="listing-table-content-block">
 {snippet itemsCollection}
 <table class="detail-table">
     {if $isTableCaptionVisible}
@@ -75,18 +75,5 @@
         </tr>
     {/foreach}
 </table>
-<script>
-
-(function ($) {
-$(function () {
-    checkAllFunc();
-
-    $('.detail-table tr').click(function(event) {
-        if (event.target.type !== 'checkbox') {
-          $(':checkbox', this).trigger('click');
-        }
-      });
-});
-})(window.jQuery);
-</script>
 {/snippet}
+</div>

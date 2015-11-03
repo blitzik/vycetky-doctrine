@@ -24,9 +24,9 @@
             {input lunchSub}
         </div></td>
         <td>
-            <span class="workedHours">-</span>
+            <span id="workedHours" data-workedhours="{$workedHours|toTimeWithComma}">-</span>
         </td>
-        <td>{input locality}</td></tr>
+        <td><input n:name="locality" data-autocomplete="{link searchLocality}"></td></tr>
 
     <tr><td colspan="2"><div id="slider-range"></div></td>
         <td><div id="slider-lunch"></div></td><td></td><th>{label description /}</th></tr>
@@ -50,21 +50,5 @@
         <td colspan="3">{input descOtherHours}</td></tr>
     <tr><td><div id="slider-time-other"></div></td><td colspan="4"></td></tr>
 </table>
-
-<script>
-$(function () {
-    {if isset($workedHours)}
-    $('.workedHours').text({$workedHours|toTimeWithComma});
-    {else}
-    $('.workedHours').text({$defaultWorkedHours});
-    {/if}
-
-    $( "#locality" ).autocomplete({
-        source: {link searchLocality},
-        delay: 500,
-        minLength: 3
-    });
-});
-</script>
 
 {/form itemForm}

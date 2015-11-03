@@ -1,3 +1,4 @@
+
 {block content}
 
 {control listingActionsMenu}
@@ -24,6 +25,8 @@
 
 <p class="clear-element">Při spojení se vytvoří <strong>nová výčetka</strong>. Původní výčetky zůstanou nedotčeny.
 <a href="{link Help:doc#spojeni-vycetek}">Více viz dokumentace</a></p>
+
+<div id="listing-merging-table-content-block">
 <table class="detail-table">
 
 <tr>
@@ -75,7 +78,7 @@
 
         <td n:class="w70">
             {if $itemsCount > 1}
-                <input type="checkbox" name="itm[]" data-other="{$IDs[($item->getListing()->getId() == $baseListing->getId() ? 1 : 0)]}" value="{$item->listingItemID}"> {* switched $IDs indexes *}
+                <input type="checkbox" name="itm[]" class="itemToCheck" data-other="{$IDs[($item->getListing()->getId() == $baseListing->getId() ? 1 : 0)]}" value="{$item->listingItemID}"> {* switched $IDs indexes *}
             {/if}
         </td>
     </tr>
@@ -89,33 +92,8 @@
 {/foreach}
 
 </table>
-
-<script>
-$(function() {
-     $('.detail-table tr').click(function(event) {
-         if (event.target.type !== 'checkbox') {
-            $(':checkbox', this).trigger('click');
-         }
-     });
-
-    $(':checkbox').prop('checked', false);
-
-    $(':checkbox').on('click', function() {
-        var otherItemID = $(this).data('other');
-        var otherItem = $('#rowID-' + otherItemID);
-
-        if (this.checked) {
-            otherItem.find('input[type="checkbox"]').prop('disabled', true);
-            otherItem.fadeOut(400);
-        } else {
-            otherItem.find('input[type="checkbox"]').prop('disabled', false);
-            otherItem.fadeIn(400);
-        }
-    });
-});
-</script>
-
-
+</div>
 {/form}
 
 {/block}
+

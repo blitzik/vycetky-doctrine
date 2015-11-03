@@ -30,7 +30,7 @@
                 {input lunchSub}
             </div></td>
             <td>
-                <span class="workedHours">-</span>
+                <span id="workedHours" data-workedhours="{$defaultWorkedHours|toTimeWithComma}">-</span>
             </td>
     </tr>
 
@@ -51,12 +51,6 @@
                hodnotu 0 u řádku, kde byl k těmto hodinám nastaven komentář,
                bude tento komentář ztracen.</div>
 </div>
-
-<script>
-$(function () {
-    $('.workedHours').text({$defaultWorkedHours});
-});
-</script>
 
 <div class="box box-hint w250 right">
     <h3>Hromadná změna položek</h3>

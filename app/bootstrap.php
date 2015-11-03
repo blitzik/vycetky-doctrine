@@ -1,13 +1,14 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
+//require __DIR__ . '/../../../ven-new/autoload.php';
 
 $configurator = new Nette\Configurator;
 
 $configurator->enableDebugger(__DIR__ . '/../log');
 
-//$configurator->setDebugMode(true);
-//Tracy\Debugger::enable(Tracy\Debugger::DEVELOPMENT);
+//$configurator->setDebugMode(false);
+//Tracy\Debugger::enable(Tracy\Debugger::PRODUCTION);
 
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 

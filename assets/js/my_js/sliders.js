@@ -16,7 +16,7 @@
         var lunch = $('#lunch');
         var otherHours = $('#otherHours');
 
-        var workedHours = $('.workedHours');
+        var workedHours = $('#workedHours');
 
         var timeFieldsGroup = {
             'workStart': {

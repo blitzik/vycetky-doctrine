@@ -126,9 +126,12 @@ class ItemFormControl extends BaseComponent
             $workedHours = $this->listingItem->workedHours->getHours();
         }
 
-        $template->workedHours = $workedHours;
-        $template->defaultWorkedHours = $this->itemUpdateFormFactory
-                                             ->getDefaultTimeValue('workedHours');
+        $template->workedHours = new \InvoiceTime(
+                                    isset($workedHours)
+                                    ? $workedHours
+                                    : $this->itemUpdateFormFactory
+                                           ->getDefaultTimeValue('workedHours')
+                                 );
 
         $template->render();
     }

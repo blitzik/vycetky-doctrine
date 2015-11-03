@@ -11,10 +11,6 @@
 </head>
 
 <body>
-<script> document.documentElement.className+=' js' </script>
-<script src="{$basePath}/assets/js/js.min.js"></script>
-
-{block scripts}{/block}
 
 <div id="container">
     <!--<h1><a href="{*link Listing:overview*}">Správa výčetek</a></h1>-->
@@ -54,6 +50,9 @@
     </footer>
 </div>
 
+{block scripts}
+<script src="{$basePath}/assets/js/js.min.js"></script>
+{/block}
 </body>
 </html>
 {/block}

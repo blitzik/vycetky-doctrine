@@ -29,10 +29,24 @@ module.exports = function (grunt) {
                     'bower_components/jquery-ui/themes/base/autocomplete.css',
                     'bower_components/jquery-ui/themes/base/menu.css',
                     'bower_components/jquery-ui/themes/base/slider.css',
-                    'bower_components/jquery-ui/themes/base/theme.css' // base theme
-                    //'assets/css/jquery_ui_theme/jquery-ui.theme.css' // downloaded theme
+                    //'bower_components/jquery-ui/themes/base/theme.css' // base theme
+                    'assets/css/jquery_ui_theme/jquery-ui.theme.css' // downloaded theme
                 ],
                 dest: 'assets/css/original/jqueryuiCss.css'
+            },
+
+            item_setting: {
+                options: {
+                    separator: ';'
+                },
+
+                src: [
+                    // jqueryUi is defined in "base"
+                    'assets/js/my_js/timeConverter.js',
+                    'assets/js/my_js/sliders.js',
+                    'assets/js/my_js/item.js'
+                ],
+                dest: 'assets/js/concatenated/item_setting.js'
             },
 
             base: {
@@ -49,22 +63,11 @@ module.exports = function (grunt) {
                     'bower_components/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
                     'bower_components/placeholders/dist/placeholders.jquery.js',
                     'assets/js/my_js/passwordValidation.js',
+                    'assets/js/my_js/listingItemsTables.js',
+                    'assets/js/my_js/listingDelete.js',
                     'assets/js/my_js/main.js'
                 ],
                 dest: 'assets/js/concatenated/js.js'
-            },
-
-            item: {
-                options: {
-                    separator: ';'
-                },
-
-                src: [
-                    'assets/js/concatenated/reducedJqueryUi.js',
-                    'assets/js/my_js/timeConverter.js',
-                    'assets/js/my_js/sliders.js'
-                ],
-                dest: 'assets/js/concatenated/item.js'
             }
         },
 
@@ -74,9 +77,10 @@ module.exports = function (grunt) {
                     'assets/js/js.min.js': ['assets/js/concatenated/js.js']
                 }
             },
-            item: {
+
+            item_setting: {
                 files: {
-                    'assets/js/item.min.js': ['assets/js/concatenated/item.js']
+                    'assets/js/item_setting.min.js': ['assets/js/concatenated/item_setting.js']
                 }
             }
         },
@@ -84,13 +88,7 @@ module.exports = function (grunt) {
         cssmin: {
             front: {
                 files: {
-                    'assets/css/front.min.css': ['assets/css/original/front.css', 'assets/css/jquery-ui.css']
-                }
-            },
-
-            item:{
-                files: {
-                    'assets/css/item.min.css': ['assets/css/original/jqueryuiCss.css']
+                    'assets/css/front.min.css': ['assets/css/original/front.css', 'assets/css/original/jqueryuiCss.css']
                 }
             },
 
@@ -129,8 +127,12 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('default', ['sass', 'concat', 'cssmin', 'uglify', 'copy']);
+    grunt.registerTask('default', ['copy', 'sass', 'concat', 'cssmin', 'uglify']);
 
-    grunt.registerTask('build_front_css', ['sass:front', 'concat:jqueryuiCss', 'cssmin:front', 'cssmin:item']);
+    grunt.registerTask('copy_files', ['copy']);
+
+    grunt.registerTask('build_js', ['concat:jqueryui', 'concat:base', 'concat:item_setting', 'uglify']);
+
+    grunt.registerTask('build_front_css', ['sass:front', 'concat:jqueryuiCss', 'cssmin:front']);
 
 };
