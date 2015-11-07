@@ -2,8 +2,9 @@
 
 namespace App\Model\Components;
 
-use Nette\Application\UI\Form;
+use Nette\Application\UI\Control;
 use Nette\InvalidArgumentException;
+use Nette\Application\UI\Form;
 use Nette\Security\User;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
@@ -14,7 +15,7 @@ use Nette\Mail\Message;
  *
  * This Component and its signal is invoked by Cron exclusively
  */
-class DatabaseBackupControl extends BaseComponent
+class DatabaseBackupControl extends Control
 {
     /** @var \DatabaseBackup */
     private $databaseBackup;
@@ -94,7 +95,7 @@ class DatabaseBackupControl extends BaseComponent
         $path = WWW_DIR . "/app/backup/$year/$month/";
         if (!file_exists($path)) {
             if (!mkdir($path, 0777, true)) {
-                $this->logError('mkdir() failure -> directory was not created!');
+                $this->logError('mkdir() failure -> directory [' .$path. '] was not created!');
                 $this->sendMail('Automatic backup', 'Check the log file.');
             }
         }
