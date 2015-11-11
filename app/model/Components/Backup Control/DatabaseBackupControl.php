@@ -2,6 +2,7 @@
 
 namespace App\Model\Components;
 
+use App\Model\Authorization\Authorizator;
 use Nette\Application\UI\Control;
 use Nette\InvalidArgumentException;
 use Nette\Application\UI\Form;
@@ -20,6 +21,9 @@ class DatabaseBackupControl extends Control
     /** @var \DatabaseBackup */
     private $databaseBackup;
 
+    /** @var  Authorizator */
+    private $authorizator;
+
     /** @var IMailer */
     private $mailer;
 
@@ -35,12 +39,14 @@ class DatabaseBackupControl extends Control
     public function __construct(
         array $emails,
         \DatabaseBackup $databaseBackup,
+        Authorizator $authorizator,
         IMailer $mailer,
         User $user
     ) {
         $this->emails = $emails;
 
         $this->databaseBackup = $databaseBackup;
+        $this->authorizator = $authorizator;
         $this->mailer = $mailer;
         $this->user = $user;
     }
