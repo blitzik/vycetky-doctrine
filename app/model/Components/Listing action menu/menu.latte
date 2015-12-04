@@ -8,38 +8,38 @@
 
 <li>
     <a href="{plink Listing:edit,
-              'id'=>$listing->id,
-              'backlink'=>$presenter->storeRequest()}"
-              {ifCurrent Listing:edit}class="selected"{/ifCurrent}>Upravit výčetku</a>
+              'id' => $listing->id,
+              'backlink' => $presenter->storeRequest()}"
+              n:class="$presenter->isLinkCurrent(':Front:Listing:edit') ? selected">Upravit výčetku</a>
 </li>
 
 <li>
-   <a href="{plink Listing:copy, 'id'=>$listing->id}"
+   <a href="{plink Listing:copy, 'id' => $listing->id}"
       title="Vytvoří totožnou kopii výčetky"
-      {ifCurrent Listing:copy}class="selected"{/ifCurrent}>Vytvořit kopii</a>
+      n:class="$presenter->isLinkCurrent(':Front:Listing:copy') ? selected">Vytvořit kopii</a>
 </li>
 
 <li>
     <a href="{plink Listing:massItemsChange,
-              'id'=>$listing->id}"
-              {ifCurrent Listing:massItemsChange}class="selected"{/ifCurrent}>Hromadně změnit čas</a>
+              'id' => $listing->id}"
+              n:class="$presenter->isLinkCurrent(':Front:Listing:massItemsChange') ? selected">Hromadně změnit čas</a>
 </li>
 
 <li>
     <a href="{plink Listing:share, 'id' => $listing->id}"
-    {ifCurrent Listing:share}class="selected"{/ifCurrent}>Odeslat výčetku</a>
+       n:class="$presenter->isLinkCurrent(':Front:Listing:share') ? selected">Odeslat výčetku</a>
 </li>
 
 <li>
     <a href="{plink Merge:search, 'id' => $listing->id}"
-    {ifCurrent Merge:search}class="selected"{/ifCurrent}>Spojit výčetku</a>
+       n:class="$presenter->isLinkCurrent(':Front:Merge:search') ? selected">Spojit výčetku</a>
 </li>
 
 <li>
     <a href="{plink Listing:remove,
-              'id'=>$listing->id,
-              'backlink' => $presenter->storeRequest()}"
-              {ifCurrent Listing:remove}class="selected"{/ifCurrent}>Odstranit výčetku</a>
+              'id' => $listing->id,
+              'backlink' => $presenter->storeRequest()}" {* TODO neoznaci se jako aktivni v menu, kvuli storeRequest *}
+              n:class="$presenter->isLinkCurrent(':Front:Listing:remove') ? selected">Odstranit výčetku</a>
 </li>
 </ul>
 </nav>
