@@ -16,23 +16,24 @@
     <!--<h1><a href="{*link Listing:overview*}">Správa výčetek</a></h1>-->
 	<nav class="menu">
 		<ul>
-			<li><a href="{link Account:detail}" class="user-box">{$user->getIdentity()->username}</a></li>
+			<li><a href="{link Account:detail}" class="user-box"><i class="fa fa-fw fa-user"></i> {$user->getIdentity()->username}</a></li>
 			<li><a href="{link Listing:overview, 'year' => $currentDate->format('Y'),
-												 'month' => $currentDate->format('n')}">Přehled výčetek</a></li>
-			<li><a class="parent">Výčetky</a>
+												 'month' => $currentDate->format('n')}"><i class="fa fa-fw fa-list-ul"></i> Přehled výčetek</a></li>
+			<li><a class="parent"><i class="fa fa-fw fa-caret-down"></i> Výčetky</a>
 				<ul>
-					<li><a href="{link Listing:add}" class="add-listing">Vytvořit výčetku</a></li>
+					<li><a href="{link Listing:add}"><i class="fa fa-fw fa-file-text-o"></i> Vytvořit výčetku</a></li>
+					<li><a href="{link Listing:add}"><i class="fa fa-fw fa-download"></i> Hromadné stažení výčetek</a></li>
 				</ul>
 			</li>
-			<li><a class="parent">Pomoc</a>
+			<li><a class="parent"><i class="fa fa-fw fa-caret-down"></i> Pomoc</a>
 				<ul>
-					<li><a href="{link Help:doc}" class="system-doc">Dokumentace</a></li>
-					<li><a href="{link Help:contact}" class="admin-contact">Kontaktní formulář</a></li>
+					<li><a href="{link Help:doc}" class=""><i class="fa fa-fw fa-info"></i> Dokumentace</a></li>
+					<li><a href="{link Help:contact}" class=""><i class="fa fa-fw fa-question"></i> Kontaktní formulář</a></li>
 				</ul>
 			</li>
-			<li><a href="{link MailBox:receivedUnread}">Schránka</a></li>
-			<li><a href="{link Users:overview}">Uživatelé</a></li>
-			<li class="logout"><a n:href="logout!">Odhlásit</a></li>
+			<li><a href="{link MailBox:receivedUnread}"><i class="fa fa-fw fa-inbox"></i> Schránka</a></li>
+			<li><a href="{link Users:overview}"><i class="fa fa-fw fa-users"></i> Uživatelé</a></li>
+			<li class="logout"><a n:href="logout!"><i class="fa fa-sign-out"></i> Odhlásit</a></li>
 		</ul>
 	</nav>
 

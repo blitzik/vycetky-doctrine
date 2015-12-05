@@ -21,7 +21,8 @@
     "nette.ajax.js": "~2.1.0",
     "jquery-ui-touch-punch": "*",
     "jquery-ui": "jquery.ui#~1.11.4",
-    "placeholders": "~4.0.1"
+    "placeholders": "~4.0.1",
+    "font-awesome-sass": "~4.4.0"
   },
   "resolutions": {
     "nette-forms": "~2.2"

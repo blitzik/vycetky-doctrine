@@ -7,7 +7,8 @@
 {if !$item->isFilling()}
     {if $day != $numberOfDaysInMonth}
         <a href="{$control->parent->link('copyItem!', ['day'=>$day])}"
-           class="ajax btn-copy" title="Kopírovat řádek o stupeň níž">&#9662;</a>
+           class="ajax btn-copy padding-6" title="Kopírovat řádek o stupeň níž">
+           <i class="fa fa-fw fa-caret-down"></i><span class="hide">Kopírovat dolů</span></a>
     {/if}
 {/if}
 </td>
@@ -19,7 +20,8 @@
 <td class="w30">
 {if !$item->isFilling()}
     <a href="{$control->parent->link('removeItem!', ['day'=>$day])}"
-       class="ajax btn-red" title="Nastavit řádek do defaultních hodnot">&Cross;</a>
+       class="ajax btn-red padding-6" title="Nastavit řádek do defaultních hodnot">
+       <i class="fa fa-fw fa-times"></i><span class="hide">Smazat</span></a>
 {/if}
 </td>
 {/define}

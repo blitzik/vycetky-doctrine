@@ -122,7 +122,17 @@ module.exports = function (grunt) {
                     src: ['bower_components/jquery-ui/themes/base/images/*'],
                     dest: 'assets/css/images/'
                 }
-            ],
+            ]
+          },
+          font_awesome: {
+              files: [
+                  {
+                      expand: true,
+                      flatten: true,
+                      src: ['bower_components/font-awesome-sass/assets/fonts/font-awesome/*'],
+                      dest: 'assets/fonts/font-awesome/'
+                  }
+              ]
           }
         }
     });

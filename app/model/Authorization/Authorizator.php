@@ -39,10 +39,10 @@ class Authorizator extends Object implements IAuthorizator
     private function defineResources(Permission $authorizator)
     {
         $authorizator->addResource('listing');
-        $authorizator->addResource('message');
+        $authorizator->addResource('message'); // view
 
-        $authorizator->addResource('relationships_tables');
-        $authorizator->addResource('users_overview');
+        $authorizator->addResource('relationships_tables'); // view_identifiers
+        $authorizator->addResource('users_overview'); // suspend_user
 
         $authorizator->addResource('database_backup');
     }

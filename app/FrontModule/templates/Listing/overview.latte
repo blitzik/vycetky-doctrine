@@ -5,7 +5,9 @@
 <!--<h2>Hlavní stránka - přehled</h2>-->
 
 {if $numberOfMessages}
-	<a href="{link MailBox:receivedUnread}" class="box box-new-messages">Ve schránce máte nové zprávy</a>
+<div class="box box-new-messages">
+	<i class="fa fa-envelope-o"></i> <a href="{link MailBox:receivedUnread}">Ve schránce máte {if $numberOfMessages > 1}nové zprávy ({$numberOfMessages}){else}novou zprávu{/if}</a>
+</div>
 {/if}
 
 {control filter}

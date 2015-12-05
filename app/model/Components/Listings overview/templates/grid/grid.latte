@@ -33,22 +33,26 @@
 {if $rowDate != $currentDate}
     <a href="{plink Listing:remove, 'id'=>$row->l_id,
                                     'backlink'=>$presenter->storeRequest()}"
-       class="btn-red btn-small" title="Odstranit výčetku">Odstranit</a>
+       class="btn-red btn-small" title="Odstranit výčetku">
+       <i class="fa fa-fw fa-trash"></i> Odstranit</a>
 
     <a href="{plink Listing:copy, 'id'=>$row->l_id}"
-       class="btn-copy btn-small" title="Vytvořit kopii výčetky">Kopie</a>
+       class="btn-copy btn-small" title="Vytvořit kopii výčetky">
+       <i class="fa fa-fw fa-copy"></i> Kopie</a>
 {/if}
 
 
     <a href="{plink Listing:edit, 'id'=>$row->l_id}"
-       class="btn-blue btn-small" title="Upravit výčetku">Upravit</a>
+       class="btn-blue btn-small" title="Upravit výčetku">
+       <i class="fa fa-fw fa-edit"></i> Upravit</a>
 
 
 
 {if $rowDate == $currentDate}
     <a href="{plink Item:edit, 'id'=>$row->l_id,
                                'day'=>date('j')}"
-       class="btn-violet btn-small" title="Upravit výčetku">Nastavit aktuální den</a>
+       class="btn-violet btn-small" title="Upravit výčetku">
+       <i class="fa fa-fw fa-sliders"></i> Nastavit aktuální den</a>
 
 {/if}
 {/define}

@@ -3,43 +3,50 @@
 <li>
     <a href="{plink Listing:pdfGeneration, 'id' => $listing->id}"
        class="createPdf"
-       title="Vygeneruje PDF dokument s výčetkou">Generovat PDF</a>
+       title="Vygeneruje PDF dokument s výčetkou">
+       <i class="fa fa-fw fa-file-pdf-o"></i> Generovat PDF</a>
 </li>
 
 <li>
     <a href="{plink Listing:edit,
               'id' => $listing->id,
               'backlink' => $presenter->storeRequest()}"
-              n:class="$presenter->isLinkCurrent(':Front:Listing:edit') ? selected">Upravit výčetku</a>
+              n:class="$presenter->isLinkCurrent(':Front:Listing:edit') ? selected">
+              <i class="fa fa-fw fa-edit"></i> Upravit</a>
 </li>
 
 <li>
    <a href="{plink Listing:copy, 'id' => $listing->id}"
       title="Vytvoří totožnou kopii výčetky"
-      n:class="$presenter->isLinkCurrent(':Front:Listing:copy') ? selected">Vytvořit kopii</a>
+      n:class="$presenter->isLinkCurrent(':Front:Listing:copy') ? selected">
+      <i class="fa fa-fw fa-copy"></i> Kopie</a>
 </li>
 
 <li>
     <a href="{plink Listing:massItemsChange,
               'id' => $listing->id}"
-              n:class="$presenter->isLinkCurrent(':Front:Listing:massItemsChange') ? selected">Hromadně změnit čas</a>
+              n:class="$presenter->isLinkCurrent(':Front:Listing:massItemsChange') ? selected">
+              <i class="fa fa-fw fa-sliders"></i> Hromadně změnit čas</a>
 </li>
 
 <li>
     <a href="{plink Listing:share, 'id' => $listing->id}"
-       n:class="$presenter->isLinkCurrent(':Front:Listing:share') ? selected">Odeslat výčetku</a>
+       n:class="$presenter->isLinkCurrent(':Front:Listing:share') ? selected">
+       <i class="fa fa-fw fa-send-o"></i> Odeslat</a>
 </li>
 
 <li>
     <a href="{plink Merge:search, 'id' => $listing->id}"
-       n:class="$presenter->isLinkCurrent(':Front:Merge:search') ? selected">Spojit výčetku</a>
+       n:class="$presenter->isLinkCurrent(':Front:Merge:search') ? selected">
+       <i class="fa fa-fw fa-compress"></i> Spojit</a>
 </li>
 
 <li>
     <a href="{plink Listing:remove,
               'id' => $listing->id,
               'backlink' => $presenter->storeRequest()}" {* TODO neoznaci se jako aktivni v menu, kvuli storeRequest *}
-              n:class="$presenter->isLinkCurrent(':Front:Listing:remove') ? selected">Odstranit výčetku</a>
+              n:class="$presenter->isLinkCurrent(':Front:Listing:remove') ? selected">
+              <i class="fa fa-fw fa-trash"></i> Odstranit</a>
 </li>
 </ul>
 </nav>

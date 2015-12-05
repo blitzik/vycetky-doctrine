@@ -108,8 +108,6 @@ class ListingPresenter extends SecurityPresenter
      */
     public $itemsFacade;
 
-    private $numberOfMessages;
-
     /**
      * @Actions detail, pdfGeneration, edit, copy, massItemsChange, share, remove
      */
@@ -132,7 +130,7 @@ class ListingPresenter extends SecurityPresenter
 
     public function renderOverview($month, $year)
     {
-        $this->numberOfMessages = $this->messageFacade
+        $numberOfMessages = $this->messageFacade
                                        ->fetchReceivedMessages(
                                            (new ReceivedMessagesQuery())
                                            ->byRecipient($this->user->getIdentity())
@@ -140,7 +138,7 @@ class ListingPresenter extends SecurityPresenter
                                            ->findUnreadMessages()
                                        )->getTotalCount();
 
-        $this->template->numberOfMessages = $this->numberOfMessages;
+        $this->template->numberOfMessages = $numberOfMessages;
     }
 
     /**

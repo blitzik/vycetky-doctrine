@@ -111,6 +111,11 @@ h3{
         &:hover{
           background-color: #ECF0F1;
         }
+
+        i{
+          font-size: 130%;
+          margin-right: 5px;
+        }
       }
     }
   }
@@ -214,69 +219,72 @@ $box-red: #ffbdb3;
 .box-new-messages{
   background-color: #bef4a9;
   border: 1px solid #2ba009;
-  color: darken(#bef4a9, 75%);
-  padding-left: 60px;
-  background-image: url("../images/email25.png");
-  background-repeat: no-repeat;
-  background-position: 15px 15px;
   margin: 0;
   float: right;
 
   @include border-radius(10px);
+
+  a{
+    color: darken(#bef4a9, 75%);
+  }
+
+  i{
+    font-size: 170%;
+    margin-right: 10px;
+  }
 }
 
 /* ------------------
    ----- HEADER -----
    ------------------ */
 
-.menu {
+.menu{
   background-color: #24272e;
   margin: 0;
   padding: 0;
   position: relative;
+  font-size: 110%;
+
+  &:after{
+    content: "";
+    display: block;
+    clear: both;
+  }
 
   ul{ margin: 0; padding: 0; overflow: auto;}
 
-  .logout {
+  .logout{
     float: right;
     background-color: lighten(#484f5c, 8%);
   }
-  li {
+  li{
     list-style-type: none;
     float: left;
 
-    a {
+    a{
       display: block;
       text-decoration: none;
       padding: 10px 15px;
       color: #dadde2;
-      background-repeat: no-repeat;
-      background-position: 0 50%;
     }
 
-    &:hover {
+    &:hover{
       background-color: #484f5c;
       cursor: pointer;
     }
 
-    &:hover > ul {
+    &:hover > ul{
       display: block;
     }
 
-    .parent {
-      background-image: url("../images/arrow.png");
-      background-size: 10px 10px;
-      background-position: 15px 50%;
-      padding-left: 35px;
+    .parent i{
+      color: #00A651;
     }
 
     .user-box{
-      padding-left: 55px;
+
       margin: 0;
       background-color: #FFF;
-      background-image: url('../images/user151.png');
-      background-repeat: no-repeat;
-      background-position: 15px 50%;
       color: #006699;
       text-decoration: underline;
 
@@ -285,51 +293,35 @@ $box-red: #ffbdb3;
 
   }
 
-  li > ul {
+  li > ul{
     min-width: 10px;
     display: none;
     position: absolute;
     top: 100%;
   }
 
-  ul ul {
+  ul ul{
     background-color: #484f5c;
-    border: 0px solid red;
-    padding: 5px 15px;
+    border: 0;
     @include border-radius(0 0 8px 8px);
 
-    li {
+    li{
       float: none;
       display: block;
 
-      a {
-        padding-left: 40px;
-        padding-right: 0;
-        background-repeat: no-repeat;
-        background-position: 0 50%;
-        &:hover {
+      a{
+        &:hover{
           text-decoration: underline;
         }
+
+        i{
+          margin-right: 10px;
+        }
+
       }
 
-      .add-listing {
-        background-image: url("../images/add118.png");
-      }
-      .list-of-listing {
-        background-image: url("../images/view2.png");
-      }
-      .system-doc {
-        background-image: url("../images/document9.png");
-      }
-      .admin-contact {
-        background-image: url("../images/faq8.png");
-      }
+
     }
-  }
-  &:after{
-    content: "";
-    display: block;
-    clear: both;
   }
 }
 
@@ -788,4 +780,12 @@ h2{
 
 .clear-element{
   clear: both;
+}
+
+.padding-6{
+  padding: 6px;
+}
+
+.hide{
+  display: none;
 }

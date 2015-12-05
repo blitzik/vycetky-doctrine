@@ -3,10 +3,12 @@
 
     {if array_key_exists($userBeingBlockedID, $usersWithClosedAccountIDs)}
     <a href="{link openAccount!, $userBeingBlockedID}"
-       n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-primary">Odemknout účet</a>
+       n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-primary">
+       <i class="fa fa-fw fa-check-circle-o"></i> Odemknout účet</a>
     {else}
     <a href="{link closeAccount!, $userBeingBlockedID}"
-           n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-violet">Uzavřít účet</a>
+           n:if="$user->isAllowed('users_overview', 'suspend_user')" class="ajax btn-violet">
+           <i class="fa fa-fw fa-ban"></i> Uzavřít účet</a>
     {/if}
 
 </div>
@@ -15,10 +17,10 @@
 
     {if array_key_exists($userBeingBlockedID, $blockedUsersIDs)}
     <a href="{link unblockUser!, id => $userBeingBlockedID}"
-       class="ajax btn-green">Zrušit blokaci uživatele</a>
+       class="ajax btn-green"><i class="fa fa-fw fa-thumbs-o-up"></i> Zrušit blokaci uživatele</a>
     {else}
     <a href="{link blockUser!, id => $userBeingBlockedID}"
-       class="ajax btn-red">Blokovat uživatele</a>
+       class="ajax btn-red"><i class="fa fa-fw fa-thumbs-o-down"></i> Blokovat uživatele</a>
     {/if}
 
 </div>
