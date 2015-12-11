@@ -8,14 +8,10 @@ use Nette\Utils\Validators;
 
 class ListingItemDecorator extends FillingItem
 {
-    /**
-     * @var ListingItem
-     */
+    /** @var ListingItem */
     private $listingItem;
 
-    /**
-     * @var bool|null
-     */
+    /** @var bool|null */
     private $isFromBaseListing = null;
 
     public function __construct(

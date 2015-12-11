@@ -110,6 +110,58 @@ class ListingsReader extends Object
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+
+    /**
+     * @param $year
+     * @param User|null $user
+     * @return array
+     */
+    public function getAnnualListingsForPDFGeneration($year, User $user = null)
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('l, partial u.{id, username, name}')
+           ->from(Listing::class, 'l')
+           ->leftJoin(ListingItem::class, 'li WITH li.listing = l')
+           ->leftJoin('li.workedHours', 'wh')
+           ->innerJoin('l.user', 'u');
+
+        $this->addTotalWorkedHours($qb);
+        $this->addWorkedHours($qb);
+        $this->addLunchHours($qb);
+        $this->addOtherHours($qb);
+
+        if (isset($user)) {
+            $qb->where('l.user = :user')
+               ->setParameter('user', $user);
+        }
+
+        $qb->andWhere('l.year = :year')
+           ->setParameter('year', $year)
+           ->groupBy('l.id');
+
+        return $qb->getQuery()->getScalarResult();
+    }
+
+    /**
+     * @param User|null $user
+     * @return array
+     */
+    public function getListingsYears(User $user = null)
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('l.year, COUNT(l.id) AS numberOfListings')
+           ->from(Listing::class, 'l');
+
+        if (isset($user)) {
+            $qb->where('l.user = :user')
+               ->setParameter('user', $user);
+        }
+
+        $qb->groupBy('l.year');
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
     private function addWorkedDays(QueryBuilder $qb)
     {
         $qb->addSelect('COUNT(li.id) AS worked_days');

@@ -2,33 +2,36 @@
 
 namespace App\Model\Facades;
 
-use App\Model\Domain\Entities\ListingItem;
-use App\Model\Domain\Entities\User;
-use App\Model\ResultObjects\ListingResult;
-use App\Model\Services\Managers\ListingsManager;
-use App\Model\Services\Readers\ListingItemsReader;
-use App\Model\Services\Readers\ListingsReader;
-use App\Model\Services\Readers\UsersReader;
-use App\Model\Services\Writers\ListingsWriter;
-use App\Model\Subscribers\Results\ResultObject;
-use Doctrine\ORM\ORMException;
-use Exceptions\Runtime\ListingNotFoundException;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
+use Exceptions\Runtime\RecipientsNotFoundException;
+use App\Model\Services\Readers\ListingItemsReader;
+use App\Model\Services\Managers\ListingsManager;
+use Exceptions\Runtime\ListingNotFoundException;
+use App\Model\Subscribers\Results\ResultObject;
+use App\Model\Services\Readers\ListingsReader;
+use App\Model\Services\Writers\ListingsWriter;
 use Exceptions\Logic\InvalidArgumentException;
+use App\Model\Services\Readers\UsersReader;
+use App\Model\ResultObjects\ListingResult;
 use App\Model\Domain\ListingItemDecorator;
+use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Services\ItemsService;
+use App\Model\Domain\Entities\User;
 use App\Model\Domain\FillingItem;
-use Exceptions\Runtime\RecipientsNotFoundException;
 use Kdyby\Doctrine\QueryObject;
-use Nette\Object;
+use Doctrine\ORM\ORMException;
 use Nette\Utils\Arrays;
+use Nette\Object;
 
 class ListingsFacade extends Object
 {
-    /** @var array  */
+    /** @var array */
     public $onListingSharing = [];
+
+    /** @var array */
+    public $onListingChange = [];
 
     /** @var ListingItemsReader  */
     private $listingItemsReader;
@@ -36,14 +39,14 @@ class ListingsFacade extends Object
     /** @var ListingsManager  */
     private $listingsManager;
 
-    /** @var ItemsService  */
-    private $itemsService;
-
     /** @var ListingsReader  */
     private $listingsReader;
 
     /** @var ListingsWriter  */
     private $listingsWriter;
+
+    /** @var ItemsService  */
+    private $itemsService;
 
     /** @var ItemsFacade  */
     private $itemsFacade;
@@ -76,6 +79,7 @@ class ListingsFacade extends Object
      */
     public function saveListing(Listing $listing)
     {
+        $this->onListingChange($listing);
         return $this->listingsManager->saveListing($listing);
     }
 
@@ -141,6 +145,7 @@ class ListingsFacade extends Object
      */
     public function removeListing(Listing $listing)
     {
+        $this->onListingChange($listing);
         $this->listingsWriter->removeListing($listing);
     }
 
@@ -175,6 +180,8 @@ class ListingsFacade extends Object
         WorkedHours $newWorkedHours,
         array $daysToChange
     ) {
+        $this->onListingChange($listing);
+
         return $this->listingsManager
                     ->changeWorkedHours($listing, $newWorkedHours, $daysToChange);
     }
@@ -298,6 +305,15 @@ class ListingsFacade extends Object
                         $selectedCollisionItems,
                         $ownerOfOutputListing
                     );
+    }
+
+    /**
+     * @param User|null $user
+     * @return array
+     */
+    public function getListingsYears(User $user = null)
+    {
+        return Arrays::associate($this->listingsReader->getListingsYears($user), 'year');
     }
 
     /**

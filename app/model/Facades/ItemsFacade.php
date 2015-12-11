@@ -19,6 +19,9 @@ use Nette\Object;
 
 class ItemsFacade extends Object
 {
+    /** @var array */
+    public $onItemChange = [];
+
     /** @var ListingItemsManager  */
     private $listingItemsManager;
 
@@ -59,7 +62,10 @@ class ItemsFacade extends Object
         $item = $this->listingItemsManager
                      ->prepareListingItemByFormsData($newValues, $listingItem);
 
-        return $this->listingItemsWriter->saveListingItem($item);
+        $listingItem = $this->listingItemsWriter->saveListingItem($item);
+        $this->onItemChange($listingItem->getListing());
+
+        return $listingItem;
     }
 
     /**
@@ -78,6 +84,7 @@ class ItemsFacade extends Object
      */
     public function removeListingItem($day, Listing $listing)
     {
+        $this->onItemChange($listing);
         $this->listingItemsWriter->removeListingItem($day, $listing);
     }
 
@@ -91,6 +98,8 @@ class ItemsFacade extends Object
         $day,
         Listing $listing
     ) {
+        $this->onItemChange($listing);
+
         $currentItem = $this->listingItemsReader->getByDay($day, $listing);
 
         return $this->listingItemsWriter
@@ -110,6 +119,8 @@ class ItemsFacade extends Object
         $day,
         Listing $listing
     ) {
+        $this->onItemChange($listing);
+
         $currentItem = $this->listingItemsReader->getByDay($day, $listing);
 
         return $this->listingItemsWriter

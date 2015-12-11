@@ -23,9 +23,7 @@ class ListingResult extends Object
     /** @var \InvoiceTime  */
     private $otherHours;
 
-    /**
-     * @var Listing
-     */
+    /** @var Listing */
     private $listing;
 
     public function __construct($result)

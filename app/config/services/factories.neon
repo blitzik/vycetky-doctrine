@@ -39,6 +39,10 @@ services:
 		setup:
 			- setCompanyParameters(%company%)
 
+	annualPDFGenerationControlFactory:
+		implement: App\Model\Components\IAnnualPDFGenerationControlFactory
+		arguments: [%company%]
+
 	listingActionMenuControlFactory:
 		implement: App\Model\Components\IListingActionsMenuControlFactory
 		parameters: [App\Model\Domain\Entities\Listing listing]

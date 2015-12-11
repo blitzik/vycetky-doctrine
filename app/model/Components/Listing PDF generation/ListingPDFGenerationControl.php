@@ -6,8 +6,9 @@ use App\Model\Domain\Entities\Listing;
 use App\Model\Facades\ItemsFacade;
 use App\Model\Facades\ListingsFacade;
 use App\Model\ResultObjects\ListingResult;
+use App\Model\Services\Pdf\ListingPDFGenerator;
+use App\Model\Services\Pdf\PdfResult;
 use App\Model\Time\TimeUtils;
-use Joseki\Application\Responses\PdfResponse;
 use Nette;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
@@ -18,17 +19,20 @@ class ListingPDFGenerationControl extends BaseComponent
     private $companyParameters;
 
 
-    /**  @var ItemsFacade */
-    private $itemsFacade;
+    /** @var IListingDescriptionControlFactory */
+    private $listingDescriptionFactory;
+
+    /** @var ListingPDFGenerator */
+    private $listingPDFGenerator;
 
     /** @var ListingsFacade */
     private $listingsFacade;
 
-    /** @var IListingDescriptionControlFactory */
-    private $listingDescriptionFactory;
-
     /** @var ListingResult */
     private $listingResult;
+
+    /**  @var ItemsFacade */
+    private $itemsFacade;
 
     /** @var Listing */
     private $listing;
@@ -37,6 +41,7 @@ class ListingPDFGenerationControl extends BaseComponent
         ListingResult $listingResult,
         ItemsFacade $itemsFacade,
         ListingsFacade $listingsFacade,
+        ListingPDFGenerator $listingPDFGenerator,
         IListingDescriptionControlFactory $listingDescriptionControlFactory
     ) {
         $this->listingResult = $listingResult;
@@ -44,6 +49,7 @@ class ListingPDFGenerationControl extends BaseComponent
 
         $this->itemsFacade = $itemsFacade;
         $this->listingsFacade = $listingsFacade;
+        $this->listingPDFGenerator = $listingPDFGenerator;
         $this->listingDescriptionFactory = $listingDescriptionControlFactory;
     }
 
@@ -94,37 +100,21 @@ class ListingPDFGenerationControl extends BaseComponent
     {
         $values = $button->getForm()->getValues();
 
-        $template = $this->createTemplate();
-        $template->setFile(__DIR__ . '/templates/pdf.latte');
+        $settings = [
+            'isWageVisible' => $values['wage'],
+            'areOtherHoursVisible' => $values['otherHours'],
+            'areWorkedHoursVisible' => $values['workedHours'],
+            'areLunchHoursVisible' => $values['lunch']
+        ];
 
-        $template->itemsCollection = $this->itemsFacade
-                                          ->generateEntireTable($this->listing);
+        /** @var PdfResult $pdf */
+        $pdf = $this->listingPDFGenerator
+                    ->generateListingPDF(
+                        $this->listingResult,
+                        $settings
+                    );
 
-        $template->isWageVisible = $values['wage'];
-        $template->areOtherHoursVisible = $values['otherHours'];
-        $template->areWorkedHoursVisible = $values['workedHours'];
-        $template->areLunchHoursVisible = $values['lunch'];
-
-
-        $template->totalWorkedHours = $this->listingResult->getTotalWorkedHours();
-        $template->workedHours      = $this->listingResult->getWorkedHours();
-        $template->lunchHours       = $this->listingResult->getLunchHours();
-        $template->otherHours       = $this->listingResult->getOtherHours();
-
-        $template->listing      = $this->listing;
-        $template->username     = $values['name'] == null ?: $values['name'];
-        $template->employer     = $values['employer'];
-        $template->employeeName = $values['name'];
-
-        $listingName = TimeUtils::getMonthName($this->listing->getMonth()) . ' '
-                       . $this->listing->getYear();
-
-        $response = new PdfResponse($template);
-        $response->setSaveMode(PdfResponse::INLINE);
-        $response->documentAuthor = 'Výčetkový systém - http://vycetky.alestichava.cz';
-        $response->documentTitle = $listingName;
-
-        $this->presenter->sendResponse($response);
+        $this->presenter->sendResponse(new Nette\Application\Responses\FileResponse($pdf->getPdfFilePath(), $pdf->getPdfFilename()));
     }
 
     public function processReset(SubmitButton $button)

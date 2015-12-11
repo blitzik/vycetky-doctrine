@@ -2,6 +2,7 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Components\IAnnualPDFGenerationControlFactory;
 use App\Model\Components\IListingCopyFormControlFactory;
 use App\Model\Components\IListingPDFGenerationControlFactory;
 use App\Model\Components\IListingRemovalControlFactory;
@@ -19,9 +20,15 @@ use App\Model\Facades\ItemsFacade;
 use App\Model\Queries\Listings\ListingsForOverviewQuery;
 use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\ResultObjects\ListingResult;
+use App\Model\Services\ListingPDFGenerator;
+use App\Model\Services\Readers\ListingsReader;
 use Exceptions\Runtime;
 use App\Model\Entities;
+use Nette\Caching\Cache;
+use Nette\Caching\Storages\FileStorage;
 use Nette\InvalidArgumentException;
+use Nette\Utils\Arrays;
+use Tracy\Debugger;
 
 class ListingPresenter extends SecurityPresenter
 {
@@ -35,6 +42,12 @@ class ListingPresenter extends SecurityPresenter
      * @inject
      */
     public $listingPDFGenerationControlFactory;
+
+    /**
+     * @var IAnnualPDFGenerationControlFactory
+     * @inject
+     */
+    public $annualPDFGenerationControlFactory;
 
     /**
      * @var ISharingListingControlFactory
@@ -142,7 +155,7 @@ class ListingPresenter extends SecurityPresenter
     }
 
     /**
-     * @Actions overview
+     * @Actions overview, massPdfGeneration
      */
     protected function createComponentListingsOverview()
     {
@@ -417,6 +430,41 @@ class ListingPresenter extends SecurityPresenter
                     ->create($this->listingResult);
     }
 
+    /*
+     * -------------------------------
+     * ----- MASS PDF GENERATION -----
+     * -------------------------------
+     */
+
+    /**
+     * @var ListingsReader
+     * @inject
+     */
+    public $abcd;
+
+    public function actionMassPdfGeneration()
+    {
+        //$listingResult = $this->getListingByID(66, true);
+        //dump($this->listingPdfGenerator->generate([$listingResult->getListing()]));
+        //Debugger::$maxDepth = 5;
+        //dump($this->listingsFacade->generateListingsPDFs(2015, $this->user->getIdentity()));
+    }
+    
+    public function renderMassPdfGeneration()
+    {
+
+    }
+
+    /**
+     * @Actions massPdfGeneration
+     */
+    protected function createComponentAnnualPDFGeneration()
+    {
+        $comp = $this->annualPDFGenerationControlFactory->create();
+        $comp->setUser($this->user->getIdentity());
+
+        return $comp;
+    }
 
     private function setPeriodParametersForFilter($year, $month)
     {

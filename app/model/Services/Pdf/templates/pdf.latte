@@ -1,10 +1,11 @@
 {layout none}
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <style type="text/css">
-        
+
     body{
 	font-size: 0.80em;
 	line-height: 1.6;
@@ -12,40 +13,38 @@
 	background: white;
         font-family: Verdana, Geneva, Kalimati, sans-serif;
     }
-    
-    
-    
+
     table{
         width: 100%;
         border: 1px solid black;
         border-collapse: collapse;
     }
-    
+
     th{
         font-weight: normal;
         border: 1px solid black;
     }
-    
+
     td{
         border: 1px solid black;
         padding: 4px;
         text-align: center;
     }
-    
+
     .listingTable th{
         font-weight: bold;
     }
-    
+
     .info{
         width: 500px;
         border: 0px;
     }
-    
+
     .info td{
         text-align: left;
         border: 0;
     }
-    
+
     .hours,
     .others,
     .box{
@@ -55,16 +54,14 @@
     .hours td{
         padding: 0px;
     }
-    
-    
-        
+
     .signature,
     .totalHours{
         text-align: right;
         font-size: 1.2em;
         padding-right: 10px;
     }
-    
+
     .w20{ width: 20px;}
     .w45{ width: 45px;}
     .w65{ width: 65px}
@@ -72,15 +69,19 @@
     .w120{ width: 120px;}
     .w130{ width: 130px;;}
     .w280{ width: 280px;}
-        
+
+    .listing-page{
+        height: 290mm;
+    }
     </style>
-    
+
 </head>
 <body>
 
+<div class="listing-page">
 <table class="info">
     <tr><td>Zaměstnavatel:</td><td><b>{$employer}</b></td></tr>
-    <tr><td>Přehled o docházce za měsíc:</td><td><b>{$listing->period|listingMonthYear}</b></tr>
+    <tr><td>Přehled o docházce za měsíc:</td><td><b>{$listingData['listing']['period']|listingMonthYear}</b></td></tr>
     <tr><td>Jméno:</td><td>{$employeeName}</td></tr>
 </table>
 
@@ -89,7 +90,7 @@
     <tr><th class="w45">Datum</th><th class="w20">Den</th><th class="w280">Popis práce - místo</th><th>Prac. doba</th>
         <th class="w65">Oběd</th><th class="w65">Odpr. hodiny</th><th class="w65">Ost. hod.</th></tr>
 
-    {foreach $itemsCollection as $day => $item}
+    {foreach $listingData['table'] as $day => $item}
 
         <tr><td>{$day}</td>
         <td>{$item->day|dayShortcut}</td>
@@ -116,9 +117,9 @@
         <th class="w120">Dovolená hod.</th>
         <td></td>
         <th class="w120">Ostat. hod.</th>
-        <td>{if $areOtherHoursVisible}{$otherHours|toTimeWithComma}{/if}</td>
+        <td>{if $areOtherHoursVisible}{$listingData['listing']['other_hours']|toTimeWithComma}{/if}</td>
         <th class="w120">Odprac. hod.</th>
-        <td class="w130">{if $areWorkedHoursVisible}{$workedHours|toTimeWithComma}{/if}</td>
+        <td class="w130">{if $areWorkedHoursVisible}{$listingData['listing']['worked_hours']|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th>Nemoc hod.</th>
@@ -126,11 +127,11 @@
         <th>Svátek</th>
         <td></td>
         <th>Obědy</th>
-        <td>{if $areLunchHoursVisible}{$lunchHours|toTimeWithComma}{/if}</td>
+        <td>{if $areLunchHoursVisible}{$listingData['listing']['lunch_hours']|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th colspan="5" class="totalHours"><b>Hodin celkem</b></th>
-        <td><b>{$totalWorkedHours|toTimeWithComma}</b></td>
+        <td><b>{(int)$listingData['listing']['total_worked_hours_in_sec']|toTimeWithComma}</b></td>
     </tr>
 
 </table>
@@ -139,7 +140,7 @@
 
     <tr>
         <th style="width: 215px"><b>Základní mzda</b></th>
-        <td class="w120">{if $isWageVisible and $listing->hourlyWage > 0}{$listing->hourlyWage} Kč/h{/if}</td>
+        <td class="w120">{if $isWageVisible and $listingData['listing']['l_hourlyWage'] > 0}{$listingData['listing']['l_hourlyWage']} Kč/h{/if}</td>
         <th style="">Dovolená - dni</th>
         <td class="w130"></td>
     </tr>
@@ -151,5 +152,7 @@
 
 </table>
 </div>
+</div>
+
 </body>
 </html>

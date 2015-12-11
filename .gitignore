@@ -1,3 +1,4 @@
+/assets/fonts
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -61,5 +62,7 @@ assets/css/original/*
 
 assets/js/concatenated/*
 assets/js/*.min.js
+
+listings_pdfs
 
 !git.folder.keep

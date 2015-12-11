@@ -10,6 +10,7 @@ use App\Model\Domain\Entities\Listing;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
+use Tracy\Debugger;
 
 class ListingItemsReader extends Object
 {
@@ -39,7 +40,7 @@ class ListingItemsReader extends Object
     {
         $itemQb = $this->getBasicDQL($listing);
         $itemQb->addSelect('l, partial u.{id, username, role}');
-        $itemQb->innerJoin('li.listing', 'l')
+        $itemQb//->innerJoin('li.listing', 'l')
                ->innerJoin('l.user', 'u');
         $itemQb->andWhere('li.day = :day')->setParameter('day', $day);
 
@@ -98,18 +99,39 @@ class ListingItemsReader extends Object
     }
 
     /**
+     * @param array $listingsIDs
+     * @return array
+     */
+    public function findListingsItems(
+        array $listingsIDs
+    ) {
+        $qb = $this->getBasicDQL();
+        $qb->addSelect('l');
+        $qb->where('li.listing IN (:listings)')
+           ->setParameter('listings', $listingsIDs);
+
+        $qb->orderBy('li.listing');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @param int $listingID
      * @return \Kdyby\Doctrine\QueryBuilder
      */
-    private function getBasicDQL($listingID)
+    private function getBasicDQL($listingID = null)
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('li, lo, wh')
            ->from(ListingItem::class, 'li')
+           ->innerJoin('li.listing', 'l')
            ->innerJoin('li.locality', 'lo')
-           ->innerJoin('li.workedHours', 'wh')
-           ->where('li.listing = :listingID')
-           ->setParameter('listingID', $listingID);
+           ->innerJoin('li.workedHours', 'wh');
+
+        if (isset($listingID)) {
+            $qb->where('li.listing = :listingID')
+               ->setParameter('listingID', $listingID);
+        }
 
         return $qb;
     }

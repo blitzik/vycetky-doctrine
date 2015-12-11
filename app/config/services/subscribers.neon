@@ -11,3 +11,7 @@ services:
 	listingSubscriber:
 		class: App\Model\Subscribers\ListingSubscriber
 		tags: [kdyby.subscriber]
+
+	listingsPDFCacheInvalidationSubscriber:
+		class: App\Model\Subscribers\ListingsPDFCacheInvalidationSubscriber
+		tags: [kdyby.subscriber]

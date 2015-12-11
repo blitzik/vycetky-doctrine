@@ -1,0 +1,19 @@
+{if !empty($listingsData)}
+
+<table class="table t-classic">
+    <tr><th>Rok</th><th>Počet</th><th>{*Výčetky každá zvlášť*}</th>{*<th>Vše do jednoho PDF</th>*}</tr>
+    {foreach $listingsData as $listing}
+        <tr>
+            <td>{$listing['year']}</td>
+            <td>{$listing['numberOfListings']}</td>
+            <td><a href="{link download year => $listing['year']}">Stáhnout</a></td>
+            {*<td><a href="{link downloadAllInOne year => $listing['year']}">Stáhnout</a></td>*}
+        </tr>
+    {/foreach}
+</table>
+
+{else}
+
+Váš účet neobsahuje žádné výčetky.
+
+{/if}

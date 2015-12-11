@@ -18,6 +18,10 @@ parameters:
 		system: 'system@email.em'
 		admin: %mainEmail%
 
+	pdf:
+		author: the_one_who_generates_the_PDFs
+		storage_path: %wwwDir%/listings_pdfs
+
 
 doctrine:
 	host: %database.host%
