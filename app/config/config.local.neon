@@ -7,6 +7,7 @@ parameters:
 
 	database:
 		host: 127.0.0.1
+		driver: mysql # needed by backup service
 		username: root
 		password: asqw
 		dbname: listings
@@ -19,7 +20,7 @@ parameters:
 		admin: %mainEmail%
 
 	pdf:
-		author: the_one_who_generates_the_PDFs
+		author: %emails.system%
 		storage_path: %wwwDir%/listings_pdfs
 
 

@@ -117,10 +117,12 @@ class SingleListingPDFGenerator extends Object
     private function setDocumentProperties(PdfResponse $pdfResponse, array $listingData)
     {
         $pdfResponse->documentAuthor = $this->documentAuthor;
+
+        $description = isset($listingData['listing']['l_description']) ? ('-' . Strings::webalize($listingData['listing']['l_description'])) : null;
         $pdfResponse->documentTitle = Strings::webalize($listingData['listing']['l_id']
                 . 'i-' . TimeUtils::getMonthName($listingData['listing']['l_month'])
                 . '-' . $listingData['listing']['l_year'])
-                . '-' . Strings::webalize($listingData['listing']['l_description']);
+                . $description;
     }
 
     /**
