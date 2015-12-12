@@ -64,14 +64,14 @@ class SingleListingPDFGenerator extends Object
 
     /**
      * @param array $listingData ['listing'][] & ['table'][]; table contains IDisplayableItem items
-     * @param array $listingSettings
+     * @param array $settings
      * @return PdfResult
      */
-    public function generate($listingData, array $listingSettings)
+    public function generate($listingData, array $settings)
     {
         $listing = $listingData['listing'];
 
-        $settings = $this->getSettings($listingSettings);
+        $settings = $this->getSettings($settings);
 
         $ss = md5(serialize($settings));
         $storagePath = $this->pdfStoragePath . '/' . $listing['u_id'] . '/' . $listing['l_year'] . '/' . $ss . '/';
@@ -129,18 +129,18 @@ class SingleListingPDFGenerator extends Object
     /**
      * @param ITemplate $template
      * @param array $listingData
-     * @param array $listingSettings
+     * @param array $settings
      * @return ITemplate
      */
     private function prepareTemplate(
         ITemplate $template,
         array $listingData,
-        array $listingSettings
+        array $settings
     ) {
-        $this->setListingsTemplateSettings($template, $listingSettings);
+        $this->setListingsTemplateSettings($template, $settings['listingsSettings']);
 
-        $template->employer = /*$this->companyName*/'abcd';
-        $template->employeeName = $listingData['listing']['u_name'];
+        $template->employer = $settings['userSettings']['employer'];
+        $template->employeeName = $settings['userSettings']['name'];
 
         $template->listingData = $listingData;
 
@@ -192,12 +192,27 @@ class SingleListingPDFGenerator extends Object
      */
     private function getSettings(array $listingsPDFGenerationSettings)
     {
-        $defaultSettings['isWageVisible'] = true;
-        $defaultSettings['areOtherHoursVisible'] = false;
-        $defaultSettings['areWorkedHoursVisible'] = false;
-        $defaultSettings['areLunchHoursVisible'] = false;
+        $defaultListingSettings['isWageVisible'] = true;
+        $defaultListingSettings['areOtherHoursVisible'] = false;
+        $defaultListingSettings['areWorkedHoursVisible'] = false;
+        $defaultListingSettings['areLunchHoursVisible'] = false;
 
-        return array_merge($defaultSettings, $listingsPDFGenerationSettings);
+        if (!isset($listingsPDFGenerationSettings['listingsSettings'])) {
+            $listingsPDFGenerationSettings['listingsSettings'] = $defaultListingSettings;
+        } else {
+            $listingsPDFGenerationSettings['listingsSettings'] = array_merge($defaultListingSettings, $listingsPDFGenerationSettings['listingsSettings']);
+        }
+
+        $defaultUserSettings['employer'] = '';
+        $defaultUserSettings['name'] = '';
+
+        if (!isset($listingsPDFGenerationSettings['userSettings'])) {
+            $listingsPDFGenerationSettings['userSettings'] = $defaultUserSettings;
+        } else {
+            $listingsPDFGenerationSettings['userSettings'] = array_merge($defaultUserSettings, $listingsPDFGenerationSettings['userSettings']);
+        }
+
+        return $listingsPDFGenerationSettings;
     }
 
     /**

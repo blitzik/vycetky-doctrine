@@ -1,16 +1,32 @@
 {if !empty($listingsData)}
 
+<div class="left-side">
+{form resultPdf}
+{customFormErrors}
+
+<div class="left">
 <table class="table t-classic">
-    <tr><th>Rok</th><th>Počet</th><th>{*Výčetky každá zvlášť*}</th>{*<th>Vše do jednoho PDF</th>*}</tr>
+    {control resultPdf-userSettings}
+    <tr><td>{input reset}</td><td>{input generatePdf}</td></tr>
+</table>
+
+<table class="table t-classic">
+    <tr><th></th><th>Rok</th><th>Počet výčetek</th></tr>
     {foreach $listingsData as $listing}
         <tr>
+            <td><input type="radio" name="year" value="{$listing['year']}"{if $iterator->isFirst()} checked="checked"{/if}></td>
             <td>{$listing['year']}</td>
             <td>{$listing['numberOfListings']}</td>
-            <td><a href="{link download year => $listing['year']}">Stáhnout</a></td>
-            {*<td><a href="{link downloadAllInOne year => $listing['year']}">Stáhnout</a></td>*}
+            {*<td><a href="{link download year => $listing['year']}">Stáhnout</a></td>*}
         </tr>
     {/foreach}
 </table>
+</div>
+
+{control resultPdf-listingsSettings}
+
+{/form}
+</div>
 
 {else}
 

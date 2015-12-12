@@ -1,21 +1,14 @@
 <div class="left-side">
-{form listingResultSettings}
+{form resultPdf}
 {customFormErrors}
 
 <table class="table t-classic">
 <caption>{control listingDescription}</caption>
-    <tr><th>{label employer /}</th><td colspan="2">{input employer}</td></tr>
-    <tr><th>{label name /}</th><td colspan="2">{input name}</td></tr>
+    {control resultPdf-userSettings}
     <tr><td>{input reset}</td><td>{input generatePdf}</td></tr>
 </table>
 
-<table class="table t-classic">
-    <tr><th>Zobrazení položek výčetky</th></tr>
-    <tr><td>{input wage}</td></tr>
-    <tr><th>Zobrazení celkových hodin ve spodní části výčetky</th></tr>
-    <tr><td>{input otherHours}</td></tr>
-    <tr><td>{input workedHours}</td></tr>
-    <tr><td>{input lunch}</td></tr>
-</table>
+{control resultPdf-listingsSettings}
+
 {/form}
 </div>

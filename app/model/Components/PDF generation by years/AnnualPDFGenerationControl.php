@@ -2,11 +2,14 @@
 
 namespace App\Model\Components;
 
+use App\Model\Components\Forms\Pdf\ListingsPdfSettingsContainer;
+use App\Model\Components\Forms\Pdf\UserPdfSettingsContainer;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\ListingsFacade;
 use App\Model\Services\Pdf\ListingPDFGenerator;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 
 class AnnualPDFGenerationControl extends BaseComponent
 {
@@ -23,18 +26,15 @@ class AnnualPDFGenerationControl extends BaseComponent
     private $user;
 
     public function __construct(
+        User $user,
         array $companyParameters,
         ListingsFacade $listingsFacade,
         ListingPDFGenerator $PDFGenerator
     ) {
+        $this->user = $user;
         $this->listingsFacade = $listingsFacade;
         $this->companyParameters = $companyParameters;
         $this->PDFGenerator = $PDFGenerator;
-    }
-
-    public function setUser(User $user)
-    {
-        $this->user = $user;
     }
 
     public function render()
@@ -47,22 +47,53 @@ class AnnualPDFGenerationControl extends BaseComponent
 
         $template->listingsData = $annualListings;
 
-        //dump($this->listingsFacade->getListingsIDsByYear(2015, $this->user));
-
         $template->render();
+    }
+
+    protected function createComponentResultPdf()
+    {
+        $form = new Form();
+
+        $form->addComponent(new UserPdfSettingsContainer($this->companyParameters), 'userSettings');
+        $form->addComponent(new ListingsPdfSettingsContainer(), 'listingsSettings');
+
+        $form['userSettings']['name']->setDefaultValue($this->user->name);
+
+        $form->addSubmit('generatePdf', 'Stáhnout PDF')
+                ->onClick[] = [$this, 'generatePdf'];
+
+        $form->addSubmit('reset', 'Reset nastavení')
+                ->onClick[] = [$this, 'processReset'];
+
+        $form->addProtection();
+
+        return $form;
     }
 
     /**
      * @secured
      */
-    public function handleDownload($year)
+    public function generatePdf(SubmitButton $button)
     {
+        $values = $button->getForm()->getHttpData(Form::DATA_TEXT);
+
         $zipPath = $this->PDFGenerator
                         ->generateAnnualSeparatedPDFs(
-                            $year,
-                            $this->user
+                            $values['year'],
+                            $this->user,
+                            $values
                         );
 
         $this->presenter->sendResponse(new FileResponse($zipPath));
     }
+
+    /**
+     * @secured
+     */
+    public function processReset(SubmitButton $button)
+    {
+        $this->redirect('this');
+    }
+
+
 }

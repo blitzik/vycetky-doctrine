@@ -41,7 +41,8 @@ services:
 
 	annualPDFGenerationControlFactory:
 		implement: App\Model\Components\IAnnualPDFGenerationControlFactory
-		arguments: [%company%]
+		parameters: [App\Model\Domain\Entities\User user]
+		arguments: [%user%, %company%]
 
 	listingActionMenuControlFactory:
 		implement: App\Model\Components\IListingActionsMenuControlFactory

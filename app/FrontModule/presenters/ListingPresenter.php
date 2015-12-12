@@ -410,7 +410,8 @@ class ListingPresenter extends SecurityPresenter
 
         if ($this->user->getIdentity()->name !== null) {
             $this['listingPDFGeneration']
-                 ['listingResultSettings']
+                 ['resultPdf']
+                 ['userSettings']
                  ['name']->setDefaultValue($this->user->getIdentity()->name);
         }
 
@@ -436,32 +437,23 @@ class ListingPresenter extends SecurityPresenter
      * -------------------------------
      */
 
-    /**
-     * @var ListingsReader
-     * @inject
-     */
-    public $abcd;
-
-    public function actionMassPdfGeneration()
+    public function actionAnnualPdfGeneration()
     {
-        //$listingResult = $this->getListingByID(66, true);
-        //dump($this->listingPdfGenerator->generate([$listingResult->getListing()]));
-        //Debugger::$maxDepth = 5;
-        //dump($this->listingsFacade->generateListingsPDFs(2015, $this->user->getIdentity()));
+
     }
     
-    public function renderMassPdfGeneration()
+    public function renderAnnualPdfGeneration()
     {
 
     }
 
     /**
-     * @Actions massPdfGeneration
+     * @Actions annualPdfGeneration
      */
     protected function createComponentAnnualPDFGeneration()
     {
-        $comp = $this->annualPDFGenerationControlFactory->create();
-        $comp->setUser($this->user->getIdentity());
+        $comp = $this->annualPDFGenerationControlFactory
+                     ->create($this->user->getIdentity());
 
         return $comp;
     }

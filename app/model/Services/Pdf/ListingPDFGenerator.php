@@ -41,7 +41,7 @@ class ListingPDFGenerator extends Object
     public function generateAnnualSeparatedPDFs(
         $year,
         User $user,
-        array $listingsSettings = []
+        array $settings = []
     ) {
         $listings = $this->listingsReader->getAnnualListingsForPDFGeneration($year, $user);
         $listings = Arrays::associate($listings, 'l_id');
@@ -51,7 +51,7 @@ class ListingPDFGenerator extends Object
         $processedListings = [];
         foreach ($listingsData as $listingID => $data) {
             $processedListings[$listingID] = $this->listingPDFGenerator
-                                                  ->generate($data, $listingsSettings);
+                                                  ->generate($data, $settings);
         }
 
         return $this->zipPDFs($processedListings, $year);
@@ -59,10 +59,10 @@ class ListingPDFGenerator extends Object
 
     /**
      * @param ListingResult $listingResult
-     * @param array $listingSettings
+     * @param array $settings
      * @return PdfResponse
      */
-    public function generateListingPDF(ListingResult $listingResult, array $listingSettings)
+    public function generateListingPDF(ListingResult $listingResult, array $settings)
     {
         $listing = $listingResult->getListing();
         $l = [
@@ -86,7 +86,7 @@ class ListingPDFGenerator extends Object
         $listingsData = $this->getListingsData($l);
 
         /** @var PdfResult $result */
-        $result = $this->listingPDFGenerator->generate($listingsData[$listing->id], $listingSettings);
+        $result = $this->listingPDFGenerator->generate($listingsData[$listing->id], $settings);
 
         return $result;
     }
