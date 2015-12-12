@@ -93,7 +93,7 @@ class ListingPDFGenerator extends Object
 
     /**
      * @param int $year
-     * @param array $processedListings
+     * @param PdfResult[] $processedListings
      * @return null|string
      */
     private function zipPDFs(array $processedListings, $year)
@@ -110,7 +110,6 @@ class ListingPDFGenerator extends Object
         }
 
         foreach ($processedListings as $id => $pdfResult) {
-            //dump($pdfResult);
             $zip->addFile($pdfResult->getPdfFilePath(), $pdfResult->getPdfFilename());
         }
 

@@ -47,7 +47,7 @@ class ListingPDFCacheFactory extends Object
             FileSystem::createDir($cacheStoragePath);
         }
 
-        $journal = new SQLiteJournal('cached-pdfs');
+        $journal = new SQLiteJournal($this->storagePath . '/cached-pdfs-journal');
         $fileStorage = new FileStorage($cacheStoragePath, $journal);
         return new Cache($fileStorage, 'cached-pdfs');
     }
