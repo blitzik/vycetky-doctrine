@@ -16,22 +16,22 @@
         <th>{label lunch /}</th><th>Odpracovano</th></tr>
 
     <tr><td>{input workStart}
-            <div class="time-control">
-                {input workStartAdd}
-                {input workStartSub}
-            </div></td>
-            <td>{input workEnd}
-            <div class="time-control">
-                {input workEndAdd}
-                {input workEndSub}
-            </div></td><td>{input lunch}
-            <div class="time-control">
-                {input lunchAdd}
-                {input lunchSub}
-            </div></td>
-            <td>
-                <span id="workedHours" data-workedhours="{$defaultWorkedHours|toTimeWithComma}">-</span>
-            </td>
+        <div class="time-control">
+            {input workStartAdd}
+            {input workStartSub}
+        </div></td>
+        <td>{input workEnd}
+        <div class="time-control">
+            {input workEndAdd}
+            {input workEndSub}
+        </div></td><td>{input lunch}
+        <div class="time-control">
+            {input lunchAdd}
+            {input lunchSub}
+        </div></td>
+        <td>
+            <span id="workedHours" data-workedhours="{$defaultWorkedHours|toTimeWithComma}">-</span>
+        </td>
     </tr>
 
     <tr><td colspan="2"><div id="slider-range"></div></td>
