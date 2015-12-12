@@ -25,9 +25,6 @@ class SingleListingPDFGenerator extends Object
     /** @var ItemsService */
     private $itemsService;
 
-    /** @var Cache */
-    private $cache;
-
     /** @var ITemplate */
     private $template;
 
