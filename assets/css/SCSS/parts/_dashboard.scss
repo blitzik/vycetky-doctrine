@@ -107,9 +107,9 @@ h3{
     li{
 
       a{
-        /*text-decoration: none;*/
+        text-decoration: none;
         &:hover{
-          background-color: #ECF0F1;
+          text-decoration: underline;
         }
 
         i{
@@ -133,7 +133,6 @@ h3{
   background-color: #ECF0F1;
   border: 0;
   color: #333;
-  text-decoration: none;
 }
 
 #footer{
@@ -243,7 +242,7 @@ $box-red: #ffbdb3;
   margin: 0;
   padding: 0;
   position: relative;
-  font-size: 110%;
+  //font-size: 110%;
 
   &:after{
     content: "";
@@ -251,7 +250,11 @@ $box-red: #ffbdb3;
     clear: both;
   }
 
-  ul{ margin: 0; padding: 0; overflow: auto;}
+  ul{
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+  }
 
   .logout{
     float: right;
@@ -260,6 +263,10 @@ $box-red: #ffbdb3;
   li{
     list-style-type: none;
     float: left;
+
+    i{
+      font-size: 125%;
+    }
 
     a{
       display: block;
