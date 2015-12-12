@@ -63,6 +63,8 @@ assets/css/original/*
 assets/js/concatenated/*
 assets/js/*.min.js
 
-listings_pdfs
+listings_pdfs/*
 
+!.htaccess
+!web.config
 !git.folder.keep
