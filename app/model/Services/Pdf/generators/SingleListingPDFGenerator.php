@@ -191,27 +191,28 @@ class SingleListingPDFGenerator extends Object
      */
     private function getSettings(array $listingsPDFGenerationSettings)
     {
-        $defaultListingSettings['isWageVisible'] = true;
+        $defaultListingSettings['isWageVisible'] = false;
         $defaultListingSettings['areOtherHoursVisible'] = false;
         $defaultListingSettings['areWorkedHoursVisible'] = false;
         $defaultListingSettings['areLunchHoursVisible'] = false;
 
+        $resultSettings = [];
         if (!isset($listingsPDFGenerationSettings['listingsSettings'])) {
-            $listingsPDFGenerationSettings['listingsSettings'] = $defaultListingSettings;
+            $resultSettings['listingsSettings'] = $defaultListingSettings;
         } else {
-            $listingsPDFGenerationSettings['listingsSettings'] = array_merge($defaultListingSettings, $listingsPDFGenerationSettings['listingsSettings']);
+            $resultSettings['listingsSettings'] = array_merge($defaultListingSettings, $listingsPDFGenerationSettings['listingsSettings']);
         }
 
         $defaultUserSettings['employer'] = '';
         $defaultUserSettings['name'] = '';
 
         if (!isset($listingsPDFGenerationSettings['userSettings'])) {
-            $listingsPDFGenerationSettings['userSettings'] = $defaultUserSettings;
+            $resultSettings['userSettings'] = $defaultUserSettings;
         } else {
-            $listingsPDFGenerationSettings['userSettings'] = array_merge($defaultUserSettings, $listingsPDFGenerationSettings['userSettings']);
+            $resultSettings['userSettings'] = array_merge($defaultUserSettings, $listingsPDFGenerationSettings['userSettings']);
         }
 
-        return $listingsPDFGenerationSettings;
+        return $resultSettings;
     }
 
     /**

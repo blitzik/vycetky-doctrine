@@ -76,6 +76,9 @@ class AnnualPDFGenerationControl extends BaseComponent
     public function generatePdf(SubmitButton $button)
     {
         $values = $button->getForm()->getHttpData(Form::DATA_TEXT);
+        if (!empty($values['listingsSettings'])) {
+            array_walk($values['listingsSettings'], function (&$value) { $value = (bool)$value; });
+        }
 
         $zipPath = $this->PDFGenerator
                         ->generateAnnualSeparatedPDFs(
