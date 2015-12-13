@@ -37,12 +37,11 @@ class Arrays
             }
         }
 
-        if (!empty($errMsg)) {
-            $errMsg = substr($errMsg, 0, strlen($errMsg) - 2);
-        } else {
+        if (empty($errMsg)) {
             return $members;
         }
 
+        $errMsg = substr($errMsg, 0, strlen($errMsg) - 2);
         throw new MissingRequiredArrayMemberException('Missing array members: ' . $errMsg);
     }
 }
