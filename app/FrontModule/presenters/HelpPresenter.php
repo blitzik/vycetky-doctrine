@@ -52,7 +52,7 @@ class HelpPresenter extends SecurityPresenter
         $form->addSubmit('send', 'Odeslat dotaz')
                 ->setOmitted();
 
-        $form->onSuccess[] = $this->proccessHelpForm;
+        $form->onSuccess[] = [$this, 'proccessHelpForm'];
 
         return $form;
     }

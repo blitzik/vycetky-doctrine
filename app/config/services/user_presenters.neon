@@ -13,3 +13,4 @@ services:
 		class: App\UserModule\Presenters\PasswordPresenter
 		setup:
 			- setSystemEmail(%emails.system%)
+			- setApplicationUrl(%application.url%)

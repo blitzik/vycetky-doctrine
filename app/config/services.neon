@@ -28,8 +28,7 @@ services:
 
 	invitationsSender:
 		class: App\Model\Services\InvitationsSender
-		setup:
-			- setSystemEmail(%emails.system%)
+		arguments: [%emails.system%, %application.url%]
 
 	sharedListingNotification: App\Model\Notifications\SharedListingNotification
 

@@ -41,9 +41,19 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
      */
     private $systemEmail;
 
+    /**
+     * @var string
+     */
+    private $applicationUrl;
+
     public function setSystemEmail($systemEmail)
     {
         $this->systemEmail = $systemEmail;
+    }
+
+    public function setApplicationUrl($applicationUrl)
+    {
+        $this->applicationUrl = $applicationUrl;
     }
 
     /*
@@ -95,13 +105,13 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
             $this->emailNotifier->send(
                 'Výčetkový systém <' .$this->systemEmail. '>',
                 $user->email,
-                function (ITemplate $template, $email, $token) {
+                function (ITemplate $template, $email, $token, $applicationUrl) {
                     $template->setFile(__DIR__ . '/../../model/Notifications/templates/resetPassword.latte');
                     $template->email = $email;
                     $template->token = $token;
-
+                    $template->applicationUrl = $applicationUrl;
                 },
-                [$user->email, $user->token]
+                [$user->email, $user->token, $this->applicationUrl]
             );
 
             $this->flashMessage(

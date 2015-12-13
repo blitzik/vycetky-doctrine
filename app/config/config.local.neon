@@ -1,4 +1,7 @@
 parameters:
+	application: # used in email templates (can be found in Notifications/templates)
+		url: 'localhost'
+
 	mainEmail: 'admin@email.em'
 
 	backup:
