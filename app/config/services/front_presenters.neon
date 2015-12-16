@@ -10,21 +10,7 @@ services:
 		setup:
 			- setEmails(%emails%)
 
-	itemPresenter:
-		class: App\FrontModule\Presenters\ItemPresenter
-
-	listingPresenter:
-		class: App\FrontModule\Presenters\ListingPresenter
-
-	# todo mailbox presenter
-
-	mergePresenter:
-		class: App\FrontModule\Presenters\MergePresenter
-
 	frontAccountPresenter:
 		class: App\FrontModule\Presenters\AccountPresenter
 		setup:
 			- setEmails(%emails%)
-
-	usersPresenter:
-		class: App\FrontModule\Presenters\UsersPresenter

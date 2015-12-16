@@ -1,14 +1,5 @@
 services:
 
-	loginPresenter:
-		class: App\UserModule\Presenters\LoginPresenter
-
-	invitationPresenter:
-		class: App\UserModule\Presenters\InvitationPresenter
-
-	accountPresenter:
-		class: App\UserModule\Presenters\AccountPresenter
-
 	passwordPresenter:
 		class: App\UserModule\Presenters\PasswordPresenter
 		setup:
