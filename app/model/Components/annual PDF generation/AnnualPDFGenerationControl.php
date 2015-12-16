@@ -6,7 +6,7 @@ use App\Model\Components\Forms\Pdf\ListingsPdfSettingsContainer;
 use App\Model\Components\Forms\Pdf\UserPdfSettingsContainer;
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\ListingsFacade;
-use App\Model\Services\Pdf\ListingPDFGenerator;
+use App\Model\Pdf\Listing\Generators\AnnualPdfGenerator;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
@@ -19,7 +19,7 @@ class AnnualPDFGenerationControl extends BaseComponent
     /** @var ListingsFacade */
     private $listingsFacade;
 
-    /** @var ListingPDFGenerator */
+    /** @var AnnualPdfGenerator */
     private $PDFGenerator;
 
     /** @var User */
@@ -29,7 +29,7 @@ class AnnualPDFGenerationControl extends BaseComponent
         User $user,
         array $companyParameters,
         ListingsFacade $listingsFacade,
-        ListingPDFGenerator $PDFGenerator
+        AnnualPdfGenerator $PDFGenerator
     ) {
         $this->user = $user;
         $this->listingsFacade = $listingsFacade;
@@ -81,7 +81,7 @@ class AnnualPDFGenerationControl extends BaseComponent
         }
 
         $zipPath = $this->PDFGenerator
-                        ->generateAnnualSeparatedPDFs(
+                        ->generate(
                             $values['year'],
                             $this->user,
                             $values

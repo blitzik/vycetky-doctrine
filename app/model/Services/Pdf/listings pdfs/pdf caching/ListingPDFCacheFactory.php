@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Services\Pdf;
+namespace App\Model\Pdf\Listing\Caching;
 
 use Nette\Caching\Cache;
 use Nette\Caching\Storages\FileStorage;
@@ -8,7 +8,7 @@ use Nette\Caching\Storages\SQLiteJournal;
 use Nette\Object;
 use Nette\Utils\FileSystem;
 
-class ListingPDFCacheFactory extends Object
+class ListingPDFCacheFactory extends Object implements IListingPdfCacheFactory
 {
     /** @var Cache[] */
     private $caches;
@@ -21,14 +21,16 @@ class ListingPDFCacheFactory extends Object
         $this->storagePath = $storagePath;
     }
 
+
+
     /**
-     * @param array $listing
+     * @param string $userId
+     * @param $listingYear
      * @return Cache
      */
-    public function getCache(array $listing)
+    public function getCache($userId, $listingYear)
     {
-        $cacheStoragePath = $this->storagePath . '/' . $listing['u_id'] . '/' . $listing['l_year'] . '/';
-
+        $cacheStoragePath = $this->storagePath . '/' . $userId . '/' . $listingYear;
         $key = md5($cacheStoragePath);
         if (!isset($this->caches[$key])) {
             $this->caches[$key] = $this->create($cacheStoragePath);
@@ -37,11 +39,13 @@ class ListingPDFCacheFactory extends Object
         return $this->caches[$key];
     }
 
+
+
     /**
-     * @param $cacheStoragePath
+     * @param string $cacheStoragePath
      * @return Cache
      */
-    private function create($cacheStoragePath)
+    protected function create($cacheStoragePath)
     {
         if (!file_exists($cacheStoragePath)) {
             FileSystem::createDir($cacheStoragePath);

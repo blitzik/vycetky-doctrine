@@ -107,6 +107,7 @@ class ListingItemsReader extends Object
     ) {
         $qb = $this->getBasicDQL();
         $qb->addSelect('l');
+
         $qb->where('li.listing IN (:listings)')
            ->setParameter('listings', $listingsIDs);
 

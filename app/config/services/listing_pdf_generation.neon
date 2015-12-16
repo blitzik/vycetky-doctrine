@@ -1,0 +1,26 @@
+services:
+
+	mpdfFactory:
+		class: App\Model\Pdf\ContentGenerators\Mpdf\MpdfFactory
+		arguments: [%pdf.author%]
+
+	mpdfPdfContentGenerator:
+		class: App\Model\Pdf\ContentGenerators\Mpdf\MpdfPdfContentGenerator
+
+	listingPdfCacheFactory:
+		class: App\Model\Pdf\Listing\Caching\ListingPDFCacheFactory
+		arguments: [%pdf.storage_path%]
+
+	listingPdfSourceFactory:
+		class: App\Model\Pdf\Listing\PdfSources\ListingPdfSourceFactory
+
+	listingPdfFileGenerator:
+		class: App\Model\Pdf\Listing\FileGenerators\ListingPdfFileGenerator
+		arguments: [%pdf.storage_path%]
+
+	listingPdfGenerator:
+		class: App\Model\Pdf\Listing\Generators\ListingPdfGenerator
+
+	annualPdfGenerator:
+		class: App\Model\Pdf\Listing\Generators\AnnualPdfGenerator
+		arguments: [%pdf.storage_path%]

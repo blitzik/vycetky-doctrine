@@ -3,18 +3,19 @@
 namespace App\Model\Subscribers;
 
 use App\Model\Domain\Entities\Listing;
-use App\Model\Services\Pdf\ListingPDFCacheFactory;
+use App\Model\Pdf\Listing\Caching\IListingPdfCacheFactory;
 use Kdyby\Events\Subscriber;
 use Nette\Caching\Cache;
 use Nette\Object;
+use Nette\Utils\FileSystem;
 
-class ListingsPDFCacheInvalidationSubscriber extends Object implements Subscriber
+class ListingsPDFsFileInvalidationSubscriber extends Object implements Subscriber
 {
-    /** @var ListingPDFCacheFactory */
+    /** @var IListingPDFCacheFactory */
     private $cacheFactory;
 
     public function __construct(
-        ListingPDFCacheFactory $cacheFactory
+        IListingPdfCacheFactory $cacheFactory
     ) {
         $this->cacheFactory = $cacheFactory;
     }
@@ -45,10 +46,20 @@ class ListingsPDFCacheInvalidationSubscriber extends Object implements Subscribe
     private function handleInvalidation(Listing $listing)
     {
         $cache = $this->cacheFactory
-                      ->getCache([
-                          'l_year' => $listing->year,
-                          'u_id' => $listing->user->id
-                      ]);
+                      ->getCache(
+                          $listing->user->id,
+                          $listing->year
+                      );
+
+        // removal of all generated pdf files of given Listing
+        $generatedFiles = $cache->load('generatedPdfFilesByListing/' . $listing->getId());
+        if ($generatedFiles !== null) {
+            foreach ($generatedFiles as $key => $filePath) {
+                if (!is_dir($filePath) and file_exists($filePath)) {
+                    FileSystem::delete($filePath);
+                }
+            }
+        }
 
         $cache->clean([Cache::TAGS => 'listing/' . $listing->id]);
     }

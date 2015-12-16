@@ -64,6 +64,9 @@ assets/js/concatenated/*
 assets/js/*.min.js
 
 listings_pdfs/*
+log/*
+
+work.txt
 
 !.htaccess
 !web.config

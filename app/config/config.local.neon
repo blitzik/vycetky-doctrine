@@ -23,7 +23,7 @@ parameters:
 		admin: %mainEmail%
 
 	pdf:
-		author: %emails.system%
+		author: %application.url%
 		storage_path: %wwwDir%/listings_pdfs
 
 

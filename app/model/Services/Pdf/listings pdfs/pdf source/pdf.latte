@@ -81,7 +81,7 @@
 <div class="listing-page">
 <table class="info">
     <tr><td>Zaměstnavatel:</td><td><b>{$employer}</b></td></tr>
-    <tr><td>Přehled o docházce za měsíc:</td><td><b>{$listingData['listing']['period']|listingMonthYear}</b></td></tr>
+    <tr><td>Přehled o docházce za měsíc:</td><td><b>{$dataAdapter->getPeriod()|listingMonthYear}</b></td></tr>
     <tr><td>Jméno:</td><td>{$employeeName}</td></tr>
 </table>
 
@@ -90,7 +90,7 @@
     <tr><th class="w45">Datum</th><th class="w20">Den</th><th class="w280">Popis práce - místo</th><th>Prac. doba</th>
         <th class="w65">Oběd</th><th class="w65">Odpr. hodiny</th><th class="w65">Ost. hod.</th></tr>
 
-    {foreach $listingData['table'] as $day => $item}
+    {foreach $dataAdapter->getEntireListingCollection() as $day => $item}
 
         <tr><td>{$day}</td>
         <td>{$item->day|dayShortcut}</td>
@@ -117,9 +117,9 @@
         <th class="w120">Dovolená hod.</th>
         <td></td>
         <th class="w120">Ostat. hod.</th>
-        <td>{if $areOtherHoursVisible}{$listingData['listing']['other_hours']|toTimeWithComma}{/if}</td>
+        <td>{if $areOtherHoursVisible}{$dataAdapter->getOtherHours()|toTimeWithComma}{/if}</td>
         <th class="w120">Odprac. hod.</th>
-        <td class="w130">{if $areWorkedHoursVisible}{$listingData['listing']['worked_hours']|toTimeWithComma}{/if}</td>
+        <td class="w130">{if $areWorkedHoursVisible}{$dataAdapter->getWorkedHours()|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th>Nemoc hod.</th>
@@ -127,11 +127,11 @@
         <th>Svátek</th>
         <td></td>
         <th>Obědy</th>
-        <td>{if $areLunchHoursVisible}{$listingData['listing']['lunch_hours']|toTimeWithComma}{/if}</td>
+        <td>{if $areLunchHoursVisible}{$dataAdapter->getLunchHours()|toTimeWithComma}{/if}</td>
     </tr>
     <tr>
         <th colspan="5" class="totalHours"><b>Hodin celkem</b></th>
-        <td><b>{(int)$listingData['listing']['total_worked_hours_in_sec']|toTimeWithComma}</b></td>
+        <td><b>{$dataAdapter->getTotalWorkedHours()|toTimeWithComma}</b></td>
     </tr>
 
 </table>
@@ -140,7 +140,7 @@
 
     <tr>
         <th style="width: 215px"><b>Základní mzda</b></th>
-        <td class="w120">{if $isWageVisible and $listingData['listing']['l_hourlyWage'] > 0}{$listingData['listing']['l_hourlyWage']} Kč/h{/if}</td>
+        <td class="w120">{if $isWageVisible and $dataAdapter->getListingHourlyWage() > 0}{$dataAdapter->getListingHourlyWage()} Kč/h{/if}</td>
         <th style="">Dovolená - dni</th>
         <td class="w130"></td>
     </tr>

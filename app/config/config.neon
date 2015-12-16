@@ -68,6 +68,7 @@ includes:
 	- services/readers.neon
 	- services/writers.neon
 	- services/managers.neon
+	- services/listing_pdf_generation.neon
 	- services/facades.neon
 
 decorator:

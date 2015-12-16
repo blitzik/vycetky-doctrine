@@ -5,9 +5,10 @@ namespace App\Model\Components;
 use App\Model\Components\Forms\Pdf\ListingsPdfSettingsContainer;
 use App\Model\Components\Forms\Pdf\UserPdfSettingsContainer;
 use App\Model\Domain\Entities\Listing;
+use App\Model\Pdf\Listing\Generators\ListingPdfGenerator;
+use App\Model\Pdf\Listing\PdfFiles\IListingPdfFile;
 use App\Model\ResultObjects\ListingResult;
-use App\Model\Services\Pdf\ListingPDFGenerator;
-use App\Model\Services\Pdf\PdfResult;
+use App\Model\Services\Readers\ListingItemsReader;
 use Nette;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
@@ -20,7 +21,10 @@ class ListingPDFGenerationControl extends BaseComponent
     /** @var IListingDescriptionControlFactory */
     private $listingDescriptionFactory;
 
-    /** @var ListingPDFGenerator */
+    /** @var ListingItemsReader */
+    private $listingItemsReader;
+
+    /** @var ListingPdfGenerator */
     private $listingPDFGenerator;
 
     /** @var ListingResult */
@@ -29,14 +33,18 @@ class ListingPDFGenerationControl extends BaseComponent
     /** @var Listing */
     private $listing;
 
+
+
     public function __construct(
         ListingResult $listingResult,
-        ListingPDFGenerator $listingPDFGenerator,
+        ListingItemsReader $listingItemsReader,
+        ListingPdfGenerator $listingPDFGenerator,
         IListingDescriptionControlFactory $listingDescriptionControlFactory
     ) {
         $this->listingResult = $listingResult;
         $this->listing = $listingResult->getListing();
 
+        $this->listingItemsReader = $listingItemsReader;
         $this->listingPDFGenerator = $listingPDFGenerator;
         $this->listingDescriptionFactory = $listingDescriptionControlFactory;
     }
@@ -81,14 +89,35 @@ class ListingPDFGenerationControl extends BaseComponent
     {
         $values = $button->getForm()->getValues(true);
 
-        /** @var PdfResult $pdf */
+        $items = $this->listingItemsReader->findListingsItems([$this->listingResult->getListingId()]);
+
+        $listing = $this->listingResult->getListing();
+        $listingData = [
+            'l_id' => $listing->id,
+            'l_year' => $listing->year,
+            'l_month' => $listing->month,
+            'l_description' => $listing->description,
+            'l_hourlyWage' => $listing->hourlyWage,
+            'u_id' => $listing->user->id,
+            'u_name' => $listing->user->name,
+            'worked_days' => $this->listingResult->getWorkedDays(),
+            'worked_hours' => $this->listingResult->getWorkedHours(),
+            'total_worked_hours_in_sec' => $this->listingResult->getTotalWorkedHours()->toSeconds(),
+            'lunch_hours' => $this->listingResult->getLunchHours(),
+            'other_hours' => $this->listingResult->getOtherHours()
+        ];
+
+        /** @var IListingPdfFile $pdf */
         $pdf = $this->listingPDFGenerator
-                    ->generateListingPDF(
-                        $this->listingResult,
-                        $values
+                    ->generate(
+                        $listingData,
+                        $items,
+                        $values // settings
                     );
 
-        $this->presenter->sendResponse(new Nette\Application\Responses\FileResponse($pdf->getPdfFilePath(), $pdf->getPdfFilename()));
+        $response = new Nette\Application\Responses\FileResponse($pdf->getStoragePath(), $pdf->getFileName()/*, 'application/pdf', false*/);
+
+        $this->presenter->sendResponse($response);
     }
 
     public function processReset(SubmitButton $button)

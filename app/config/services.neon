@@ -32,20 +32,6 @@ services:
 
 	sharedListingNotification: App\Model\Notifications\SharedListingNotification
 
-	# PDF listing generation
-	listingPDFCacheFactory:
-		class: App\Model\Services\Pdf\ListingPDFCacheFactory
-		arguments: [%pdf.storage_path%]
-
-	singleListingPDFGenerator:
-		class: App\Model\Services\Pdf\SingleListingPDFGenerator
-		arguments: [%pdf.storage_path%]
-		setup:
-			- setDocumentAuthor(%pdf.author%)
-
-	listingPdfGenerator:
-		class: App\Model\Services\Pdf\ListingPDFGenerator
-
 	# Database Backup
 	databaseBackup:
 		class: DatabaseBackup(%database%)
