@@ -5,20 +5,29 @@
 # http://nette.org/security-warning
 #
 
+includes:
+	- parameters.neon
+	- services.neon
+	- services/front_presenters.neon
+	- services/user_presenters.neon
+	- services/subscribers.neon
+	- services/providers.neon
+	- services/factories.neon
+	- services/readers.neon
+	- services/writers.neon
+	- services/managers.neon
+	- services/listing_pdf_generation.neon
+	- services/facades.neon
+
 php:
 	date.timezone: Europe/Prague
 
 
-nette:
-	application:
-		errorPresenter: Error
-		mapping:
-			*: App\*Module\Presenters\*Presenter
 
-	session:
-		expiration: 1 month
-		savePath: %appDir%/../temp/sessions
-		name: 'listings'
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
 
 	debugger:
 		email: %mainEmail%
@@ -26,16 +35,27 @@ nette:
 			- Nette\Bridges\DITracy\ContainerPanel
 			- Nette\Bridges\HttpTracy\SessionPanel
 
-	latte:
-		macros:
-			- Nextras\Latte\Macros\RedefineMacro
-			- blitzik\Macros\FormsMacro
+session:
+	expiration: 1 month
+	savePath: %appDir%/../temp/sessions
+	name: 'listings'
+
+
+
+latte:
+	macros:
+		- Nextras\Latte\Macros\RedefineMacro
+		- blitzik\Macros\FormsMacro
+
+
 
 extensions:
 	console: Kdyby\Console\DI\ConsoleExtension
 	events: Kdyby\Events\DI\EventsExtension
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
+
+
 
 doctrine:
 	charset: utf8
@@ -57,19 +77,7 @@ doctrine:
 	types:
 		'invoicetime': App\Doctrine\Types\InvoiceTimeType
 
-includes:
-	- parameters.neon
-	- services.neon
-	- services/front_presenters.neon
-	- services/user_presenters.neon
-	- services/subscribers.neon
-	- services/providers.neon
-	- services/factories.neon
-	- services/readers.neon
-	- services/writers.neon
-	- services/managers.neon
-	- services/listing_pdf_generation.neon
-	- services/facades.neon
+
 
 decorator:
 	App\FrontModule\Presenters\SecurityPresenter:
