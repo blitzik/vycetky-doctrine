@@ -49,7 +49,7 @@ class ListingPdfSource extends Object implements IListingPdfSource
     public function getPdfTitle()
     {
         // {listingId}i-{monthName}-{year}[-{description}]
-        $description = $this->listingPdfDataAdapter->getListingDescription() !== '' ? ('-' . Strings::webalize($this->listingPdfDataAdapter->getListingDescription())) : null;
+        $description = $this->listingPdfDataAdapter->getListingDescription() != '' ? ('-' . Strings::webalize($this->listingPdfDataAdapter->getListingDescription())) : null;
 
         return Strings::webalize($this->listingPdfDataAdapter->getListingId()
             . 'i-' . TimeUtils::getMonthName($this->listingPdfDataAdapter->getListingMonth())
