@@ -93,7 +93,7 @@ class ListingPdfDataAdapter extends Object implements IListingPdfDataAdapter
      */
     public function getListingHourlyWage()
     {
-        return (int)$this->listing['l_hourlWage'];
+        return (int)$this->listing['l_hourlyWage'];
     }
 
 
