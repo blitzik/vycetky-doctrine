@@ -20,9 +20,10 @@ $configurator->createRobotLoader()
 $configurator->addConfig(__DIR__ . '/../app/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config.test.local.neon');
 
+
 $container = $configurator->createContainer();
 
-\Tester\Helpers::purge(__DIR__ . '/log');
+//\Tester\Helpers::purge(__DIR__ . '/log');
 
 
 return $container;

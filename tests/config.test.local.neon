@@ -1,6 +1,9 @@
 parameters:
 	mainEmail: 'admin@email.em'
 
+	application:
+		url: xxx
+
 	backup:
 		database:
 			password: 'password'
@@ -20,6 +23,10 @@ parameters:
 	emails:
 		system: 'system@email.em'
 		admin: %mainEmail%
+
+	pdf:
+		author: xxx
+		storage_path: xxx
 
 doctrine:
 	host: %database.host%

@@ -2,7 +2,7 @@
 
 use Tester\Assert;
 
-$x = require '../../bootstrap.php';
+require '../../bootstrap.php';
 
 class InvoiceTimeTest extends \Tester\TestCase
 {
