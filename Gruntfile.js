@@ -20,7 +20,7 @@ module.exports = function (grunt) {
                     'bower_components/jquery-ui/ui/menu.js',
                     'bower_components/jquery-ui/ui/slider.js'
                 ],
-                dest: 'assets/js/concatenated/reducedJqueryUi.js'
+                dest: 'www/assets/js/concatenated/reducedJqueryUi.js'
             },
 
             jqueryuiCss:{
@@ -30,9 +30,9 @@ module.exports = function (grunt) {
                     'bower_components/jquery-ui/themes/base/menu.css',
                     'bower_components/jquery-ui/themes/base/slider.css',
                     //'bower_components/jquery-ui/themes/base/theme.css' // base theme
-                    'assets/css/jquery_ui_theme/jquery-ui.theme.css' // downloaded theme
+                    'www/assets/css/jquery_ui_theme/jquery-ui.theme.css' // downloaded theme
                 ],
-                dest: 'assets/css/original/jqueryuiCss.css'
+                dest: 'www/assets/css/original/jqueryuiCss.css'
             },
 
             item_setting: {
@@ -42,11 +42,11 @@ module.exports = function (grunt) {
 
                 src: [
                     // jqueryUi is defined in "base"
-                    'assets/js/my_js/timeConverter.js',
-                    'assets/js/my_js/sliders.js',
-                    'assets/js/my_js/item.js'
+                    'www/assets/js/my_js/timeConverter.js',
+                    'www/assets/js/my_js/sliders.js',
+                    'www/assets/js/my_js/item.js'
                 ],
-                dest: 'assets/js/concatenated/item_setting.js'
+                dest: 'www/assets/js/concatenated/item_setting.js'
             },
 
             base: {
@@ -58,29 +58,29 @@ module.exports = function (grunt) {
                     'bower_components/jquery/dist/jquery.js',
                     'bower_components/nette-forms/src/assets/netteForms.js',
                     'bower_components/nette.ajax.js/nette.ajax.js',
-                    'assets/js/my_js/nette.ajax.spinner.extension.js',
-                    'assets/js/concatenated/reducedJqueryUi.js',
+                    'www/assets/js/my_js/nette.ajax.spinner.extension.js',
+                    'www/assets/js/concatenated/reducedJqueryUi.js',
                     'bower_components/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
                     'bower_components/placeholders/dist/placeholders.jquery.js',
-                    'assets/js/my_js/passwordValidation.js',
-                    'assets/js/my_js/listingItemsTables.js',
-                    'assets/js/my_js/listingDelete.js',
-                    'assets/js/my_js/main.js'
+                    'www/assets/js/my_js/passwordValidation.js',
+                    'www/assets/js/my_js/listingItemsTables.js',
+                    'www/assets/js/my_js/listingDelete.js',
+                    'www/assets/js/my_js/main.js'
                 ],
-                dest: 'assets/js/concatenated/js.js'
+                dest: 'www/assets/js/concatenated/js.js'
             }
         },
 
         uglify: {
             front: {
                 files: {
-                    'assets/js/js.min.js': ['assets/js/concatenated/js.js']
+                    'www/assets/js/js.min.js': ['www/assets/js/concatenated/js.js']
                 }
             },
 
             item_setting: {
                 files: {
-                    'assets/js/item_setting.min.js': ['assets/js/concatenated/item_setting.js']
+                    'www/assets/js/item_setting.min.js': ['www/assets/js/concatenated/item_setting.js']
                 }
             }
         },
@@ -88,13 +88,16 @@ module.exports = function (grunt) {
         cssmin: {
             front: {
                 files: {
-                    'assets/css/front.min.css': ['assets/css/original/front.css', 'assets/css/original/jqueryuiCss.css']
+                    'www/assets/css/front.min.css': [
+                        'www/assets/css/original/front.css',
+                        'www/assets/css/original/jqueryuiCss.css'
+                    ]
                 }
             },
 
             user_front: {
                 files: {
-                    'assets/css/user_front.min.css': ['assets/css/original/user_front.css']
+                    'www/assets/css/user_front.min.css': ['www/assets/css/original/user_front.css']
                 }
             }
         },
@@ -102,13 +105,13 @@ module.exports = function (grunt) {
         sass: {
             front: {
                 files: {
-                    'assets/css/original/front.css': 'assets/css/SCSS/front.scss'
+                    'www/assets/css/original/front.css': 'www/assets/css/SCSS/front.scss'
                 }
             },
 
             user_front: {
                 files: {
-                    'assets/css/original/user_front.css': 'assets/css/SCSS/user_front.scss'
+                    'www/assets/css/original/user_front.css': 'www/assets/css/SCSS/user_front.scss'
                 }
             }
         },
@@ -120,7 +123,7 @@ module.exports = function (grunt) {
                     expand: true,
                     flatten: true,
                     src: ['bower_components/jquery-ui/themes/base/images/*'],
-                    dest: 'assets/css/images/'
+                    dest: 'www/assets/css/images/'
                 }
             ]
           },
@@ -130,7 +133,7 @@ module.exports = function (grunt) {
                       expand: true,
                       flatten: true,
                       src: ['bower_components/font-awesome-sass/assets/fonts/font-awesome/*'],
-                      dest: 'assets/fonts/font-awesome/'
+                      dest: 'www/assets/fonts/font-awesome/'
                   }
               ]
           }

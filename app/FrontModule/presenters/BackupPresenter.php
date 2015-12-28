@@ -2,40 +2,53 @@
 
 namespace App\FrontModule\Presenters;
 
+use App\Model\Authorization\Authorizator;
 use App\Model\Components\IDatabaseBackupControlFactory;
+use App\Model\Components\IManualDatabaseBackupControlFactory;
 use Nette\Application\UI\Presenter;
 
 class BackupPresenter extends Presenter
 {
+    /**
+     * @var IManualDatabaseBackupControlFactory
+     * @inject
+     */
+    public $manualBackupFactory;
+
     /**
      * @var IDatabaseBackupControlFactory
      * @inject
      */
     public $backupControlFactory;
 
-    /** @var array ['admin' => ... , 'system' => ...] */
-    private $emails;
+    /** @var Authorizator */
+    private $authorizator;
 
-    public function setEmails(array $emails)
+
+    public function setAuthorizator(Authorizator $authorizator)
     {
-        $this->emails = $emails;
+        $this->authorizator = $authorizator;
     }
+
 
     public function renderDatabaseBackup()
     {
     }
 
+
     public function actionDatabaseBackup()
     {
     }
+
 
     /**
      * @Actions databaseBackup
      */
     protected function createComponentDatabaseBackup()
     {
-        $comp = $this->backupControlFactory->create($this->emails);
+        $comp = $this->backupControlFactory->create();
 
         return $comp;
     }
+
 }

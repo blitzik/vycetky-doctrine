@@ -3,7 +3,7 @@
 namespace App\FrontModule\Presenters;
 
 use App\Model\Components\IAccountPasswordControlFactory;
-use App\Model\Components\IDatabaseBackupControlFactory;
+use App\Model\Components\IManualDatabaseBackupControlFactory;
 use App\Model\Components\IUsersBlockingManagementControlFactory;
 use App\Model\Components\IInvitationGenerationControlFactory;
 use App\Model\Components\IInvitationsManagementControlFactory;
@@ -41,10 +41,10 @@ class AccountPresenter extends SecurityPresenter
     public $accountPasswordFactory;
 
     /**
-     * @var IDatabaseBackupControlFactory
+     * @var IManualDatabaseBackupControlFactory
      * @inject
      */
-    public $databaseBackupFactory;
+    public $manualDatabaseBackupFactory;
 
     /**
      * @var UsersFacade
@@ -124,20 +124,27 @@ class AccountPresenter extends SecurityPresenter
 
     public function actionDatabaseBackup()
     {
-
     }
 
     public function renderDatabaseBackup()
     {
-
     }
+
 
     /**
      * @Actions databaseBackup
      */
-    protected function createComponentBackup()
+    protected function createComponentManualDatabaseBackup()
     {
-        return $this->databaseBackupFactory->create($this->emails);
+        $comp = $this->manualDatabaseBackupFactory->create();
+        $comp->onBeforeManualBackup[] = function () {
+            if (!$this->authorizator->isAllowed($this->user->getIdentity(), 'database_backup')) {
+                $this->flashMessage('Nemáte dostatečná oprávnění k provedení akce', 'warning');
+                $this->redirect('this');
+            }
+        };
+
+        return $comp;
     }
 
 

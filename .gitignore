@@ -1,4 +1,3 @@
-/assets/fonts
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -45,7 +44,8 @@ Temporary Items
 
 btfj.dat
 /.idea
-app/backup
+/assets/fonts
+/app/backup
 /temp/cache/*
 /temp/sessions/*
 
@@ -56,15 +56,18 @@ node_modules
 .sass-cache
 bower_components
 
-assets/css/*.min.css
-assets/css/images/*
-assets/css/original/*
+www/assets/css/*.min.css
+www/assets/css/images/*
+www/assets/css/original/*
 
-assets/js/concatenated/*
-assets/js/*.min.js
+www/assets/js/concatenated/*
+www/assets/js/*.min.js
 
 listings_pdfs/*
 log/*
+/.htaccess
+
+vendor
 
 work.txt
 

@@ -86,12 +86,18 @@ services:
 
 	paginatorFactory: \Components\IPaginatorFactory
 
+	manualDatabaseBackupControlFactory:
+		implement: App\Model\Components\IManualDatabaseBackupControlFactory
+		setup:
+			- addBackupHandler(@emailBackupHandler)
+			- addBackupHandler(@fileBackupHandler)
+
 	databaseBackupControlFactory:
 		implement: App\Model\Components\IDatabaseBackupControlFactory
-		parameters: [array emails]
-		arguments: [%emails%]
 		setup:
-			- setPasswordForBackup(%backup.database.password%)
+			- setPasswordForBackup(%backup.password%)
+			- addBackupHandler(@emailBackupHandler)
+			- addBackupHandler(@fileBackupHandler)
 
 	invitationGenerationControlFactory:
 		implement: App\Model\Components\IInvitationGenerationControlFactory

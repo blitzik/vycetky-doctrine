@@ -43,7 +43,7 @@ class LocalitiesFacade extends Object
         $localities = $this->em->createQuery(
             'SELECT partial li.{id}, partial l.{id, name} FROM ' .ListingItem::class. ' li
              JOIN li.locality l
-             WHERE li.listing = :listing AND l.name LIKE COLLATE(:name, utf8_czech_ci)
+             WHERE li.listing = :listing AND l.name LIKE COLLATE(:name, utf8_unicode_ci)
              GROUP BY l.id'
         )->setMaxResults($limit)
          ->setParameters([

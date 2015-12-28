@@ -5,12 +5,21 @@ parameters:
 	mainEmail: 'admin@email.em'
 
 	backup:
-		database:
-			password: heslo_pro_zalohu_databaze
+		password: heslo_pro_zalohu_databaze
+		tempBackupPath: %appDir%/backup
+
+		receivers: # list of emails where the backup will be sent
+			- %mainEmail%
+
+		uploads: # list of FTPs where the backup will be uploaded
+			first:
+				host: host
+				username: username
+				password: password
+				path: /path/in/remote/ftp
 
 	database:
 		host: 127.0.0.1
-		driver: mysql # needed by backup service
 		username: root
 		password: asqw
 		dbname: listings
@@ -24,7 +33,7 @@ parameters:
 
 	pdf:
 		author: %application.url%
-		storage_path: %wwwDir%/listings_pdfs
+		storage_path: %appDir%/listings_pdfs
 
 
 doctrine:

@@ -3,7 +3,7 @@ services:
 	backupPresenter:
 		class: App\FrontModule\Presenters\BackupPresenter
 		setup:
-			- setEmails(%emails%)
+			- setAuthorizator(@authorizator)
 
 	helpPresenter:
 		class: App\FrontModule\Presenters\HelpPresenter

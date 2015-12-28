@@ -54,6 +54,7 @@ extensions:
 	events: Kdyby\Events\DI\EventsExtension
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
+	monolog: Kdyby\Monolog\DI\MonologExtension
 
 
 
@@ -76,6 +77,11 @@ doctrine:
 
 	types:
 		'invoicetime': App\Doctrine\Types\InvoiceTimeType
+
+
+
+monolog:
+	name: listings
 
 
 

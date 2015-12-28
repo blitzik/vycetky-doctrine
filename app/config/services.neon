@@ -34,7 +34,15 @@ services:
 
 	# Database Backup
 	databaseBackup:
-		class: DatabaseBackup(%database%)
+		class: App\Model\Database\Backup\DatabaseBackup(%database%, %backup.tempBackupPath%)
+
+	emailBackupHandler:
+		class: App\Model\Database\Backup\Handlers\DatabaseBackupEmailHandler
+		arguments: [%backup.receivers%, %emails.system%]
+
+	fileBackupHandler:
+		class: App\Model\Database\Backup\Handlers\DatabaseBackupFileHandler
+		arguments: [%backup.uploads%]
 
 	# Router
 	- App\RouterFactory
