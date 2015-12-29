@@ -4,7 +4,6 @@ namespace App\Model\Services;
 
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use Exceptions\Logic\InvalidArgumentException;
-use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\IDisplayableItem;
 use App\Model\Domain\FillingItem;
 use App\Model\Domain\Entities;
@@ -15,27 +14,25 @@ class ItemsService extends Object
 {
     /**
      * @param Entities\ListingItem[] $listingItems
-     * @return array Array of ListingItemDecorators
+     * @return IDisplayableItem[]
      */
-    public function convert2DisplayableItems(
+    public function prepareDisplayableItemsCollection(
         array $listingItems
     ) {
         $collection = [];
         foreach ($listingItems as $listingItem) {
-            if ($listingItem instanceof IDisplayableItem) {
-                $collection[$listingItem->day->format('j')] = $listingItem;
-
-            } else if ($listingItem instanceof Entities\ListingItem) {
-                $collection[$listingItem->day] = new ListingItemDecorator($listingItem);
-            } else {
+            if (!$listingItem instanceof IDisplayableItem) {
                 throw new InvalidArgumentException(
                     'Only instances of '.Entities\ListingItem::class.' or '.FillingItem::class.' can be processed'
                 );
             }
+
+            $collection[$listingItem->getDate()->format('j')] = $listingItem;
         }
 
         return $collection;
     }
+
 
     /**
      * If there are 2 items in one particular day, the item from
@@ -91,13 +88,14 @@ class ItemsService extends Object
         return $resultCollection;
     }
 
+
     /**
-     * @param IDisplayableItem[] $listingItemsDecorators
+     * @param IDisplayableItem[] $displayableItems
      * @param \DateTime $period
      * @return array
      */
     public function generateEntireTable(
-        array $listingItemsDecorators,
+        array $displayableItems,
         \DateTime $period
     ) {
         $year = $period->format('Y');
@@ -106,13 +104,13 @@ class ItemsService extends Object
 
         $list = [];
         for ($day = 1; $day <= $daysInMonth; $day++) {
-            if (array_key_exists($day, $listingItemsDecorators)) {
-                if (!$listingItemsDecorators[$day] instanceof IDisplayableItem) {
+            if (array_key_exists($day, $displayableItems)) {
+                if (!$displayableItems[$day] instanceof IDisplayableItem) {
                     throw new InvalidArgumentException(
-                        'Only instances of '.ListingItemDecorator::class.' can pass.'
+                        'Only instances of '.IDisplayableItem::class.' can pass.'
                     );
                 }
-                $list[$day] = $listingItemsDecorators[$day];
+                $list[$day] = $displayableItems[$day];
             } else {
 
                 $list[$day] = new FillingItem(
@@ -123,6 +121,7 @@ class ItemsService extends Object
 
         return $list;
     }
+
 
     /**
      * @param array $baseListingItems
@@ -150,7 +149,7 @@ class ItemsService extends Object
 
             foreach ($listingItems as $item) {
                 if (count($listingItems) > 1) {
-                    if (array_key_exists($item->id, $selectedCollisionItems)) {
+                    if (array_key_exists($item->getId(), $selectedCollisionItems)) {
                         // it will always make clone of the first found item (from base listing)
                         $items[] = clone $item;
                         break;
@@ -170,6 +169,7 @@ class ItemsService extends Object
 
         return $items;
     }
+
 
     /**
      * @param $listingItem

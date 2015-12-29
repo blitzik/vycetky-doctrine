@@ -2,6 +2,7 @@
 
 namespace App\Model\Facades;
 
+use App\Model\Domain\MergeableListingItem;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use Exceptions\Runtime\RecipientsNotFoundException;
 use App\Model\Services\Readers\ListingItemsReader;
@@ -253,7 +254,7 @@ class ListingsFacade extends Object
         $items = $this->itemsService
                       ->mergeListingItems(
                           $this->listingItemsReader->findListingItems($baseListing->getId()),
-                          $this->listingItemsReader->findListingItems($listing->id)
+                          $this->listingItemsReader->findListingItems($listing->getId())
                       );
 
         $days = $baseListing->getNumberOfDaysInMonth();
@@ -269,7 +270,7 @@ class ListingsFacade extends Object
                 );
             } else {
                 foreach ($items[$day] as $key => $item) {
-                    $itemDec = new ListingItemDecorator($item);
+                    $itemDec = new MergeableListingItem($item);
                     $itemDec->setAsItemFromBaseListing(true);
 
                     if ($key != 0) {

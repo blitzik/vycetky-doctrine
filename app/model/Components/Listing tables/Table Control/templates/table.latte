@@ -41,26 +41,26 @@
                 {else}<td></td>{/if}
             {/if}
            <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$day}</td>
-           <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$item->day|dayShortcut}</td>
+           <td n:class="$item->isCurrentDay() ? null : $item->isWeekDay() ? weekDayHighlight">{$item->date|dayShortcut}</td>
 
         {if !$item->isFilling()}
 
             {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}
-            {var $localityDesc = $item->locality . $description}
+            {var $localityDesc = $item->locality->name . $description}
 
-            <td><a id="{$item->getDay()->format('j')}">{$localityDesc|truncate:40}</a></td>
+            <td><a id="{$item->getDate()->format('j')}">{$localityDesc|truncate:40}</a></td>
             <td>{if !$item->areWorkedHoursWithoutLunchZero()}
-                {$item->workStart|date:'H:i'} - {$item->workEnd|date:'H:i'}{/if}</td>
-
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
-                {$item->lunch|toTimeWithComma:true}{/if}</td>
+                {$item->workedHours->workStart|date:'H:i'} - {$item->workedHours->workEnd|date:'H:i'}{/if}</td>
 
             <td>{if !$item->areWorkedHoursWithoutLunchZero()}
-                {$item->hours|toTimeWithComma}{/if}</td>
+                {$item->workedHours->lunch|toTimeWithComma:true}{/if}</td>
+
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}
+                {$item->workedHours->hours|toTimeWithComma}{/if}</td>
 
             <td{if !is_null($item->descOtherHours)} title="{$item->descOtherHours}"
                                           class="desc-other-hours"{/if}>
-                                          {$item->otherHours|toTimeWithComma}</td>
+                                          {$item->workedHours->otherHours|toTimeWithComma}</td>
 
         {else}
             <td></td><td></td><td></td><td></td><td></td>

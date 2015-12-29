@@ -2,6 +2,7 @@
 
 namespace App\Model\Facades;
 
+use App\Model\Domain\IDisplayableItem;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\ShiftEndBeforeStartException;
@@ -11,7 +12,6 @@ use App\Model\Services\Readers\ListingItemsReader;
 use App\Model\Services\Writers\ListingItemsWriter;
 use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
-use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\Listing;
 use App\Model\Services\ItemsService;
@@ -34,6 +34,7 @@ class ItemsFacade extends Object
     /** @var ItemsService  */
     private $itemsService;
 
+
     public function __construct(
         ListingItemsManager $listingItemManager,
         ListingItemsWriter $listingItemsWriter,
@@ -46,6 +47,7 @@ class ItemsFacade extends Object
 
         $this->itemsService = $itemService;
     }
+
 
     /**
      * @param array $newValues
@@ -68,6 +70,7 @@ class ItemsFacade extends Object
         return $listingItem;
     }
 
+
     /**
      * @param $day
      * @param Listing $listing
@@ -78,6 +81,7 @@ class ItemsFacade extends Object
         return $this->listingItemsReader->getByDay($day, $listing);
     }
 
+
     /**
      * @param int $day
      * @param Listing $listing
@@ -87,6 +91,7 @@ class ItemsFacade extends Object
         $this->onItemChange($listing);
         $this->listingItemsWriter->removeListingItem($day, $listing);
     }
+
 
     /**
      * @param int $day
@@ -109,6 +114,7 @@ class ItemsFacade extends Object
                     );
     }
 
+
     /**
      * @param int $day
      * @param Listing $listing
@@ -130,30 +136,32 @@ class ItemsFacade extends Object
                     );
     }
 
+
     /**
      * @param array $listingItems
      * @return array Array of ListingItemDecorators
      */
-    public function convert2DisplayableItems(array $listingItems)
+    public function prepareDisplayableItemsCollection(array $listingItems)
     {
-        return $this->itemsService->convert2DisplayableItems($listingItems);
+        return $this->itemsService->prepareDisplayableItemsCollection($listingItems);
     }
+
 
     /**
      * @param Listing $listing
-     * @return ListingItemDecorator[]
+     * @return IDisplayableItem[]
      */
     public function generateEntireTable(
         Listing $listing
     ) {
         $listingItems = $this->listingItemsReader->findListingItems($listing);
 
-        $collectionOfDecorators = $this->convert2DisplayableItems(
+        $displayableItems = $this->prepareDisplayableItemsCollection(
             $listingItems
         );
 
         return $this->itemsService->generateEntireTable(
-            $collectionOfDecorators,
+            $displayableItems,
             $listing->getPeriod()
         );
     }

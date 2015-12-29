@@ -2,12 +2,10 @@
 
 namespace App\FrontModule\Presenters;
 
-use App\Model\Domain\Entities\Listing;
 use App\Model\ResultObjects\ListingResult;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use App\Model\Components\IListingActionsMenuControlFactory;
-use Exceptions\Runtime\ListingNotFoundException;
 use Nette\Application\UI\Form;
 use App\Model\Time\TimeUtils;
 
@@ -34,6 +32,7 @@ class MergePresenter extends SecurityPresenter
                      ->create($this->listingResult->getListing());
         return $comp;
     }
+
 
     /*
      * ---------------------------
@@ -68,10 +67,12 @@ class MergePresenter extends SecurityPresenter
         $this->listings = $this->prepareListingsForSearchSelect($listings);
     }
 
+
     public function renderSearch($id)
     {
 
     }
+
 
     private function prepareListingsForSearchSelect(array $listings)
     {
@@ -83,6 +84,7 @@ class MergePresenter extends SecurityPresenter
 
         return $result;
     }
+
 
     /**
      * @Actions search
@@ -102,6 +104,7 @@ class MergePresenter extends SecurityPresenter
         return $form;
     }
 
+
     public function processListingSelection(Form $form, $values)
     {
         $this->redirect(
@@ -110,6 +113,7 @@ class MergePresenter extends SecurityPresenter
              'with' => $values['listingsList']]
         );
     }
+
 
     /*
      * ----------------------------
@@ -148,6 +152,7 @@ class MergePresenter extends SecurityPresenter
         }
     }
 
+
     public function renderListing($id, $with)
     {
         $this->template->baseListing = $this->listingResult->getListing();
@@ -162,6 +167,7 @@ class MergePresenter extends SecurityPresenter
                                               );
         }
     }
+
 
     /**
      * @Actions listing
@@ -178,6 +184,7 @@ class MergePresenter extends SecurityPresenter
 
         return $form;
     }
+
 
     public function processMergeListings(Form $form, $values)
     {

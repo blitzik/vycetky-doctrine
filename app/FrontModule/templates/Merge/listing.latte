@@ -53,7 +53,7 @@
         {if !$item->isFilling()}id="rowID-{$item->listingItemID}"{/if}>
 
         <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null)), w45">{$day}</td>
-        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null)), w45">{$item->day|dayShortcut}</td>
+        <td n:class="($itemsCount > 1 and !$item->isFilling() and $item->isItemFromBaseListing()) ? baseListing : ($itemsCount > 1 ? listingToMerge : ($item->isWeekDay() ? weekDayHighlight : null)), w45">{$item->getDate()|dayShortcut}</td>
 
         {if !$item->isFilling()}
             {var $description = $item->description != null ? ' ('. $item->description . ')' : NULL}

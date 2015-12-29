@@ -2,7 +2,8 @@
 
 namespace App\Model\Domain\Entities;
 
-use App\Model\Authorization\IResource;
+use App\Model\Domain\IDisplayableItem;
+use App\Model\Time\TimeUtils;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Exceptions\Logic\InvalidArgumentException;
@@ -21,7 +22,7 @@ use Nette\Utils\Validators;
  *      }
  * )
  */
-class ListingItem extends Entity
+class ListingItem extends Entity implements IDisplayableItem
 {
     use Identifier;
 
@@ -64,6 +65,8 @@ class ListingItem extends Entity
      */
     protected $descOtherHours;
 
+    /** @var \DateTime */
+    private $date;
 
     /**
      * @param int $day
@@ -90,6 +93,7 @@ class ListingItem extends Entity
         $this->setWorkedTime($workedHours, $descOtherHours);
     }
 
+
     /**
      * @param string|null $description
      */
@@ -99,6 +103,7 @@ class ListingItem extends Entity
         Validators::assert($description, 'unicode:..30|null');
         $this->description = $description;
     }
+
 
     /**
      * @param string $descOtherHours
@@ -111,6 +116,7 @@ class ListingItem extends Entity
         $this->setDescOtherHours($descOtherHours);
     }
 
+
     /**
      * @param WorkedHours $workedHours
      */
@@ -118,6 +124,7 @@ class ListingItem extends Entity
     {
         $this->workedHours = $workedHours;
     }
+
 
     /**
      * @param string|null $descOtherHours
@@ -143,6 +150,7 @@ class ListingItem extends Entity
         $this->descOtherHours = null;
     }
 
+
     /**
      * @param $day
      */
@@ -161,6 +169,7 @@ class ListingItem extends Entity
         $this->day = $day;
     }
 
+
     /**
      * @param Listing $listing
      */
@@ -176,6 +185,7 @@ class ListingItem extends Entity
         $this->listing = $listing;
     }
 
+
     /**
      * @param Locality $locality
      */
@@ -183,6 +193,7 @@ class ListingItem extends Entity
     {
         $this->locality = $locality;
     }
+
 
     /**
      * @return Listing
@@ -192,6 +203,9 @@ class ListingItem extends Entity
         return $this->listing;
     }
 
+
+    // Locality and WorkedHours are immutable objects
+
     /**
      * @return Locality
      */
@@ -200,6 +214,7 @@ class ListingItem extends Entity
         return $this->locality;
     }
 
+
     /**
      * @return WorkedHours
      */
@@ -207,6 +222,7 @@ class ListingItem extends Entity
     {
         return $this->workedHours;
     }
+
 
     public function compare(ListingItem $listingItem)
     {
@@ -224,5 +240,65 @@ class ListingItem extends Entity
 
         return true;
     }
+
+
+    /**
+     * @return bool
+     */
+    public function areWorkedHoursWithoutLunchZero()
+    {
+        $workedHours = $this->workedHours
+                            ->getWorkEnd()
+                            ->subTime(
+                                $this->workedHours
+                                     ->getWorkStart()
+                            );
+
+        return ($workedHours->compare('00:00:00') === 0) ? true : false;
+    }
+
+
+    /*
+     * -------------------------------------------
+     * ----- IDisplayableItem implementation -----
+     * -------------------------------------------
+     */
+
+    public function getDate()
+    {
+        if ($this->date === null) {
+            $this->date = TimeUtils::getDateTimeFromParameters(
+                $this->listing->year,
+                $this->listing->month,
+                $this->day
+            );
+        }
+
+        return $this->date;
+    }
+
+
+    public function isFilling()
+    {
+        return false;
+    }
+
+
+    public function isWeekDay()
+    {
+        $d = date_format($this->getDate(), 'w');
+
+        return ($d > 0 && $d < 6) ? true : false;
+    }
+
+
+    public function isCurrentDay()
+    {
+        if ($this->getDate()->format('Y-m-d') == (new \DateTime('now'))->format('Y-m-d'))
+            return true;
+
+        return false;
+    }
+
 
 }

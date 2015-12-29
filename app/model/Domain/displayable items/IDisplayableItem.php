@@ -22,5 +22,5 @@ interface IDisplayableItem
     /**
      * @return \DateTime
      */
-    public function getDay();
+    public function getDate();
 }

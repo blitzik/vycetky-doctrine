@@ -33,7 +33,7 @@ parameters:
 
 	pdf:
 		author: %application.url%
-		storage_path: %appDir%/listings_pdfs
+		storage_path: %appDir%/../listings_pdfs
 
 
 doctrine:

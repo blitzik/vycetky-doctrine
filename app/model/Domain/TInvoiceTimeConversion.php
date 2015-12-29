@@ -9,6 +9,7 @@ trait TInvoiceTimeConversion
         return new \InvoiceTime($time);
     }
 
+
     public function fromInvoiceTime(\InvoiceTime $time)
     {
         return $time->getTime();

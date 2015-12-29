@@ -25,6 +25,7 @@ class AnnualPDFGenerationControl extends BaseComponent
     /** @var User */
     private $user;
 
+
     public function __construct(
         User $user,
         array $companyParameters,
@@ -36,6 +37,7 @@ class AnnualPDFGenerationControl extends BaseComponent
         $this->companyParameters = $companyParameters;
         $this->PDFGenerator = $PDFGenerator;
     }
+
 
     public function render()
     {
@@ -49,6 +51,7 @@ class AnnualPDFGenerationControl extends BaseComponent
 
         $template->render();
     }
+
 
     protected function createComponentResultPdf()
     {
@@ -70,6 +73,7 @@ class AnnualPDFGenerationControl extends BaseComponent
         return $form;
     }
 
+
     /**
      * @secured
      */
@@ -89,6 +93,7 @@ class AnnualPDFGenerationControl extends BaseComponent
 
         $this->presenter->sendResponse(new FileResponse($zipPath));
     }
+
 
     /**
      * @secured

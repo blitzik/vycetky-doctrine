@@ -94,16 +94,16 @@
     {foreach $dataAdapter->getEntireListingCollection() as $day => $item}
 
         <tr><td>{$day}</td>
-        <td>{$item->day|dayShortcut}</td>
+        <td>{$item->getDate()|dayShortcut}</td>
         {if !$item->isFilling()}
             {var $description = $item->description != NULL ? ' ('. $item->description . ')' : NULL}
-            {var $localityDesc = $item->locality . $description}
+            {var $localityDesc = $item->locality->name . $description}
             <td>{$localityDesc|truncate:35}</td>
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->workStart|date:'H:i'} -
-                                                             {$item->workEnd|date:'H:i'}{/if}</td>
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->lunch|toTimeWithComma:true}{/if}</td>
-            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->hours|toTimeWithComma}{/if}</td>
-            <td>{$item->otherHours|toTimeWithComma}</td>
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->workedHours->workStart|date:'H:i'} -
+                                                             {$item->workedHours->workEnd|date:'H:i'}{/if}</td>
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->workedHours->lunch|toTimeWithComma:true}{/if}</td>
+            <td>{if !$item->areWorkedHoursWithoutLunchZero()}{$item->workedHours->hours|toTimeWithComma}{/if}</td>
+            <td>{$item->workedHours->otherHours|toTimeWithComma}</td>
         {else}
             <td></td><td></td><td></td><td></td><td></td>
         {/if}

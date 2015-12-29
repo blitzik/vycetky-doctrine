@@ -45,6 +45,7 @@ class ItemsTableControl extends BaseComponent
     private $workedDays;
     private $totalWorkedHours;
 
+
     public function __construct(
         ListingResult $listingResult,
         IListingDescriptionControlFactory $listingDescriptionControlFactory,
@@ -58,6 +59,7 @@ class ItemsTableControl extends BaseComponent
         $this->listingsFacade = $listingsFacade;
         $this->itemFacade = $itemFacade;
     }
+
 
     /**
      * @param ListingItem[]|IDisplayableItem[] $listingItems
@@ -78,6 +80,7 @@ class ItemsTableControl extends BaseComponent
         $this->redrawControl();
     }
 
+
     protected function createComponentDescription()
     {
         $comp = $this->listingDescriptionControlFactory
@@ -85,6 +88,7 @@ class ItemsTableControl extends BaseComponent
 
         return $comp;
     }
+
 
     public function showTableCaption(
         $destination = null,
@@ -103,16 +107,19 @@ class ItemsTableControl extends BaseComponent
         $this->isTableCaptionVisible = true;
     }
 
+
     public function showActions($path, array $parameters = null)
     {
         $this->parameters = $parameters;
         $this->showActions = $path;
     }
 
+
     public function showCheckBoxes()
     {
         $this->showCheckBoxes = true;
     }
+
 
     public function render()
     {
@@ -123,7 +130,7 @@ class ItemsTableControl extends BaseComponent
             $this->items = $this->itemFacade
                                 ->generateEntireTable($this->listing);
         } else {
-            $this->items = $this->itemFacade->convert2DisplayableItems(
+            $this->items = $this->itemFacade->prepareDisplayableItemsCollection(
                 $this->items
             );
         }

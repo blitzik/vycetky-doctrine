@@ -28,7 +28,7 @@ class ListingPdfDataAdapter extends Object implements IListingPdfDataAdapter
         $this->listing = $data['listing'];
         $this->items = $data['items'];
 
-        $items = $this->itemsService->convert2DisplayableItems($this->items);
+        $items = $this->itemsService->prepareDisplayableItemsCollection($this->items);
         $this->entireListingItemsCollection = $this->itemsService
                                                    ->generateEntireTable($items, \DateTime::createFromFormat('!Y-m', $this->listing['l_year'].'-'.$this->listing['l_month']));
     }
