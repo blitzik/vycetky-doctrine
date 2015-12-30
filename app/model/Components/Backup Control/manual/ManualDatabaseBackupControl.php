@@ -74,7 +74,8 @@ class ManualDatabaseBackupControl extends Control
         $this->onBeforeManualBackup();
 
         try {
-            $results = $this->databaseBackup->backup('manual', true);
+            $removeBackupAtTheEnd = true;
+            $results = $this->databaseBackup->backup('manual', $removeBackupAtTheEnd);
 
             $errorOccurred = false;
             /** @var ResultObject $result */
@@ -87,8 +88,8 @@ class ManualDatabaseBackupControl extends Control
                 }
             }
 
-            if ($errorOccurred === false) {
-                $this->presenter->flashMessage('Databáze byla úspěšně zazálohována', 'success');
+            if ($removeBackupAtTheEnd === false or $errorOccurred === false) {
+                $this->presenter->flashMessage('Při zálohování nenastala žádná chyba.', 'success');
             }
 
         } catch (\Exception $e) {
