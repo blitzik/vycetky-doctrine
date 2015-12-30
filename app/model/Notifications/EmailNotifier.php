@@ -4,9 +4,9 @@ namespace App\Model\Notifications;
 
 use Nette\Application\UI\ITemplateFactory;
 use Nette\Application\LinkGenerator;
-use Nette\InvalidStateException;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
+use Nette\Mail\SendException;
 use Nette\Object;
 
 class EmailNotifier extends Object
@@ -36,7 +36,7 @@ class EmailNotifier extends Object
      * @param string $recipientEmail
      * @param callable $templateCallback
      * @param array $param
-     * @throws InvalidStateException
+     * @throws SendException
      */
     public function send(
         $senderEmail,

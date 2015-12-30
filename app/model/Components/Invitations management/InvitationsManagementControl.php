@@ -4,7 +4,7 @@ namespace App\Model\Components;
 
 use Components\IPaginatorFactory;
 use Exceptions\Runtime\InvitationValidityException;
-use Nette\InvalidStateException;
+use Nette\Mail\SendException;
 use Nette\Utils\Html;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
@@ -86,7 +86,7 @@ class InvitationsManagementControl extends BaseComponent
 
             $this->flashMessage($el, 'warning');
 
-        } catch (InvalidStateException $e) {
+        } catch (SendException $e) {
             $this->flashMessage('Pozvánku se nepodařilo odeslat.', 'warning');
             $this->flashMessage(
                 'Pokud problém přetrvá,

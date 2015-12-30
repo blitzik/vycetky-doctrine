@@ -119,7 +119,7 @@ class PasswordPresenter extends Nette\Application\UI\Presenter
                 'success'
             );
 
-        } catch (Nette\InvalidStateException $e) {
+        } catch (Nette\Mail\SendException $e) {
             Debugger::log($e);
             $this->flashMessage(
                 'Při zpracování došlo k chybě. Zkuste prosím akci opakovat později.',

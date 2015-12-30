@@ -14,7 +14,6 @@ use App\Model\Services\Writers\ListingsWriter;
 use Exceptions\Logic\InvalidArgumentException;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\ResultObjects\ListingResult;
-use App\Model\Domain\ListingItemDecorator;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Domain\Entities\WorkedHours;
 use App\Model\Domain\Entities\Listing;

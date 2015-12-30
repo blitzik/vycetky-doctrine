@@ -5,7 +5,6 @@ namespace App\Model\Facades;
 use App\Model\Authorization\Authorizator;
 use App\Model\Domain\Entities\IMessage;
 use App\Model\Domain\Entities\SentMessage;
-use App\Model\Domain\Entities\ReceivedMessage;
 use App\Model\Domain\Entities\User;
 use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\Query\SentMessagesQuery;
@@ -15,7 +14,6 @@ use App\Model\Services\Readers\MessagesReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\MessagesWriter;
 use App\Model\Subscribers\Results\NewMessageResultObject;
-use Exceptions\Logic\InvalidArgumentException;
 use Exceptions\Runtime\MessageTypeException;
 use Nette\Object;
 

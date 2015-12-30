@@ -6,7 +6,7 @@ use Exceptions\Runtime\InvitationExpiredException;
 use App\Model\Notifications\EmailNotifier;
 use App\Model\Domain\Entities\Invitation;
 use Nette\Application\UI\ITemplate;
-use Nette\InvalidStateException;
+use Nette\Mail\SendException;
 use Tracy\Debugger;
 use Nette\Object;
 
@@ -38,7 +38,7 @@ class InvitationsSender extends Object
     /**
      * @param Invitation $invitation
      * @throws InvitationExpiredException
-     * @throws InvalidStateException
+     * @throws SendException
      */
     public function sendInvitation(Invitation $invitation)
     {
@@ -56,7 +56,7 @@ class InvitationsSender extends Object
                 },
                 [$invitation, $invitation->getSender()->username, $this->applicationUrl]
             );
-        } catch (InvalidStateException $e) {
+        } catch (SendException $e) {
             Debugger::log($e);
             throw $e;
         }

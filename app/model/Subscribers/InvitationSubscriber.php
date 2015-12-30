@@ -6,7 +6,7 @@ use App\Model\Subscribers\Results\IResultObject;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
 use Kdyby\Events\Subscriber;
-use Nette\InvalidStateException;
+use Nette\Mail\SendException;
 use Nette\Object;
 use Tracy\Debugger;
 
@@ -39,7 +39,7 @@ class InvitationSubscriber extends Object implements Subscriber
     ) {
         try {
             $this->invitationsFacade->sendInvitation($invitation);
-        } catch (InvalidStateException $e) {
+        } catch (SendException $e) {
             $validationObject->addError(
                 'Registrační pozvánku se nepodařilo odeslat.',
                 'warning'

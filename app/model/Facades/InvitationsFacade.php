@@ -14,7 +14,7 @@ use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationExpiredException;
 use Exceptions\Runtime\InvitationNotFoundException;
 use Exceptions\Runtime\UserAlreadyExistsException;
-use Nette\InvalidStateException;
+use Nette\Mail\SendException;
 use Nette\Utils\Validators;
 use Nette\Object;
 
@@ -143,7 +143,7 @@ class InvitationsFacade extends Object
      * @param Invitation|string $invitation
      * @throws InvitationNotFoundException
      * @throws InvitationExpiredException
-     * @throws InvalidStateException
+     * @throws SendException
      * @return void
      */
     public function sendInvitation($invitation)
