@@ -6,7 +6,7 @@ use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\ReceivedMessage;
 use Exceptions\Logic\InvalidArgumentException;
 
-class NewMessageResultObject extends ResultObject
+class NewMessageResultObject extends EntityResultObject
 {
     /** @var ReceivedMessage[] */
     private $messageReferences;

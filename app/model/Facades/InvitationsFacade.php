@@ -9,7 +9,7 @@ use App\Model\Services\InvitationsSender;
 use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\InvitationsWriter;
-use App\Model\Subscribers\Results\ResultObject;
+use App\Model\Subscribers\Results\EntityResultObject;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationExpiredException;
 use Exceptions\Runtime\InvitationNotFoundException;
@@ -111,7 +111,7 @@ class InvitationsFacade extends Object
 
     /**
      * @param Invitation $invitation
-     * @return ResultObject
+     * @return EntityResultObject
      * @throws InvitationAlreadyExistsException
      * @throws UserAlreadyExistsException
      */
@@ -125,7 +125,7 @@ class InvitationsFacade extends Object
 
         $this->invitationsHandler->process($invitation);
 
-        $resultObject = new ResultObject($invitation);
+        $resultObject = new EntityResultObject($invitation);
         $this->onInvitationCreation($invitation, $resultObject);
 
         return $resultObject;

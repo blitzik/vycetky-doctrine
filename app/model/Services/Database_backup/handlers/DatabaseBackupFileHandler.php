@@ -9,6 +9,7 @@
 namespace App\Model\Database\Backup\Handlers;
 
 use App\Model\Database\Backup\DatabaseBackupFile;
+use App\Model\Subscribers\Results\ResultObject;
 use Kdyby\Monolog\Logger;
 use Nette\Object;
 
@@ -30,10 +31,17 @@ class DatabaseBackupFileHandler extends Object implements IDatabaseBackupHandler
     }
 
 
+    /**
+     * @param DatabaseBackupFile $file
+     * @return ResultObject[]
+     */
     public function process(DatabaseBackupFile $file)
     {
         $d = $file->getBackupDate();
+        $results = [];
         foreach ($this->uploadsCredentials as $credentials) {
+            $result = new ResultObject(); // empty ResultObject means all is OK
+
             $backupPath = $credentials['path'] . '/' . $d->format('Y') . '/' . $d->format('F');
             $entireFilePath = $backupPath . '/' . $file->getFileName();
 
@@ -51,8 +59,12 @@ class DatabaseBackupFileHandler extends Object implements IDatabaseBackupHandler
 
             } catch (\FtpException $e) {
                 $this->logger->addCritical(sprintf('Uploading backup file\'s failed. %s', $e));
+                $result->addError('Zálohu se nepodařilo nahrát na: ' . $credentials['host'] , 'error');
             }
-        }
-    }
 
+            $results[] = $result;
+        }
+
+        return $results;
+    }
 }

@@ -9,6 +9,7 @@
 namespace App\Model\Database\Backup\Handlers;
 
 use App\Model\Database\Backup\DatabaseBackupFile;
+use App\Model\Subscribers\Results\ResultObject;
 use Kdyby\Monolog\Logger;
 use Nette\Mail\IMailer;
 use Nette\Mail\Message;
@@ -46,11 +47,18 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
     }
 
 
+    /**
+     * @param DatabaseBackupFile $file
+     * @return ResultObject[]
+     */
     public function process(DatabaseBackupFile $file)
     {
+        $results = [];
         foreach ($this->receiversEmails as $receiverEmail) {
-            $this->sendMail($receiverEmail, date('Y-m-d-H-i-s') . ' - database backup', 'OK', $file->getFilePath());
+            $results[] = $this->sendMail($receiverEmail, date('Y-m-d-H-i-s') . ' - database backup', 'OK', $file->getFilePath());
         }
+
+        return $results;
     }
 
 
@@ -59,10 +67,11 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
      * @param string $subject
      * @param string $messageText
      * @param string $attachedFile
-     * @throws \Nette\InvalidStateException
+     * @return ResultObject
      */
     private function sendMail($receiver, $subject, $messageText, $attachedFile = null)
     {
+        $result = new ResultObject();
         $message = new Message();
 
         $message->setFrom('Výčetkový systém <' . $this->systemEmail . '>')
@@ -78,6 +87,9 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
             $this->mailer->send($message);
         } catch (SendException $s) {
             $this->logger->addError(sprintf('Backup file sending\'s failed. %s', $s));
+            $result->addError('Zálohu se nepodařilo odeslat na adresu: ' . $receiver, 'error');
         }
+
+        return $result;
     }
 }

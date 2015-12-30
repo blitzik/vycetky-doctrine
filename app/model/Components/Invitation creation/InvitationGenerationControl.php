@@ -4,7 +4,7 @@ namespace App\Model\Components;
 
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Facades\InvitationsFacade;
-use App\Model\Subscribers\Results\ResultObject;
+use App\Model\Subscribers\Results\EntityResultObject;
 use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationCreationAttemptException;
@@ -58,7 +58,7 @@ class InvitationGenerationControl extends BaseComponent
             $this->user->getIdentity() // todo - security\User tu nema co delat
         );
         try {
-            /** @var ResultObject $resultObject */
+            /** @var EntityResultObject $resultObject */
             $resultObject = $this->invitationsFacade
                                  ->createInvitation($invitation);
 

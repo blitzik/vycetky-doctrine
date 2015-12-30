@@ -2,14 +2,29 @@
 
 namespace App\Model\Subscribers\Results;
 
-use Nette\Object;
+use App\Model\Domain\Entities\Entity;
 use Nette\Utils\Validators;
 
-class ResultObject extends Object implements IResultObject
+class EntityResultObject extends ResultObject
 {
     /** @var array */
     protected $errors = [];
 
+    /** @var Entity */
+    protected $entity;
+
+    public function __construct(Entity $entity)
+    {
+        $this->entity = $entity;
+    }
+
+    /**
+     * @return Entity
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 
     public function addError($message, $type)
     {
@@ -19,7 +34,6 @@ class ResultObject extends Object implements IResultObject
         $this->errors[] = ['message' => $message, 'type' => $type];
     }
 
-
     /**
      * @return bool
      */
@@ -28,7 +42,6 @@ class ResultObject extends Object implements IResultObject
         return empty($this->errors);
     }
 
-
     /**
      * @return mixed
      */
@@ -36,7 +49,6 @@ class ResultObject extends Object implements IResultObject
     {
         return $this->errors[0];
     }
-
 
     /**
      * @return array

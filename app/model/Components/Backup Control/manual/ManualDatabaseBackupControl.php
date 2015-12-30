@@ -10,6 +10,7 @@ namespace App\Model\Components;
 
 use App\Model\Database\Backup\DatabaseBackup;
 use App\Model\Database\Backup\Handlers\IDatabaseBackupHandler;
+use App\Model\Subscribers\Results\ResultObject;
 use Kdyby\Monolog\Logger;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
@@ -73,8 +74,22 @@ class ManualDatabaseBackupControl extends Control
         $this->onBeforeManualBackup();
 
         try {
-            $this->databaseBackup->backup('manual', true);
-            $this->presenter->flashMessage('Databáze byla úspěšně zazálohována', 'success');
+            $results = $this->databaseBackup->backup('manual', true);
+
+            $errorOccurred = false;
+            /** @var ResultObject $result */
+            foreach ($results as $result) {
+                if (!$result->hasNoErrors()) {
+                    foreach ($result->getAllErrors() as $error) {
+                        $this->presenter->flashMessage($error['message'], $error['type']);
+                    }
+                    $errorOccurred = true;
+                }
+            }
+
+            if ($errorOccurred === false) {
+                $this->presenter->flashMessage('Databáze byla úspěšně zazálohována', 'success');
+            }
 
         } catch (\Exception $e) {
             $this->logger->addError(sprintf('Manual database backup failure. %s', $e));

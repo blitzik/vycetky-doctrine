@@ -3,9 +3,11 @@
 namespace App\Model\Database\Backup;
 
 use App\Model\Database\Backup\Handlers\IDatabaseBackupHandler;
+use App\Model\Subscribers\Results\ResultObject;
 use Kdyby\Monolog\Logger;
 use Nette\IOException;
 use Nette\Object;
+use Nette\Utils\Arrays;
 use Nette\Utils\FileSystem;
 
 class DatabaseBackup extends Object
@@ -57,6 +59,7 @@ class DatabaseBackup extends Object
      * @param bool $removeBackupFileAtTheEnd
      * @throws \Exception
      * @throws IOException
+     * @return ResultObject[]
      */
     public function backup($fileNamePrefix = null, $removeBackupFileAtTheEnd = false)
     {
@@ -69,14 +72,18 @@ class DatabaseBackup extends Object
 
         $this->mysqlDump->save($file->getFilePath());
 
+        $resultObjects = [];
         /** @var IDatabaseBackupHandler $handler */
         foreach ($this->backupHandlers as $handler) {
-            $handler->process($file);
+            $results = $handler->process($file);
+            $resultObjects = array_merge($resultObjects, $results);
         }
 
         if ($removeBackupFileAtTheEnd === true) {
             $this->removeBackupFile($file);
         }
+
+        return Arrays::flatten($resultObjects);
     }
 
 

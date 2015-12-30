@@ -8,7 +8,7 @@ use Exceptions\Runtime\RecipientsNotFoundException;
 use App\Model\Services\Readers\ListingItemsReader;
 use App\Model\Services\Managers\ListingsManager;
 use Exceptions\Runtime\ListingNotFoundException;
-use App\Model\Subscribers\Results\ResultObject;
+use App\Model\Subscribers\Results\EntityResultObject;
 use App\Model\Services\Readers\ListingsReader;
 use App\Model\Services\Writers\ListingsWriter;
 use Exceptions\Logic\InvalidArgumentException;
@@ -207,7 +207,7 @@ class ListingsFacade extends Object
      * @param int $recipientID
      * @param $description
      * @param array|null $ignoredListingDays
-     * @return ResultObject
+     * @return EntityResultObject
      * @throws RecipientsNotFoundException
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -230,7 +230,7 @@ class ListingsFacade extends Object
                                 $ignoredListingDays
                             );
 
-        $resultObject = new ResultObject($newListing);
+        $resultObject = new EntityResultObject($newListing);
         $this->onListingSharing($newListing, $listing->getUser(), $resultObject);
 
         return $resultObject;
