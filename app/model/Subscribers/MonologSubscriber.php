@@ -51,10 +51,10 @@ class MonologSubscriber extends Object implements Subscriber
 
             // CRITICAL
             InvitationSubscriber::class . '::onCritical',
-            ListingsWriter::class . '::onCritical',
-            ListingItemsWriter::class . '::onCritical',
             InvitationHandler::class . '::onCritical',
             InvitationsSender::class . '::onCritical',
+            ListingsWriter::class . '::onCritical',
+            ListingItemsWriter::class . '::onCritical',
         ];
     }
 
