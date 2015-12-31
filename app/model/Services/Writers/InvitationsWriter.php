@@ -19,14 +19,13 @@ class InvitationsWriter extends Object
 
 
     /**
-     * Uses safePersist method of EntityManager
      *
      * @param Invitation $invitation
      * @return Invitation|null
      */
     public function saveInvitation(Invitation $invitation)
     {
-        return $this->em->safePersist($invitation);
+        return $this->em->persist($invitation)->flush();
     }
 
 
