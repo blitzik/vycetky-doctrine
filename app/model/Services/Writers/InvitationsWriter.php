@@ -11,10 +11,12 @@ class InvitationsWriter extends Object
     /** @var EntityManager  */
     private $em;
 
+
     public function __construct(EntityManager $entityManager)
     {
         $this->em = $entityManager;
     }
+
 
     /**
      * Uses safePersist method of EntityManager
@@ -26,6 +28,7 @@ class InvitationsWriter extends Object
     {
         return $this->em->safePersist($invitation);
     }
+
 
     /**
      * @param string|Invitation $invitation Invitation's E-mail or instance of invitation

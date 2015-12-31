@@ -109,10 +109,16 @@ class AccountPresenter extends SecurityPresenter
         $user = $this->user->getIdentity();
         $user->name = $values['name'];
 
-        $this->usersFacade->saveUser($user);
+        try {
+            $this->usersFacade->saveUser($user);
 
-        $this->flashMessage('Vaše jméno bylo úspěšně změněno.', 'success');
-        $this->redirect('this');
+            $this->flashMessage('Vaše jméno bylo úspěšně změněno.', 'success');
+            $this->redirect('this');
+
+        } catch (\Exception $e) {
+            $this->flashMessage('Jméno nemohlo být změněno. Zkuste akci opakovat později.', 'error');
+            return;
+        }
     }
 
 

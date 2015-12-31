@@ -4,7 +4,6 @@ namespace App\Model\Factories;
 
 use App\Model\Domain\Entities\User;
 use App\Model\Facades\UsersFacade;
-use Doctrine\DBAL\DBALException;
 use Nette\Application\UI\Form;
 use Nette\Object;
 
@@ -21,10 +20,12 @@ class PasswordChangeFormFactory extends Object
     /** @var  User */
     private $user;
 
+
     public function __construct(UsersFacade $usersFacade)
     {
         $this->usersFacade = $usersFacade;
     }
+
 
     /**
      * @param User $user
@@ -61,6 +62,7 @@ class PasswordChangeFormFactory extends Object
         return $form;
     }
 
+
     public function processChangePassword(Form $form, $values)
     {
         $this->onBeforeChange($form, $this->user);
@@ -70,7 +72,7 @@ class PasswordChangeFormFactory extends Object
 
             $this->usersFacade->saveUser($this->user);
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
             $this->onError($form, $this->user);
         }
 

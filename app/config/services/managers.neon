@@ -5,6 +5,3 @@ services:
 
 	listingItemsManager:
 		class: App\Model\Services\Managers\ListingItemsManager
-
-	messagesManager:
-		class: App\Model\Services\Managers\MessagesManager

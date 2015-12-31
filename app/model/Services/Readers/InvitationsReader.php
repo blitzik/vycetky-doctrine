@@ -12,11 +12,15 @@ use Nette\Object;
 
 class InvitationsReader extends Object
 {
+    /** @var array */
+    public $onInfo = [];
+
     /** @var EntityManager  */
     private $em;
 
     /** @var EntityRepository  */
     private $invitationsRepository;
+
 
     public function __construct(
         EntityManager $entityManager
@@ -25,6 +29,7 @@ class InvitationsReader extends Object
 
         $this->invitationsRepository = $entityManager->getRepository(Invitation::class);
     }
+
 
     /**
      * @param InvitationsQuery $invitationsQuery
@@ -35,24 +40,27 @@ class InvitationsReader extends Object
         return $this->invitationsRepository->fetch($invitationsQuery);
     }
 
+
     /**
-     * @param $id
+     * @param string $email
      * @return Invitation
      * @throws InvitationNotFoundException
      */
-    public function getInvitationByEmail($id)
+    public function getInvitationByEmail($email)
     {
         $qb = $this->invitationsRepository
                    ->createQueryBuilder('i')
-                   ->where('i.id = :id')
-                   ->setParameter('id', $id);
+                   ->where('i.email = :email') // todo WTF? there should be email and NOT id
+                   ->setParameter('email', $email);
 
         try {
             return $qb->getQuery()->getSingleResult();
         } catch (NoResultException $e) {
+            $this->onInfo("Email: $email NOT found. [getInvitationByEmail]", $e, self::class);
             throw new InvitationNotFoundException;
         }
     }
+
 
     /**
      * @param string $email
@@ -75,6 +83,7 @@ class InvitationsReader extends Object
         try {
             $invitation = $qb->getQuery()->getSingleResult();
         } catch (NoResultException $e) {
+            $this->onInfo("Email: $email NOT found. [getInvitationByEmail]", $e, self::class);
             return null;
         }
 

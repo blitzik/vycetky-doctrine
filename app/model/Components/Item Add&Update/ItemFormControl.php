@@ -7,7 +7,6 @@ use App\Model\Domain\Entities\ListingItem;
 use App\Model\Facades\ItemsFacade;
 use App\Model\Facades\LocalitiesFacade;
 use App\Model\Time\TimeUtils;
-use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\ListingItemDayAlreadyExistsException;
 use Exceptions\Runtime\NegativeResultOfTimeCalcException;
 use Exceptions\Runtime\OtherHoursZeroTimeException;
@@ -195,7 +194,7 @@ class ItemFormControl extends BaseComponent
             );
             return;
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
             $form->addError('Položka nebyla uložena. Zkuste akci opakovat později.');
             return;
         }

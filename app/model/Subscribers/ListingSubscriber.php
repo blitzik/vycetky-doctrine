@@ -20,6 +20,7 @@ class ListingSubscriber extends Object implements Subscriber
     /** @var MessagesFacade  */
     private $messagesFacade;
 
+
     public function __construct(
         SharedListingNotification $listingNotification,
         MessagesFacade $messagesFacade
@@ -27,6 +28,7 @@ class ListingSubscriber extends Object implements Subscriber
         $this->listingNotification = $listingNotification;
         $this->messagesFacade = $messagesFacade;
     }
+
 
     /**
      * Returns an array of events this subscriber wants to listen to.
@@ -39,6 +41,7 @@ class ListingSubscriber extends Object implements Subscriber
             'App\Model\Facades\ListingsFacade::onListingSharing'
         ];
     }
+
 
     public function onListingSharing(
         Listing $newListing,
@@ -56,7 +59,6 @@ class ListingSubscriber extends Object implements Subscriber
             $this->messagesFacade->sendMessage($message, [$newListing->getUser()->getId()]);
 
         } catch (DBALException $e) {
-            Debugger::log($e, Debugger::ERROR);
 
             $resultObject->addError(
                 'Nepodařilo se odeslat zprávu o

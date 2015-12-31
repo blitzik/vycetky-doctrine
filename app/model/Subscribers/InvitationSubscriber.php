@@ -8,18 +8,22 @@ use App\Model\Facades\InvitationsFacade;
 use Kdyby\Events\Subscriber;
 use Nette\Mail\SendException;
 use Nette\Object;
-use Tracy\Debugger;
 
 class InvitationSubscriber extends Object implements Subscriber
 {
+    /** @var array */
+    public $onCritical = [];
+
     /** @var InvitationsFacade  */
     private $invitationsFacade;
+
 
     public function __construct(
         InvitationsFacade $invitationsFacade
     ) {
         $this->invitationsFacade = $invitationsFacade;
     }
+
 
     /**
      * Returns an array of events this subscriber wants to listen to.
@@ -29,9 +33,10 @@ class InvitationSubscriber extends Object implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-            'App\Model\Facades\InvitationsFacade::onInvitationCreation'
+            InvitationsFacade::class . '::onInvitationCreation'
         ];
     }
+
 
     public function onInvitationCreation(
         Invitation $invitation,
@@ -44,8 +49,6 @@ class InvitationSubscriber extends Object implements Subscriber
                 'Registrační pozvánku se nepodařilo odeslat.',
                 'warning'
             );
-
-            Debugger::log($e);
         }
     }
 }

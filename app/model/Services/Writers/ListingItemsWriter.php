@@ -13,11 +13,13 @@ use Exceptions\Runtime\ShiftItemDownException;
 use Exceptions\Runtime\ShiftItemUpException;
 use App\Model\Domain\Entities\ListingItem;
 use Kdyby\Doctrine\EntityManager;
-use Tracy\Debugger;
 use Nette\Object;
 
 class ListingItemsWriter extends Object
 {
+    /** @var array */
+    public $onCritical = [];
+
     const WRITE_DOWN = 1;
     const WRITE_UP   = -1;
 
@@ -27,6 +29,7 @@ class ListingItemsWriter extends Object
     /** @var ListingItemsReader  */
     private $listingItemReader;
 
+
     public function __construct(
         EntityManager $entityManager,
         ListingItemsReader $listingItemReader
@@ -34,6 +37,7 @@ class ListingItemsWriter extends Object
         $this->em = $entityManager;
         $this->listingItemReader = $listingItemReader;
     }
+
 
     /**
      * @param ListingItem $listingItem
@@ -50,15 +54,16 @@ class ListingItemsWriter extends Object
             $this->em->close();
             throw new ListingItemDayAlreadyExistsException;
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
             $this->em->close();
 
-            Debugger::log($e, Debugger::ERROR);
+            $this->onCritical('Listing item saving of Listing #id('.$listingItem->getListing()->getId().') failed.', $e, self::class);
             throw $e;
         }
 
         return $listingItem;
     }
+
 
     /**
      * @param $day
@@ -71,6 +76,7 @@ class ListingItemsWriter extends Object
              WHERE l.listing = :listing AND l.day = :day'
         )->execute(['listing' => $listing, 'day' => $day]);
     }
+
 
     /**
      * @param ListingItem $listingItem
@@ -108,6 +114,7 @@ class ListingItemsWriter extends Object
         return $this->saveListingItem($item);
     }
 
+
     /**
      * @param ListingItem $new
      * @param ListingItem $original
@@ -124,6 +131,7 @@ class ListingItemsWriter extends Object
         );
         $new->setDescription($original->description);
     }
+
 
     /**
      * @param ListingItem $listingItem
@@ -143,6 +151,7 @@ class ListingItemsWriter extends Object
                         ListingItemsReader::ITEM_LOWER
                     );
     }
+
 
     /**
      * @param ListingItem $listingItem

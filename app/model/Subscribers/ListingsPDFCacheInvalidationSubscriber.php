@@ -20,6 +20,7 @@ class ListingsPDFsFileInvalidationSubscriber extends Object implements Subscribe
         $this->cacheFactory = $cacheFactory;
     }
 
+
     /**
      * Returns an array of events this subscriber wants to listen to.
      *
@@ -33,15 +34,18 @@ class ListingsPDFsFileInvalidationSubscriber extends Object implements Subscribe
         ];
     }
 
+
     public function onListingChange(Listing $listing)
     {
         $this->handleInvalidation($listing);
     }
 
+
     public function onItemChange(Listing $listing)
     {
         $this->handleInvalidation($listing);
     }
+
 
     private function handleInvalidation(Listing $listing)
     {

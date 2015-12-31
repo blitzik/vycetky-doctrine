@@ -8,7 +8,6 @@ use App\Model\Domain\Entities\SentMessage;
 use App\Model\Domain\Entities\User;
 use App\Model\Query\ReceivedMessagesQuery;
 use App\Model\Query\SentMessagesQuery;
-use App\Model\Services\Managers\MessagesManager;
 use App\Model\Services\MessagesService;
 use App\Model\Services\Readers\MessagesReader;
 use App\Model\Services\Readers\UsersReader;
@@ -19,9 +18,6 @@ use Nette\Object;
 
 class MessagesFacade extends Object
 {
-    /** @var MessagesManager  */
-    private $messagesManager;
-
     /** @var MessagesService  */
     private $messagesService;
 
@@ -37,21 +33,21 @@ class MessagesFacade extends Object
     /** @var Authorizator  */
     private $authorizator;
 
+
     public function __construct(
-        MessagesManager $messagesManager,
         MessagesService $messagesService,
         MessagesReader $messagesReader,
         MessagesWriter $messagesWriter,
         UsersReader $usersReader,
         Authorizator $authorizator
     ) {
-        $this->messagesManager = $messagesManager;
         $this->messagesService = $messagesService;
         $this->messagesReader = $messagesReader;
         $this->messagesWriter = $messagesWriter;
         $this->usersReader = $usersReader;
         $this->authorizator = $authorizator;
     }
+
 
     /**
      * @param SentMessagesQuery $query
@@ -62,6 +58,7 @@ class MessagesFacade extends Object
         return $this->messagesReader->fetchMessages($query);
     }
 
+
     /**
      * @param ReceivedMessagesQuery $query
      * @return array|\Kdyby\Doctrine\ResultSet
@@ -70,6 +67,7 @@ class MessagesFacade extends Object
     {
         return $this->messagesReader->fetchMessagesReferences($query);
     }
+
 
     /**
      * @param $id
@@ -97,6 +95,7 @@ class MessagesFacade extends Object
         return $message;
     }
 
+
     /**
      * @param SentMessage $message
      * @return array
@@ -113,6 +112,7 @@ class MessagesFacade extends Object
         return $recipients;
     }
 
+
     public function canMessageBeSentTo(
         $recipientID,
         array $restrictedUsers,
@@ -122,11 +122,12 @@ class MessagesFacade extends Object
                     ->canMessageBeSentTo($recipientID, $restrictedUsers, $users);
     }
 
+
     /**
      * @param SentMessage $message
      * @param array $recipientsIDs
      * @return NewMessageResultObject
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function sendMessage(SentMessage $message, array $recipientsIDs)
     {
@@ -139,6 +140,7 @@ class MessagesFacade extends Object
         return $messageResult;
     }
 
+
     /**
      * @param array $messagesIDs
      * @return void
@@ -147,6 +149,7 @@ class MessagesFacade extends Object
     {
         $this->messagesWriter->removeMessages($messagesIDs);
     }
+
 
     /**
      * @param array $messagesReferencesIDs

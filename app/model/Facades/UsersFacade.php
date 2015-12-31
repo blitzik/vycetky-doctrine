@@ -36,6 +36,7 @@ class UsersFacade extends Object
     /** @var UserSystemCreator  */
     private $userSystemCreator;
 
+
     public function __construct(
         UsersReader $usersReader,
         UsersWriter $usersWriter,
@@ -50,14 +51,17 @@ class UsersFacade extends Object
         $this->userSystemCreator = $userSystemCreator;
     }
 
+
     /**
      * @param User $user
      * @return User
+     * @throws \Exception
      */
     public function saveUser(User $user)
     {
         return $this->usersWriter->saveUser($user);
     }
+
 
     /**
      * @param Query $usersQuery
@@ -68,6 +72,7 @@ class UsersFacade extends Object
         return $this->usersReader->fetchUsers($usersQuery);
     }
 
+
     /**
      * @param $id
      * @return User|null
@@ -77,6 +82,7 @@ class UsersFacade extends Object
         return $this->usersReader->getUserByID($id);
     }
 
+
     /**
      * @param $email
      * @return User|null
@@ -85,6 +91,7 @@ class UsersFacade extends Object
     {
         return $this->usersReader->getUserByEmail($email);
     }
+
 
     /**
      * @param bool $onlyActiveUsers
@@ -100,6 +107,7 @@ class UsersFacade extends Object
         return $this->usersService->separateSuspendedUsers($users);
     }
 
+
     /**
      * @return array
      */
@@ -107,6 +115,7 @@ class UsersFacade extends Object
     {
         return Arrays::associate($this->usersReader->findSuspendedUsers(), 'id');
     }
+
 
     /**
      * @param array $usersIDs
@@ -116,6 +125,7 @@ class UsersFacade extends Object
     {
         return $this->usersReader->findUsersByIDs($usersIDs);
     }
+
 
     /**
      * Finds users that are blocked by or blocking given user
@@ -139,6 +149,7 @@ class UsersFacade extends Object
         return /*$this->usersService->mergeUsersBlockingEachOther(*/$resultArray/*)*/;
     }
 
+
     /**
      * @param User $user
      * @param Invitation $invitation
@@ -161,11 +172,13 @@ class UsersFacade extends Object
 
         return $this->userSystemCreator->registerUser($user, $invitation);
     }
-    
+
+
     /**
      * @param $email
      * @return User
      * @throws UserNotFoundException
+     * @throws \Exception
      */
     public function createPasswordRestoringToken($email)
     {
@@ -177,6 +190,7 @@ class UsersFacade extends Object
         $user->createToken();
         return $this->saveUser($user);
     }
+
 
     /**
      * @param User $user

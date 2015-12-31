@@ -11,16 +11,17 @@ use App\Model\Domain\Entities\Listing;
 use App\Model\Domain\Entities\ListingItem;
 use App\Model\Services\Readers\UsersReader;
 use App\Model\Services\Writers\ListingsWriter;
-use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\NoCollisionListingItemSelectedException;
 use Exceptions\Runtime\RuntimeException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
 use Nette\Utils\Validators;
-use Tracy\Debugger;
 
 class ListingsManager extends Object
 {
+    /** @var array */
+    public $onError = [];
+
     /** @var WorkedHoursProvider  */
     private $workedHoursProvider;
 
@@ -56,6 +57,7 @@ class ListingsManager extends Object
         $this->em = $entityManager;
     }
 
+
     /**
      * @param Listing $listing
      * @return Listing
@@ -65,12 +67,13 @@ class ListingsManager extends Object
         return $this->listingsWriter->saveListing($listing);
     }
 
+
     /**
      * @param Listing $listing
      * @param bool $withItems
      * @param array|null $valuesForNewListing
      * @return Listing
-     * @throws DBALException
+     * @throws \Exception
      */
     public function establishListingCopy(
         Listing $listing,
@@ -100,14 +103,15 @@ class ListingsManager extends Object
             $this->em->flush();
             $this->em->clear();
 
-        } catch (DBALException $e) {
-            Debugger::log($e, Debugger::ERROR);
+        } catch (\Exception $e) {
+            $this->onError('establishListingCopy', $e, self::class);
 
             throw $e;
         }
 
         return $newListing;
     }
+
 
     /**
      * @param Listing $listing
@@ -129,12 +133,13 @@ class ListingsManager extends Object
         return $copies;
     }
 
+
     /**
      * @param Listing $listing
      * @param WorkedHours $newWorkedHours
      * @param array $daysToChange
      * @return Listing
-     * @throws DBALException
+     * @throws \Exception
      */
     public function baseListingOn(
         Listing $listing,
@@ -164,12 +169,13 @@ class ListingsManager extends Object
 
             return $newListing;
 
-        } catch (DBALException $e) {
-            Debugger::log($e, Debugger::ERROR);
+        } catch (\Exception $e) {
+            $this->onError('baseListingOn', $e, self::class);
 
             throw $e;
         }
     }
+
 
     /**
      * @param Listing $listing
@@ -201,13 +207,14 @@ class ListingsManager extends Object
         return $updatedItems;
     }
 
+
     /**
      * @param Listing $listing
      * @param User $recipient
      * @param $description
      * @param array $ignoredListingDays
      * @return Listing
-     * @throws DBALException
+     * @throws \Exception
      */
     public function shareListing(
         Listing $listing,
@@ -247,15 +254,16 @@ class ListingsManager extends Object
 
             return $newListing;
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
             $this->em->rollback();
             $this->em->close();
 
-            Debugger::log($e, Debugger::ERROR);
+            $this->onError('shareListing', $e, self::class);
 
             throw $e;
         }
     }
+
 
     /**
      * @param Listing $baseListing
@@ -264,7 +272,7 @@ class ListingsManager extends Object
      * @param User $ownerOfOutputListing
      * @return Listing
      * @throws NoCollisionListingItemSelectedException
-     * @throws DBALException
+     * @throws \Exception
      */
     public function mergeListings(
         Listing $baseListing,
@@ -304,15 +312,16 @@ class ListingsManager extends Object
             $this->em->commit();
             return $newListing;
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
             $this->em->rollback();
             $this->em->close();
 
-            Debugger::log($e, Debugger::ERROR);
+            $this->onError('Merging of listings #id('.$baseListing->getId().') and #id('.$listingToMerge->getId().') failed.', $e, self::class);
 
             throw $e;
         }
     }
+
 
     /**
      * @param Listing $base

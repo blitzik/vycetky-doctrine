@@ -20,6 +20,7 @@ class UsersReader extends Object
     /** @var EntityRepository  */
     private $usersRepository;
 
+
     public function __construct(
         EntityManager $entityManager
     ) {
@@ -27,6 +28,7 @@ class UsersReader extends Object
 
         $this->usersRepository = $this->em->getRepository(User::class);
     }
+
 
     /**
      * @param Query $usersQuery
@@ -36,6 +38,7 @@ class UsersReader extends Object
     {
         return $this->usersRepository->fetch($usersQuery);
     }
+
 
     /**
      * @param $email
@@ -51,6 +54,7 @@ class UsersReader extends Object
         return $count > 0;
     }
 
+
     /**
      * @param $username
      * @return bool
@@ -64,6 +68,7 @@ class UsersReader extends Object
 
         return $count > 0;
     }
+
 
     /**
      * @param int $id
@@ -84,6 +89,7 @@ class UsersReader extends Object
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+
     /**
      * @param $email
      * @return User|null
@@ -97,6 +103,7 @@ class UsersReader extends Object
 
         return $query->getOneOrNullResult();
     }
+
 
     /**
      * @param bool $onlyActiveUsers
@@ -117,6 +124,7 @@ class UsersReader extends Object
         return $q->getQuery()->getArrayResult();
     }
 
+
     /**
      * @return array
      */
@@ -127,6 +135,7 @@ class UsersReader extends Object
              WHERE u.isClosed = 1'
         )->getArrayResult();
     }
+
 
     /**
      * @param array $IDs
@@ -141,6 +150,7 @@ class UsersReader extends Object
 
         return $q->getResult();
     }
+
 
     /**
      * @param User $user
@@ -167,6 +177,7 @@ class UsersReader extends Object
         }
     }
 
+
     /**
      * @param User $user
      * @return mixed
@@ -185,6 +196,7 @@ class UsersReader extends Object
 
         return $stats->getSingleResult();
     }
+
 
     /**
      * @return \Kdyby\Doctrine\QueryBuilder

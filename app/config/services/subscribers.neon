@@ -1,5 +1,9 @@
 services:
 
+	monologSubscriber:
+		class: App\Model\Subscribers\MonologSubscriber
+		tags: [kdyby.subscriber]
+
 	authenticationSubscriber:
 		class: App\Model\Subscribers\AuthenticationSubscriber
 		tags: [kdyby.subscriber]

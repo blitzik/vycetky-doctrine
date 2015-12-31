@@ -21,7 +21,6 @@ use App\Model\Services\ItemsService;
 use App\Model\Domain\Entities\User;
 use App\Model\Domain\FillingItem;
 use Kdyby\Doctrine\QueryObject;
-use Doctrine\ORM\ORMException;
 use Nette\Utils\Arrays;
 use Nette\Object;
 
@@ -154,7 +153,7 @@ class ListingsFacade extends Object
      * @param bool $withItems
      * @param array|null $valuesForNewListing
      * @return Listing
-     * @throws ORMException
+     * @throws \Exception
      */
     public function establishListingCopy(
         Listing $listing,
@@ -208,7 +207,7 @@ class ListingsFacade extends Object
      * @param array|null $ignoredListingDays
      * @return EntityResultObject
      * @throws RecipientsNotFoundException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function shareListing(
         Listing $listing,

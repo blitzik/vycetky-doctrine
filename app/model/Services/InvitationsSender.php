@@ -12,6 +12,9 @@ use Nette\Object;
 
 class InvitationsSender extends Object
 {
+    /** @var array */
+    public $onCritical = [];
+
     /** @var EmailNotifier  */
     private $emailNotifier;
 
@@ -20,7 +23,6 @@ class InvitationsSender extends Object
 
     /** @var string */
     private $applicationUrl;
-
 
 
     public function __construct(
@@ -32,7 +34,6 @@ class InvitationsSender extends Object
         $this->systemEmail = $systemEmail;
         $this->applicationUrl = $applicationUrl;
     }
-
 
 
     /**
@@ -57,7 +58,7 @@ class InvitationsSender extends Object
                 [$invitation, $invitation->getSender()->username, $this->applicationUrl]
             );
         } catch (SendException $e) {
-            Debugger::log($e);
+            $this->onCritical(sprintf('Invitation sending failed. [%s]', $invitation->getEmail()), $e, self::class);
             throw $e;
         }
     }

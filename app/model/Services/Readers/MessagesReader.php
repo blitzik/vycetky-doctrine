@@ -21,6 +21,7 @@ class MessagesReader extends Object
     /** @var EntityRepository  */
     private $messageReferenceRepository;
 
+
     public function __construct(EntityManager $entityManager)
     {
         $this->em = $entityManager;
@@ -28,6 +29,7 @@ class MessagesReader extends Object
         $this->messageRepository = $this->em->getRepository(SentMessage::class);
         $this->messageReferenceRepository = $this->em->getRepository(ReceivedMessage::class);
     }
+
 
     /**
      * @param SentMessagesQuery $query
@@ -38,6 +40,7 @@ class MessagesReader extends Object
         return $this->messageRepository->fetchOne($query);
     }
 
+
     /**
      * @param SentMessagesQuery $query
      * @return array|\Kdyby\Doctrine\ResultSet
@@ -46,6 +49,7 @@ class MessagesReader extends Object
     {
         return $this->messageRepository->fetch($query);
     }
+
 
     /**
      * @param ReceivedMessagesQuery $query
@@ -56,6 +60,7 @@ class MessagesReader extends Object
         return $this->messageReferenceRepository->fetchOne($query);
     }
 
+
     /**
      * @param ReceivedMessagesQuery $query
      * @return array|\Kdyby\Doctrine\ResultSet
@@ -64,6 +69,7 @@ class MessagesReader extends Object
     {
         return $this->messageReferenceRepository->fetch($query);
     }
+
 
     /**
      * @param $id
@@ -79,6 +85,7 @@ class MessagesReader extends Object
          ->getOneOrNullResult();
     }
 
+
     /**
      * @param $id
      * @return ReceivedMessage|null
@@ -93,6 +100,7 @@ class MessagesReader extends Object
         )->setParameter('id', $id)
          ->getOneOrNullResult();
     }
+
 
     /**
      * @param $messageID

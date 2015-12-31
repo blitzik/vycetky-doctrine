@@ -16,6 +16,7 @@ class AuthenticationSubscriber extends Object implements Subscriber
     /** @var IRequest  */
     private $httpRequest;
 
+
     public function __construct(
         EntityManager $entityManager,
         IRequest $httpRequest
@@ -23,6 +24,7 @@ class AuthenticationSubscriber extends Object implements Subscriber
         $this->entityManager = $entityManager;
         $this->httpRequest = $httpRequest;
     }
+
 
     /**
      * Returns an array of events this subscriber wants to listen to.
@@ -35,6 +37,7 @@ class AuthenticationSubscriber extends Object implements Subscriber
             'App\Model\Authentication\UserAuthenticator::onLoggedIn'
         ];
     }
+
 
     public function onLoggedIn(User $user)
     {

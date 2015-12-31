@@ -10,7 +10,6 @@ use App\Model\Domain\Entities\Listing;
 use Kdyby\Doctrine\EntityRepository;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
-use Tracy\Debugger;
 
 class ListingItemsReader extends Object
 {

@@ -5,15 +5,16 @@ namespace App\Model\Services;
 use App\Model\Domain\Entities\Invitation;
 use App\Model\Services\Readers\InvitationsReader;
 use App\Model\Services\Writers\InvitationsWriter;
-use Doctrine\DBAL\DBALException;
 use Exceptions\Runtime\InvitationAlreadyExistsException;
 use Exceptions\Runtime\InvitationCreationAttemptException;
 use Kdyby\Doctrine\EntityManager;
 use Nette\Object;
-use Tracy\Debugger;
 
 class InvitationHandler extends Object
 {
+    /** @var array */
+    public $onCritical = [];
+
     /** @var EntityManager  */
     private $entityManager;
 
@@ -26,6 +27,7 @@ class InvitationHandler extends Object
     /** @var int */
     private $creationAttempts = 0;
 
+
     public function __construct(
         EntityManager $entityManager,
         InvitationsReader $invitationsReader,
@@ -36,12 +38,13 @@ class InvitationHandler extends Object
         $this->invitationsWriter = $invitationsWriter;
     }
 
+
     /**
      * @param Invitation $invitation
      * @return Invitation
      * @throws InvitationAlreadyExistsException
      * @throws InvitationCreationAttemptException
-     * @throws DBALException
+     * @throws \Exception
      */
     public function process(Invitation $invitation)
     {
@@ -53,20 +56,21 @@ class InvitationHandler extends Object
         } catch (InvitationCreationAttemptException $ca) {
             $this->entityManager->rollback();
 
-            Debugger::log($ca, Debugger::ERROR);
+            $this->onCritical('Invitation creation attempts exhausted.', $ca, self::class);
             throw $ca;
 
         } catch (InvitationAlreadyExistsException $ae) {
             $this->entityManager->rollback();
             throw $ae;
 
-        } catch (DBALException $e) {
-            Debugger::log($e, Debugger::ERROR);
+        } catch (\Exception $e) {
+            $this->onCritical('-', $e, self::class);
             throw $e;
         }
 
         return $invitation;
     }
+
 
     /**
      * @param Invitation $invitation

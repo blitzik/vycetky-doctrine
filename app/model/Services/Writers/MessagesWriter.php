@@ -13,6 +13,9 @@ use Tracy\Debugger;
 
 class MessagesWriter extends Object
 {
+    /** @var array */
+    public $onError = [];
+
     /** @var EntityManager  */
     private $em;
 
@@ -21,6 +24,7 @@ class MessagesWriter extends Object
     ) {
         $this->em = $entityManager;
     }
+
 
     /**
      * @param ReceivedMessage $messageReference
@@ -33,11 +37,12 @@ class MessagesWriter extends Object
         return $messageReference;
     }
 
+
     /**
      * @param SentMessage $message
      * @param array $recipients
      * @return ReceivedMessage[]
-     * @throws DBALException
+     * @throws \Exception
      */
     public function sendMessage(SentMessage $message, array $recipients)
     {
@@ -65,15 +70,17 @@ class MessagesWriter extends Object
             $this->em->flush();
             $this->em->commit();
 
-        } catch (DBALException $e) {
+        } catch (\Exception $e) {
+            $this->em->rollback();
             $this->em->close();
-            Debugger::log($e, Debugger::ERROR);
+            $this->onError('Message sending failed.', $e, self::class);
 
             throw $e;
         }
 
         return $receivedMessages;
     }
+
 
     /**
      * @param array $messagesIDs
@@ -88,6 +95,7 @@ class MessagesWriter extends Object
         )->setParameter('IDs', $messagesIDs)
          ->execute();
     }
+
 
     /**
      * @param array $messagesReferencesIDs

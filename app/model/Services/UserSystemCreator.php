@@ -27,6 +27,7 @@ class UserSystemCreator extends Object
     /** @var UsersReader  */
     private $usersReader;
 
+
     public function __construct(
         EntityManager $entityManager,
         InvitationsReader $invitationsReader,
@@ -38,6 +39,7 @@ class UserSystemCreator extends Object
         $this->invitationsWriter = $invitationsWriter;
         $this->usersReader = $usersReader;
     }
+
 
     /**
      * @param User $newUser

@@ -20,6 +20,7 @@ class ListingsReader extends Object
     /** @var EntityRepository  */
     private $listingsRepository;
 
+
     public function __construct(
         EntityManager $entityManager
     ) {
@@ -27,6 +28,7 @@ class ListingsReader extends Object
 
         $this->listingsRepository = $this->em->getRepository(Listing::class);
     }
+
 
     /**
      * @param QueryObject $listingsQuery
@@ -43,6 +45,7 @@ class ListingsReader extends Object
         return $listing;
     }
 
+
     /**
      * @param QueryObject $listingsQuery
      * @return array|\Kdyby\Doctrine\ResultSet
@@ -51,6 +54,7 @@ class ListingsReader extends Object
     {
         return $this->listingsRepository->fetch($listingsQuery);
     }
+
 
     /**
      * @param User $owner
@@ -66,6 +70,7 @@ class ListingsReader extends Object
         )->setParameters(['user' => $owner, 'year' => $year, 'month' => $month])
          ->getArrayResult();
     }
+
 
     /**
      * @param $listingID
@@ -84,6 +89,7 @@ class ListingsReader extends Object
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
 
     /**
      * @param int $listingID
@@ -142,6 +148,7 @@ class ListingsReader extends Object
         return $qb->getQuery()->getScalarResult();
     }
 
+
     /**
      * @param User|null $user
      * @return array
@@ -162,30 +169,36 @@ class ListingsReader extends Object
         return $qb->getQuery()->getArrayResult();
     }
 
+
     private function addWorkedDays(QueryBuilder $qb)
     {
         $qb->addSelect('COUNT(li.id) AS worked_days');
     }
+
 
     private function addTotalWorkedHours(QueryBuilder $qb)
     {
         $qb->addSelect('SUM(time_to_sec(ADDTIME(SUBTIME(SUBTIME(wh.workEnd, wh.workStart), wh.lunch), wh.otherHours))) AS total_worked_hours_in_sec');
     }
 
+
     private function addWorkedHours(QueryBuilder $qb)
     {
         $qb->addSelect('SEC_TO_TIME(SUM(TIME_TO_SEC(SUBTIME(wh.workEnd, wh.workStart)))) AS worked_hours');
     }
+
 
     private function addLunchHours(QueryBuilder $qb)
     {
         $qb->addSelect('SEC_TO_TIME(SUM(TIME_TO_SEC(wh.lunch))) AS lunch_hours');
     }
 
+
     private function addOtherHours(QueryBuilder $qb)
     {
         $qb->addSelect('SEC_TO_TIME(SUM(TIME_TO_SEC(wh.otherHours))) AS other_hours');
     }
+
 
     private function getBasicDQL($id)
     {

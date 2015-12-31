@@ -82,16 +82,22 @@ class UserBlockingControl extends BaseComponent
      */
     public function handleBlockUser($id)
     {
-        $user = $this->getUser($id);
-        if ($user !== null) {
-            $this->userEntity->blockUser($user);
-            $this->usersFacade->saveUser($this->userEntity);
-            // add item with null value into array to toggle block button in template
-            $this->blockedUsersIDs[$user->getId()] = null;
-        }
+        try {
+            $user = $this->getUser($id);
+            if ($user !== null) {
+                $this->userEntity->blockUser($user);
+                $this->usersFacade->saveUser($this->userEntity);
+                // add item with null value into array to toggle block button in template
+                $this->blockedUsersIDs[$user->getId()] = null;
+            }
 
-        $this->refresh('userRestriction');
-        $this->onBlockUser($this, $user);
+            $this->refresh('userRestriction');
+            $this->onBlockUser($this, $user);
+
+        } catch (\Exception $e) {
+            $this->flashMessage('Při blokaci uživatele nastala chyba.', 'error');
+            $this->redirect('this');
+        }
     }
 
     /**
@@ -99,14 +105,20 @@ class UserBlockingControl extends BaseComponent
      */
     public function handleUnblockUser($id)
     {
-        $user = $this->getUser($id);
-        if ($user !== null) {
-            $this->userEntity->unblockUser($user);
-            $this->usersFacade->saveUser($this->userEntity);
-        }
+        try {
+            $user = $this->getUser($id);
+            if ($user !== null) {
+                $this->userEntity->unblockUser($user);
+                $this->usersFacade->saveUser($this->userEntity);
+            }
 
-        $this->refresh('userRestriction');
-        $this->onUnblockUser($this, $user);
+            $this->refresh('userRestriction');
+            $this->onUnblockUser($this, $user);
+
+        } catch (\Exception $e) {
+            $this->flashMessage('Při pokusu o odblokování uživatele nastala chyba.', 'error');
+            $this->redirect('this');
+        }
     }
 
     /**
@@ -144,16 +156,21 @@ class UserBlockingControl extends BaseComponent
 
     private function toggleAccountAccessibility($id)
     {
-        $this->checkPermission($id);
-        $user = $this->getUser($id);
-        if ($user !== null) {
-            $user->toggleAccessibility();
-            $this->usersFacade->saveUser($user);
-        } else {
+        try {
+            $this->checkPermission($id);
+            $user = $this->getUser($id);
+            if ($user !== null) {
+                $user->toggleAccessibility();
+                $this->usersFacade->saveUser($user);
+            } else {
+                $this->redirect('this');
+            }
+
+            return $user;
+        } catch (\Exception $e) {
+            $this->flashMessage('Nastala uzavírání/otevírání účtu nastala chyba.', 'error');
             $this->redirect('this');
         }
-
-        return $user;
     }
 
     private function checkPermission($userBeingProcessedID)

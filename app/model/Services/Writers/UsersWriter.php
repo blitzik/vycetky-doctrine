@@ -9,6 +9,9 @@ use Nette\Object;
 
 class UsersWriter extends Object
 {
+    /** @var array */
+    public $onError = [];
+
     /** @var EntityManager  */
     private $em;
 
@@ -20,11 +23,18 @@ class UsersWriter extends Object
     /**
      * @param User $user
      * @return User
+     * @throws \Exception
      */
     public function saveUser(User $user)
     {
-        $this->em->persist($user)->flush();
+        try {
+            $this->em->persist($user)->flush();
+            return $user;
 
-        return $user;
+        } catch (\Exception $e) {
+            $this->onError(sprintf('Saving of user "%s" #id(%s) failed', $user->username, $user->getId()), $e, self::class);
+
+            throw $e;
+        }
     }
 }
