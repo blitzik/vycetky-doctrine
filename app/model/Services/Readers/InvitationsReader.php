@@ -50,7 +50,7 @@ class InvitationsReader extends Object
     {
         $qb = $this->invitationsRepository
                    ->createQueryBuilder('i')
-                   ->where('i.email = :email') // todo WTF? there should be email and NOT id
+                   ->where('i.email = :email')
                    ->setParameter('email', $email);
 
         try {
