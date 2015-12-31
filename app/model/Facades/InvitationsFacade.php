@@ -23,6 +23,9 @@ class InvitationsFacade extends Object
     /** @var array  */
     public $onInvitationCreation = [];
 
+    /** @var array */
+    public $onAfterInvitationSending = [];
+
     /** @var InvitationsReader  */
     private $invitationsReader;
 
@@ -51,6 +54,15 @@ class InvitationsFacade extends Object
         $this->invitationsSender = $invitationsSender;
         $this->usersReader = $usersReader;
         $this->invitationsHandler = $invitationsHandler;
+    }
+
+
+    /**
+     * @param Invitation $invitation
+     */
+    public function saveInvitation(Invitation $invitation)
+    {
+        $this->invitationsWriter->saveInvitation($invitation);
     }
 
 
@@ -159,12 +171,11 @@ class InvitationsFacade extends Object
         if (Validators::is($invitation, 'string')) {
             $invitation = $this->invitationsReader->getInvitationByEmail($invitation);
         }
-        $this->checkInvitationState($invitation);
 
+        $this->checkInvitationState($invitation);
         $this->invitationsSender->sendInvitation($invitation);
 
-        $invitation->setLastSendingTime();
-        $this->invitationsWriter->saveInvitation($invitation);
+        $this->onAfterInvitationSending($invitation);
     }
 
 }

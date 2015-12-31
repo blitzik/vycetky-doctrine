@@ -33,7 +33,8 @@ class InvitationSubscriber extends Object implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-            InvitationsFacade::class . '::onInvitationCreation'
+            InvitationsFacade::class . '::onInvitationCreation',
+            InvitationsFacade::class . '::onAfterInvitationSending',
         ];
     }
 
@@ -50,5 +51,12 @@ class InvitationSubscriber extends Object implements Subscriber
                 'warning'
             );
         }
+    }
+
+
+    public function onAfterInvitationSending(Invitation $invitation)
+    {
+        $invitation->setLastSendingTime();
+        $this->invitationsFacade->saveInvitation($invitation);
     }
 }
