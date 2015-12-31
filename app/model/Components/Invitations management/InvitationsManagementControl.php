@@ -35,6 +35,7 @@ class InvitationsManagementControl extends BaseComponent
         $this->paginatorFactory = $paginatorFactory;
     }
 
+
     protected function createComponentPaginator()
     {
         $comp = $this->paginatorFactory->create();
@@ -44,6 +45,7 @@ class InvitationsManagementControl extends BaseComponent
 
         return $comp;
     }
+
 
     public function render()
     {
@@ -63,6 +65,7 @@ class InvitationsManagementControl extends BaseComponent
 
         $template->render();
     }
+
 
     /**
      * @secured
@@ -99,6 +102,7 @@ class InvitationsManagementControl extends BaseComponent
         $this->refreshTable();
     }
 
+
     /**
      * @secured
      */
@@ -109,6 +113,7 @@ class InvitationsManagementControl extends BaseComponent
 
         $this->refreshTable();
     }
+
 
     private function refreshTable()
     {

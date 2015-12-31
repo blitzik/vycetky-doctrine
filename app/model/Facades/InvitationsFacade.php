@@ -38,6 +38,7 @@ class InvitationsFacade extends Object
     /** @var UsersReader  */
     private $usersReader;
 
+
     public function __construct(
         InvitationsReader $invitationsReader,
         InvitationsWriter $invitationsWriter,
@@ -52,6 +53,7 @@ class InvitationsFacade extends Object
         $this->invitationsHandler = $invitationsHandler;
     }
 
+
     /**
      * @param InvitationsQuery $invitationsQuery
      * @return array|\Kdyby\Doctrine\ResultSet
@@ -60,6 +62,7 @@ class InvitationsFacade extends Object
     {
         return $this->invitationsReader->fetchInvitations($invitationsQuery);
     }
+
 
     /**
      * @param string $email
@@ -81,6 +84,7 @@ class InvitationsFacade extends Object
         return $inv;
     }
 
+
     /**
      * @param string $email
      * @param string $token
@@ -99,6 +103,7 @@ class InvitationsFacade extends Object
         return $invitation;
     }
 
+
     /**
      * @param Invitation $invitation
      */
@@ -108,6 +113,7 @@ class InvitationsFacade extends Object
             throw new InvitationExpiredException;
         }
     }
+
 
     /**
      * @param Invitation $invitation
@@ -131,6 +137,7 @@ class InvitationsFacade extends Object
         return $resultObject;
     }
 
+
     /**
      * @param string|Invitation $invitation Invitation's E-mail or instance of Invitation
      */
@@ -138,6 +145,7 @@ class InvitationsFacade extends Object
     {
         $this->invitationsWriter->removeInvitation($invitation);
     }
+
 
     /**
      * @param Invitation|string $invitation
@@ -153,10 +161,10 @@ class InvitationsFacade extends Object
         }
         $this->checkInvitationState($invitation);
 
+        $this->invitationsSender->sendInvitation($invitation);
+
         $invitation->setLastSendingTime();
         $this->invitationsWriter->saveInvitation($invitation);
-
-        $this->invitationsSender->sendInvitation($invitation);
     }
 
 }

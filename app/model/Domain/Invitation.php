@@ -60,6 +60,7 @@ class Invitation extends Entity
      */
     private $sender;
 
+
     /**
      * @param string $email
      * @param User|null $sender
@@ -78,15 +79,18 @@ class Invitation extends Entity
         $this->lastSending = $startDate;
     }
 
+
     private function generateToken()
     {
         $this->token = Random::generate(self::TOKEN_LENGTH);
     }
 
+
     private function setValidity(\DateTime $date)
     {
         $this->validity = $date->modifyClone(self::DURATION);
     }
+
 
     /**
      * @param string $email
@@ -98,15 +102,18 @@ class Invitation extends Entity
         $this->email = $email;
     }
 
+
     public function setLastSendingTime()
     {
         $this->lastSending = new DateTime('now');
     }
 
+
     public function canBeSend()
     {
         return (new DateTime('now')) >= $this->getNextTimeOfDispatch();
     }
+
 
     /**
      * @return \DateTimeImmutable
@@ -117,6 +124,7 @@ class Invitation extends Entity
                ->modify(self::NEXT_DISPATCH);
     }
 
+
     /**
      * @return bool
      */
@@ -124,6 +132,7 @@ class Invitation extends Entity
     {
         return (new DateTime()) < $this->validity;
     }
+
 
     /**
      * @return string
@@ -133,6 +142,7 @@ class Invitation extends Entity
         return $this->email;
     }
 
+
     /**
      * @return string
      */
@@ -140,6 +150,7 @@ class Invitation extends Entity
     {
         return $this->token;
     }
+
 
     /**
      * @return DateTime
@@ -149,6 +160,7 @@ class Invitation extends Entity
         return $this->validity;
     }
 
+
     /**
      * @return mixed
      */
@@ -156,6 +168,7 @@ class Invitation extends Entity
     {
         return $this->sender;
     }
+
 
     /**
      * @return DateTime
