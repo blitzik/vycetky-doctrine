@@ -82,6 +82,21 @@ doctrine:
 
 monolog:
 	name: listings
+	handlers:
+		main: Monolog\Handler\FingersCrossedHandler(
+			Monolog\Handler\GroupHandler([
+				Monolog\Handler\StreamHandler(%appDir%/../log/listings.log, Monolog\Logger::DEBUG),
+				Monolog\Handler\BufferHandler(
+					Monolog\Handler\NativeMailerHandler(
+						%emails.admin%,
+						'An Error Occured!',
+						%emails.system%,
+						Monolog\Logger::ERROR
+					)
+				),
+			])
+			Monolog\Logger::ERROR
+		)
 
 
 
