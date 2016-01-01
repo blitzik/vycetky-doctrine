@@ -54,30 +54,31 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
     public function process(DatabaseBackupFile $file)
     {
         $results = [];
-        foreach ($this->receiversEmails as $receiverEmail) {
-            $results[] = $this->sendMail($receiverEmail, date('Y-m-d-H-i-s') . ' - database backup', 'OK', $file->getFilePath());
-        }
+        $results[] = $this->sendMail($this->receiversEmails, date('Y-m-d-H-i-s') . ' - database backup', 'OK', $file->getFilePath());
 
         return $results;
     }
 
 
     /**
-     * @param string $receiver
+     * @param array $receivers
      * @param string $subject
      * @param string $messageText
      * @param string $attachedFile
      * @return ResultObject
      */
-    private function sendMail($receiver, $subject, $messageText, $attachedFile = null)
+    private function sendMail(array $receivers, $subject, $messageText, $attachedFile = null)
     {
         $result = new ResultObject();
         $message = new Message();
 
         $message->setFrom('Výčetkový systém <' . $this->systemEmail . '>')
-                ->addTo($receiver)
                 ->setSubject($subject)
                 ->setBody($messageText);
+
+        foreach ($receivers as $receiverEmail) {
+            $message->addTo($receiverEmail);
+        }
 
         if ($attachedFile !== null and file_exists($attachedFile)) {
             $message->addAttachment($attachedFile);
@@ -87,7 +88,7 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
             $this->mailer->send($message);
         } catch (SendException $s) {
             $this->logger->addError(sprintf('Backup file sending\'s failed. %s', $s));
-            $result->addError('Zálohu se nepodařilo odeslat na adresu: ' . $receiver, 'error');
+            $result->addError('Zálohu se nepodařilo odeslat', 'error');
         }
 
         return $result;
