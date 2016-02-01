@@ -54,7 +54,7 @@ class DatabaseBackupEmailHandler extends Object implements IDatabaseBackupHandle
     public function process(DatabaseBackupFile $file)
     {
         $results = [];
-        $results[] = $this->sendMail($this->receiversEmails, date('Y-m-d-H-i-s') . ' - database backup', 'OK', $file->getFilePath());
+        $results[] = $this->sendMail($this->receiversEmails, date('Y-m-d-H-i-s') . ' - database backup', 'OK');
 
         return $results;
     }

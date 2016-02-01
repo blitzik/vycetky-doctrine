@@ -113,30 +113,36 @@ class InvoiceTime extends \Nette\Object
      */
     private static function gatherTime($time)
     {
-        if ($time instanceof self) {
-            $time = $time->getTime();
-        }
+        do {
+            if ($time instanceof self) {
+                $time = $time->getTime();
+                break;
+            }
 
-        if ($time instanceof \DateTime) {
-            $time = $time->format('H:i:s');
-        }
+            if ($time instanceof \DateTime) {
+                $time = $time->format('H:i:s');
+                break;
+            }
 
-        // time in seconds
-        if (is_int($time) and ctype_digit((string)$time) and ($time % self::TIME_STEP) === 0) {
-            $time = TimeManipulator::seconds2time($time);
-        }
+            // time in seconds
+            if (is_int($time) and ctype_digit((string)$time) and ($time % self::TIME_STEP) === 0) {
+                $time = TimeManipulator::seconds2time($time);
+                break;
+            }
 
-        // time in hours:minutes format
-        if (is_string($time) and preg_match('~^\d+:[0-5][0-9]$~', $time)) {
-            $time = $time . ':00'; // add SECONDS part to HH..:MM format
-        }
+            // time in hours:minutes format
+            if (is_string($time) and preg_match('~^\d+:[0-5][0-9]$~', $time)) {
+                $time = $time . ':00'; // add SECONDS part to HH..:MM format
+                break;
+            }
 
-        // time in format with comma
-        if (is_string($time) and preg_match('~^\d+(,[05])?$~', $time)) {
-            $time = self::timeWithComma2Time($time);
-        }
+            // time in format with comma
+            if (is_string($time) and preg_match('~^\d+(,[05])?$~', $time)) {
+                $time = self::timeWithComma2Time($time);
+                break;
+            }
+        } while (false);
 
-        // final check
         if (!preg_match(self::TIME_REGEXP, $time)) {
             throw new InvalidArgumentException(
                 'Wrong $time format.'
