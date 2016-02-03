@@ -50,7 +50,7 @@ class LoginPresenter extends Presenter
             $this->user->login($values['email'], $values['pass']);
 
             if ($values['keepLogin']) {
-                $this->user->setExpiration('+30 days', false);
+                $this->user->setExpiration('+14 days', false);
             } else {
                 $this->user->setExpiration('+1 hour', true);
             }

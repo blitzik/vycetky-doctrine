@@ -36,7 +36,7 @@ application:
 			- Nette\Bridges\HttpTracy\SessionPanel
 
 session:
-	expiration: 1 month
+	expiration: 14 days
 	savePath: %appDir%/../temp/sessions
 	name: 'listings'
 
