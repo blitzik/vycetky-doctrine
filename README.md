@@ -37,11 +37,10 @@ Pro automatickou zálohu databáze lze vytvořit úlohu pro CRON, která bude
 volat adresu www.vase-domena. cz/backup/database-backup?do=databaseBackup-backup&databaseBackup-pass=<b>HESLO_UVEDENE_V_CONFIGU</b>
 (na konci adresy se zadává heslo, které se nastaví v config.local.neon)
 
-zálohuje se vždy jen jednou za den, pokud již záloha existuje, tak se další nevytváří.
+Automaticky se zálohuje jen jednou za den. Volá-li se odkaz pro zálohu vícekrát
+a záloha již existuje, tak se další nevytváří.
 Je-li potřeba stejně vytvořit zálohu, uživatel v roli administrátora má možnost
-vytvořit zálohu kliknutím na tlačítko zálohy ve svém účtu.
-
-Pokud je třeba vytvářet zálohu vícekrát denně, bude potřeba přepsat script.
+vytvořit zálohu kliknutím na tlačítko zálohy ve svém účtu. Manuálně lze využívat neomezeně.
 
 Součástí jsou i dva handlery (lze dospat další), které dále mohou manipulovat s
 vygenerovaným SQL souborem. Jeden se stará o zasílání informací o právě proběhlé
