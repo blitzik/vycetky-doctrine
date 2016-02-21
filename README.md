@@ -42,3 +42,17 @@ Je-li potřeba stejně vytvořit zálohu, uživatel v roli administrátora má m
 vytvořit zálohu kliknutím na tlačítko zálohy ve svém účtu.
 
 Pokud je třeba vytvářet zálohu vícekrát denně, bude potřeba přepsat script.
+
+Součástí jsou i dva handlery (lze dospat další), které dále mohou manipulovat s
+vygenerovaným SQL souborem. Jeden se stará o zasílání informací o právě proběhlé
+záloze (jestli proběhla v pořádku) a druhý se stará o upload tohoto souboru
+přes FTP. Obojí lze konfigurovat v config.local.neon
+
+
+Pár obrázků z aplikace:
+
+<img src="http://alestichava.cz/github-images/vycetky/overview.png" width="800">
+<img src="http://alestichava.cz/github-images/vycetky/listing-detail.png" width="800">
+<img src="http://alestichava.cz/github-images/vycetky/item.png" width="800">
+<img src="http://alestichava.cz/github-images/vycetky/time-change.png" width="800">
+<img src="http://alestichava.cz/github-images/vycetky/merging.png" width="800">
