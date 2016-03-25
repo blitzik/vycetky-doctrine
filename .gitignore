@@ -59,6 +59,7 @@ bower_components
 www/assets/css/*.min.css
 www/assets/css/images/*
 www/assets/css/original/*
+www/assets/fonts/*
 
 www/assets/js/concatenated/*
 www/assets/js/*.min.js

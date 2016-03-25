@@ -117,26 +117,27 @@ module.exports = function (grunt) {
         },
 
         copy: {
-          main: {
-            files: [
-                {
-                    expand: true,
-                    flatten: true,
-                    src: ['bower_components/jquery-ui/themes/base/images/*'],
-                    dest: 'www/assets/css/images/'
-                }
-            ]
-          },
-          font_awesome: {
-              files: [
-                  {
-                      expand: true,
-                      flatten: true,
-                      src: ['bower_components/font-awesome-sass/assets/fonts/font-awesome/*'],
-                      dest: 'www/assets/fonts/font-awesome/'
-                  }
-              ]
-          }
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['bower_components/jquery-ui/themes/base/images/*'],
+                        dest: 'www/assets/css/images/'
+                    }
+                ]
+            },
+
+            font_awesome: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['bower_components/font-awesome-sass/assets/fonts/font-awesome/*'],
+                        dest: 'www/assets/fonts/font-awesome/'
+                    }
+                ]
+            }
         }
     });
 

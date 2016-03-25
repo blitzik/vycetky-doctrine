@@ -3,19 +3,20 @@
 namespace App\UserModule\Presenters;
 
 use Exceptions\Runtime\InaccessibleAccountException;
-use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
+use Nette\Application\UI\Form;
 
 class LoginPresenter extends Presenter
 {
     public function actionDefault()
     {
-
+        if ($this->user->isLoggedIn()) {
+            $this->redirect(':Front:Listing:overview');
+        }
     }
 
     public function renderDefault()
     {
-
     }
 
     protected function createComponentLoginForm()
