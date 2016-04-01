@@ -50,8 +50,8 @@ přes FTP. Obojí lze konfigurovat v config.local.neon
 
 Pár obrázků z aplikace:
 
-<img src="http://alestichava.cz/github-images/vycetky/overview.png" width="800">
-<img src="http://alestichava.cz/github-images/vycetky/listing-detail.png" width="800">
-<img src="http://alestichava.cz/github-images/vycetky/item.png" width="800">
-<img src="http://alestichava.cz/github-images/vycetky/time-change.png" width="800">
-<img src="http://alestichava.cz/github-images/vycetky/merging.png" width="800">
+<img src="http://others.alestichava.cz/vycetky/overview.png" width="800">
+<img src="http://others.alestichava.cz/vycetky/listing-detail.png" width="800">
+<img src="http://others.alestichava.cz/vycetky/item.png" width="800">
+<img src="http://others.alestichava.cz/vycetky/time-change.png" width="800">
+<img src="http://others.alestichava.cz/vycetky/merging.png" width="800">
